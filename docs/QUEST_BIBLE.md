@@ -92,6 +92,8 @@ Star Core restoration rule:
 
 - Episode 1 restoration requires all five Episode 1 fragments.
 - `InventoryService` must verify ownership of `item_ep01_fragment_universe`, `item_ep01_fragment_earth`, `item_ep01_fragment_theos`, `item_ep01_fragment_rocket`, and `item_ep01_fragment_moon`.
+- Episode 1 fragments are collectible achievement items and must be retained after assembly.
+- Fragment assembly must not consume or remove any Episode 1 fragment item.
 - Quest 8 restores `item_star_core_segment_01`.
 - The full Star Core remains incomplete after Episode 1 because additional future segments are required.
 - Episode progression must store segment ownership by item ID so future segment items can be added without root save schema changes.
@@ -496,13 +498,16 @@ Inventory reward:
 Discovery IDs:
 
 - `disc_ep01_theos_calibration_console`
-- `disc_ep01_theos_signal_array`
 - `disc_ep01_theos_fragment`
+- `disc_ep01_theos_satellite_history`
+- `disc_ep01_theos_theos_1`
+- `disc_ep01_theos_theos_2`
 - `disc_ep01_theos_thailand_map`
 - `disc_ep01_theos_satellite_imagery`
 - `disc_ep01_theos_disaster_monitoring`
 - `disc_ep01_theos_agriculture_monitoring`
 - `disc_ep01_theos_water_resource_monitoring`
+- `disc_ep01_theos_forest_monitoring`
 
 Companion Assist IDs:
 
@@ -770,6 +775,7 @@ Solo support rules:
 - Final route, Moon Fragment collection, fragment assembly, and Star Core Segment restoration must be completable by one player.
 - If restoration supports multiple players placing fragments together, Proton must provide solo restoration support.
 - Required item ownership checks must use server-authoritative `InventoryService` state.
+- Fragment assembly validates the five fragment items but does not consume them.
 - Proton may remind the player about missing required fragments but must not grant missing fragments.
 
 Multiplayer bonus rules:
@@ -835,13 +841,16 @@ Teamwork reward bundles:
 | `disc_ep01_terrain_fragment` | Terrain Sandbox | `quest_ep01_main_004` | `25` |
 | `disc_ep01_terrain_observation_point` | Terrain Sandbox | `quest_ep01_main_004` | `25` |
 | `disc_ep01_theos_calibration_console` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
-| `disc_ep01_theos_signal_array` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_theos_fragment` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
+| `disc_ep01_theos_satellite_history` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
+| `disc_ep01_theos_theos_1` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
+| `disc_ep01_theos_theos_2` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_theos_thailand_map` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_theos_satellite_imagery` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_theos_disaster_monitoring` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_theos_agriculture_monitoring` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_theos_water_resource_monitoring` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
+| `disc_ep01_theos_forest_monitoring` | THEOS Satellite Center | `quest_ep01_main_005` | `25` |
 | `disc_ep01_rocket_preflight_console` | Rocket Mission | `quest_ep01_main_006` | `25` |
 | `disc_ep01_rocket_launch_platform` | Rocket Mission | `quest_ep01_main_006` | `25` |
 | `disc_ep01_rocket_fragment` | Rocket Mission | `quest_ep01_main_006` | `25` |
@@ -858,6 +867,12 @@ Optional hidden discovery:
 | Discovery ID | Location | Related Quest | Explorer Score |
 | --- | --- | --- | --- |
 | `disc_ep01_hidden_space_inspirium_secret` | Any Episode 1 location | Optional | `100` |
+
+Hidden discovery reward bundle:
+
+| Reward Bundle ID | Source Discovery | Explorer Score | Notes |
+| --- | --- | --- | --- |
+| `reward_ep01_hidden_space_inspirium_secret` | `disc_ep01_hidden_space_inspirium_secret` | `100` | Optional hidden secret reward. Duplicate-safe per player. |
 
 ## Structured Discovery Lore Definitions
 
@@ -876,12 +891,17 @@ THEOS lore entries:
 
 | DiscoveryId | LoreId | Topic | Summary | CharacterVoice | RelatedConcepts |
 | --- | --- | --- | --- | --- | --- |
+| `disc_ep01_theos_calibration_console` | `lore_ep01_theos_calibration_console` | Satellite calibration | Calibration helps a satellite system line up signals so useful Earth observation data can be received and studied. | Proton | `satellite_calibration`, `signal_processing`, `earth_observation` |
+| `disc_ep01_theos_fragment` | `lore_ep01_theos_fragment` | THEOS Fragment | The THEOS Fragment represents how observing Earth from space can help people understand and care for the planet. | Atom | `theos_fragment`, `earth_observation`, `space_technology` |
+| `disc_ep01_theos_satellite_history` | `lore_ep01_theos_satellite_history` | Thai satellite history | Thailand's Earth observation work uses satellite technology to study land, water, forests, farms, and changing environments. | Neutron | `thai_satellite`, `satellite_history`, `earth_observation` |
+| `disc_ep01_theos_theos_1` | `lore_ep01_theos_theos_1` | THEOS-1 | THEOS-1 helped show how satellite imagery can support mapping, planning, and environmental observation. | Proton | `theos_1`, `thai_satellite`, `satellite_imagery` |
+| `disc_ep01_theos_theos_2` | `lore_ep01_theos_theos_2` | THEOS-2 | THEOS-2 continues Thailand's Earth observation mission with newer satellite technology and stronger monitoring potential. | Neutron | `theos_2`, `thai_satellite`, `earth_observation` |
 | `disc_ep01_theos_thailand_map` | `lore_ep01_theos_thailand_map` | Thai Earth observation | THEOS missions help observe Thailand from space so people can better understand land, water, cities, farms, and natural areas. | Proton | `thai_satellite`, `earth_observation`, `map_reading` |
 | `disc_ep01_theos_satellite_imagery` | `lore_ep01_theos_satellite_imagery` | Satellite imagery | Satellite images show patterns on Earth that are difficult to see from the ground, helping scientists compare change over time. | Neutron | `satellite_imagery`, `earth_science`, `change_detection` |
 | `disc_ep01_theos_disaster_monitoring` | `lore_ep01_theos_disaster_monitoring` | Flood monitoring | Earth observation satellites can help identify flood-affected areas and support faster planning during disasters. | Proton | `flood_monitoring`, `disaster_monitoring`, `public_safety` |
 | `disc_ep01_theos_agriculture_monitoring` | `lore_ep01_theos_agriculture_monitoring` | Agriculture monitoring | Satellite data can help monitor farmland health, crop patterns, and changes in growing areas. | Neutron | `agriculture_monitoring`, `food_systems`, `remote_sensing` |
 | `disc_ep01_theos_water_resource_monitoring` | `lore_ep01_theos_water_resource_monitoring` | Water resource monitoring | Satellite observations can help track rivers, reservoirs, and water resources across large areas. | Proton | `water_resources`, `earth_systems`, `remote_sensing` |
-| `disc_ep01_theos_signal_array` | `lore_ep01_theos_forest_monitoring` | Forest monitoring | Satellite imagery can help observe forests and detect changes in land cover over time. | Neutron | `forest_monitoring`, `land_cover`, `earth_observation` |
+| `disc_ep01_theos_forest_monitoring` | `lore_ep01_theos_forest_monitoring` | Forest monitoring | Satellite imagery can help observe forests and detect changes in land cover over time. | Neutron | `forest_monitoring`, `land_cover`, `earth_observation` |
 
 Lore validation rules:
 
@@ -941,6 +961,7 @@ Inventory and assembly validation:
 
 - Quest 8 assembly must verify ownership through `InventoryService`.
 - Required Episode 1 fragment IDs are `item_ep01_fragment_universe`, `item_ep01_fragment_earth`, `item_ep01_fragment_theos`, `item_ep01_fragment_rocket`, and `item_ep01_fragment_moon`.
+- Episode 1 fragment items must be retained after assembly and must not be consumed.
 - `item_star_core_segment_01` must be granted only after all five Episode 1 fragments are validated.
 - Future segment items `item_star_core_segment_02`, `item_star_core_segment_03`, `item_star_core_segment_04`, and `item_star_core_segment_05` must be representable as inventory items without root save schema changes.
 
@@ -972,4 +993,3 @@ EpisodeService progression hooks:
 - Episode 1 completion grants `item_star_core_segment_01`.
 - Future episode completion hooks must support `item_star_core_segment_02`, `item_star_core_segment_03`, `item_star_core_segment_04`, and `item_star_core_segment_05`.
 - Segment tracking must use inventory item ownership and episode progress maps, not new root save fields.
-

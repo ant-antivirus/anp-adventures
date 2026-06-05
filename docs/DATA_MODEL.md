@@ -32,6 +32,8 @@ PlayerData
   Quests
   Inventory
   Discoveries
+  Journal
+  Lore
   Badges
   Zones
   Companion
@@ -143,6 +145,22 @@ InventoryItemState
 
 Inventory item categories should be defined in `InventoryConfig`.
 
+Episode 1 fragment items are collectible achievement items. They must be retained after Star Core Segment assembly and must not be consumed:
+
+- `item_ep01_fragment_universe`
+- `item_ep01_fragment_earth`
+- `item_ep01_fragment_theos`
+- `item_ep01_fragment_rocket`
+- `item_ep01_fragment_moon`
+
+Star Core Segment items are persistent inventory items:
+
+- `item_star_core_segment_01`
+- `item_star_core_segment_02`
+- `item_star_core_segment_03`
+- `item_star_core_segment_04`
+- `item_star_core_segment_05`
+
 ### Discoveries
 
 Stores exploration and discovery progress.
@@ -162,6 +180,49 @@ ZoneDiscoveryProgress
 ```
 
 Discovery rewards must be granted through `RewardService` to avoid duplicate scoring.
+
+### Journal
+
+Stores persistent player journal unlocks.
+
+```text
+Journal
+  UnlockedEntryIds: map<string, boolean>
+  EntryStates: map<string, JournalEntryState>
+```
+
+```text
+JournalEntryState
+  JournalEntryId: string
+  SourceType: string
+  SourceId: string
+  UnlockedAt: number
+  ViewedAt: number?
+```
+
+Journal entries may be unlocked by discoveries, quest milestones, fragment collection, Star Core Segment restoration, or approved server-authored events.
+
+### Lore
+
+Stores persistent lore unlocks.
+
+```text
+Lore
+  UnlockedLoreIds: map<string, boolean>
+  LoreStates: map<string, LoreEntryState>
+```
+
+```text
+LoreEntryState
+  LoreId: string
+  DiscoveryId: string?
+  SourceType: string
+  SourceId: string
+  UnlockedAt: number
+  ViewedAt: number?
+```
+
+Lore entries should reference stable discovery IDs or milestone IDs. Lore text should remain in definitions, not player save data.
 
 ### Badges
 
@@ -268,6 +329,8 @@ RewardBundle
   ZoneUnlocks: array<string>
   EpisodeUnlocks: array<string>
   DiscoveryCredit: array<string>
+  JournalUnlocks: array<string>
+  LoreUnlocks: array<string>
 ```
 
 ```text
@@ -348,8 +411,9 @@ Definitions include:
 - Reward definitions.
 - Item definitions.
 - Discovery definitions.
+- Journal definitions.
+- Lore definitions.
 - Badge definitions.
 - Zone definitions.
 
 Save data should reference definition IDs and store state, not duplicate full definitions.
-

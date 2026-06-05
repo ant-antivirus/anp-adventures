@@ -30,9 +30,11 @@ Space Inspirium
 
 Story:
 
-The Star Core that powers Space Inspirium has shattered into multiple fragments.
+The Star Core system at Space Inspirium has become unstable, revealing that one Star Core Segment is missing its knowledge fragments.
 
-Players must work together with Atom, Neutron and Proton to recover the fragments and restore the facility.
+Players work with Atom, Neutron and Proton to recover the Episode 1 fragments, restore `item_star_core_segment_01`, and stabilize Space Inspirium.
+
+Episode 1 does not restore the full Star Core. It restores Star Core Segment 01 and reveals that future episodes must restore additional segments.
 
 ---
 
@@ -93,6 +95,12 @@ Players gain score from:
 * Puzzle Solving
 * Teamwork
 * Quest Completion
+
+Persistent story progression includes:
+
+* Episode 1 fragments
+* Star Core Segment items
+* Journal and lore unlocks
 
 ---
 

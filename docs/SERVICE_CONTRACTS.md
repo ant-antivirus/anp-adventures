@@ -13,7 +13,7 @@ It specifies service responsibilities, public methods, events, inputs, outputs, 
 - Persistent player state is owned by `PlayerDataService`.
 - Rewards are granted only through `RewardService`.
 - Explorer Score is modified only through `ProgressionService`, normally as part of a reward grant.
-- Quest IDs, episode IDs, zone IDs, item IDs, discovery IDs, reward IDs, and companion assist IDs must come from definitions or config modules.
+- Quest IDs, episode IDs, zone IDs, item IDs, discovery IDs, journal entry IDs, lore IDs, reward IDs, and companion assist IDs must come from definitions or config modules.
 - Required progression must be solo-completable.
 - Any required mechanic that benefits from co-op must declare Proton Companion support.
 - Public methods return structured results instead of raw booleans when the caller needs diagnostics.
@@ -1391,6 +1391,179 @@ Payload:
 - `CompletedAt`.
 - `SourceContext`.
 
+## JournalService
+
+### Responsibilities
+
+- Own persistent journal unlock state.
+- Unlock journal entries from approved server sources.
+- Mark unlocked journal entries as viewed.
+- Expose journal state snapshots to clients.
+- Validate journal entry IDs against journal definitions.
+- Coordinate with `DiscoveryService`, `LoreService`, `QuestService`, `InventoryService`, and `EpisodeService` for milestone-based entries.
+
+### Public Methods
+
+#### `GetJournalState`
+
+Inputs:
+
+- `PlayerRef`.
+- `JournalEntryId`: optional.
+
+Outputs:
+
+- Journal state snapshot or one journal entry state.
+
+Validation rules:
+
+- Player data must be loaded.
+- Journal entry ID must exist when supplied.
+
+#### `UnlockJournalEntry`
+
+Inputs:
+
+- `PlayerRef`.
+- `JournalEntryId`.
+- `SourceContext`.
+
+Outputs:
+
+- `ServiceResult.Data.JournalEntryState`.
+- `ServiceResult.Data.WasAlreadyUnlocked`.
+
+Validation rules:
+
+- Journal entry ID must exist.
+- Source must be server-approved.
+- Operation must be idempotent.
+- Unlock must persist through `PlayerDataService`.
+- Client-submitted unlock claims are invalid.
+
+#### `MarkJournalEntryViewed`
+
+Inputs:
+
+- `PlayerRef`.
+- `JournalEntryId`.
+- `SourceContext`.
+
+Outputs:
+
+- `ServiceResult.Data.JournalEntryState`.
+
+Validation rules:
+
+- Journal entry ID must exist.
+- Entry must already be unlocked.
+- Viewing state may be requested by the client but must only update known unlocked entries.
+
+### Events
+
+#### `JournalEntryUnlocked`
+
+Payload:
+
+- `Player`.
+- `JournalEntryId`.
+- `SourceContext`.
+
+#### `JournalEntryViewed`
+
+Payload:
+
+- `Player`.
+- `JournalEntryId`.
+- `SourceContext`.
+
+## LoreService
+
+### Responsibilities
+
+- Own persistent lore unlock state.
+- Unlock lore entries from discoveries and approved server milestones.
+- Mark unlocked lore entries as viewed.
+- Validate lore IDs against lore definitions.
+- Ensure lore entries reference valid discoveries or milestone sources.
+- Expose lore state snapshots to clients.
+
+### Public Methods
+
+#### `GetLoreState`
+
+Inputs:
+
+- `PlayerRef`.
+- `LoreId`: optional.
+
+Outputs:
+
+- Lore state snapshot or one lore entry state.
+
+Validation rules:
+
+- Player data must be loaded.
+- Lore ID must exist when supplied.
+
+#### `UnlockLoreEntry`
+
+Inputs:
+
+- `PlayerRef`.
+- `LoreId`.
+- `SourceContext`.
+
+Outputs:
+
+- `ServiceResult.Data.LoreEntryState`.
+- `ServiceResult.Data.WasAlreadyUnlocked`.
+
+Validation rules:
+
+- Lore ID must exist.
+- Source must be server-approved.
+- If the lore entry is discovery-linked, the referenced discovery ID must exist.
+- Operation must be idempotent.
+- Unlock must persist through `PlayerDataService`.
+- Client-submitted unlock claims are invalid.
+
+#### `MarkLoreEntryViewed`
+
+Inputs:
+
+- `PlayerRef`.
+- `LoreId`.
+- `SourceContext`.
+
+Outputs:
+
+- `ServiceResult.Data.LoreEntryState`.
+
+Validation rules:
+
+- Lore ID must exist.
+- Entry must already be unlocked.
+- Viewing state may be requested by the client but must only update known unlocked entries.
+
+### Events
+
+#### `LoreEntryUnlocked`
+
+Payload:
+
+- `Player`.
+- `LoreId`.
+- `SourceContext`.
+
+#### `LoreEntryViewed`
+
+Payload:
+
+- `Player`.
+- `LoreId`.
+- `SourceContext`.
+
 ## Required Cross-Service Validation
 
 ### Quest Completion To Reward Grant
@@ -1415,13 +1588,15 @@ Required flow:
 
 1. `DiscoveryService` validates the discovery claim.
 2. `DiscoveryService` records discovery state.
-3. `DiscoveryService` calls `RewardService` with a discovery source context.
-4. `RewardService` grants configured rewards.
+3. `DiscoveryService` unlocks configured journal or lore entries through `JournalService` or `LoreService`.
+4. `DiscoveryService` calls `RewardService` with a discovery source context.
+5. `RewardService` grants configured rewards.
 
 Validation rules:
 
 - Discovery claims must be server-validatable.
 - Already discovered IDs must not grant duplicate score or items.
+- Journal and lore unlocks must be idempotent and persistent.
 
 ### Solo Assist To Quest Progress
 
@@ -1451,4 +1626,3 @@ Validation rules:
 
 - New episodes must not require root save schema changes unless a migration is explicitly defined.
 - Episode references must resolve before the episode is considered valid.
-

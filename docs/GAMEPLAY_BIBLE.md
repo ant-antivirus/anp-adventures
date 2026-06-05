@@ -104,7 +104,8 @@ Space Pioneer Badge
 
 Players can collect:
 
-* Star Core Fragments
+* Episode Fragments
+* Star Core Segment Items
 * Mission Items
 * Event Items
 * Achievement Rewards
@@ -113,4 +114,6 @@ Players can collect:
 
 ## Win Condition
 
-Restore the Star Core and reactivate Space Inspirium.
+Restore `item_star_core_segment_01` and complete Episode 1.
+
+Episode 1 does not restore the full Star Core. It restores Segment 01, keeps all five Episode 1 fragments as collectible achievement items, and sets up future Star Core Segment restoration.

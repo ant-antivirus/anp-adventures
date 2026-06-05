@@ -9,7 +9,7 @@ This document does not define gameplay content, quest stories, puzzles, dialogue
 ## Architecture Principles
 
 - Use Luau and ModuleScripts for all reusable systems.
-- Keep server authority over progression, rewards, inventory, quests, badges, discoveries, and save data.
+- Keep server authority over progression, rewards, inventory, quests, badges, discoveries, journal unlocks, lore unlocks, and save data.
 - Keep clients responsible for input, UI, camera presentation, local feedback, and non-authoritative previews.
 - Use a service pattern on the server and a controller pattern on the client.
 - Store IDs in config and definition modules instead of hardcoding NPC names, quest IDs, item IDs, badge IDs, or zone IDs in logic.
@@ -32,6 +32,7 @@ src/
         BadgeConfig.lua
         InventoryConfig.lua
         CompanionConfig.lua
+        JournalConfig.lua
       Constants/
         RemoteNames.lua
         AttributeNames.lua
@@ -41,6 +42,7 @@ src/
         QuestTypes.lua
         RewardTypes.lua
         InventoryTypes.lua
+        JournalTypes.lua
         ServiceTypes.lua
       Util/
         Signal.lua
@@ -52,11 +54,14 @@ src/
         Rewards/
         Interactions/
         Discoveries/
+        Lore/
+        Journal/
     Remotes/
       QuestRemotes/
       InventoryRemotes/
       ProgressionRemotes/
       CompanionRemotes/
+      JournalRemotes/
       InteractionRemotes/
 
   ServerScriptService/
@@ -72,6 +77,8 @@ src/
         DiscoveryService.lua
         ZoneService.lua
         CompanionService.lua
+        JournalService.lua
+        LoreService.lua
         InteractionService.lua
         MultiplayerService.lua
         EpisodeService.lua
@@ -96,6 +103,7 @@ src/
           InventoryController.lua
           ProgressionController.lua
           CompanionController.lua
+          JournalController.lua
           InteractionController.lua
           ZoneController.lua
           InputController.lua
@@ -151,6 +159,7 @@ The client may request:
 - Interacting with a world object.
 - Claiming a visible collectible.
 - Requesting a Proton hint.
+- Viewing an unlocked journal or lore entry.
 - Requesting travel to an unlocked destination.
 - Updating local settings.
 
@@ -161,6 +170,7 @@ The server must decide:
 - Whether rewards are granted.
 - Whether Explorer Score changes.
 - Whether inventory or badge state changes.
+- Whether journal or lore entries unlock.
 - Whether the request counts as solo, co-op, or companion-assisted progress.
 - Whether persistent data should be saved.
 
@@ -217,6 +227,8 @@ Each episode should define:
 - Zone IDs.
 - Quest definition IDs.
 - Discovery IDs.
+- Journal entry IDs.
+- Lore entry IDs.
 - Reward references.
 - Badge references.
 - Required progression dependencies.
@@ -236,6 +248,8 @@ Examples of ID categories:
 - `CharacterId`
 - `ItemId`
 - `DiscoveryId`
+- `JournalEntryId`
+- `LoreId`
 - `BadgeId`
 - `RewardBundleId`
 - `InteractionId`
@@ -269,6 +283,8 @@ Persistent systems include:
 - Objective progress where needed.
 - Inventory.
 - Discoveries.
+- Journal unlocks.
+- Lore unlocks.
 - Badge state.
 - Zone unlocks.
 - Episode completion.
@@ -282,6 +298,22 @@ Runtime-only systems include:
 - Non-persistent interaction cooldowns.
 - Active session caches.
 
+## Journal And Lore Architecture
+
+Journal and lore content are definition-driven systems.
+
+Journal definitions describe player-facing records such as discoveries, episode notes, fragment records, Star Core Segment records, and educational summaries.
+
+Lore definitions describe structured world-building and educational entries connected to discoveries. Lore text must be separate from discovery IDs so localization and content edits do not change persistent progression data.
+
+Journal and lore unlocks must be persistent. They may be triggered by:
+
+- `DiscoveryService` when a discovery is recorded.
+- `LoreService` when a lore entry is unlocked by an approved server source.
+- `JournalService` when episode, quest, fragment, or Star Core Segment milestones are reached.
+
+Journal and lore unlocks must not be granted from client-trusted state.
+
 ## Bootstrap Order
 
 Recommended server startup order:
@@ -290,7 +322,7 @@ Recommended server startup order:
 2. Validate definitions.
 3. Create remotes.
 4. Initialize persistent services.
-5. Initialize progression, inventory, reward, and badge services.
+5. Initialize progression, inventory, reward, badge, journal, and lore services.
 6. Initialize quest, discovery, zone, companion, interaction, multiplayer, and episode services.
 7. Bind player lifecycle.
 8. Load player data on join.
@@ -314,6 +346,6 @@ The project should include validation scripts or test utilities for:
 - Quest definitions with unreachable objectives.
 - Required multiplayer mechanics without Proton solo support.
 - Rewards that reference unknown item, score, badge, or unlock IDs.
+- Journal or lore entries that reference unknown discoveries, quests, episodes, or items.
 - Episode definitions that reference missing zones or quests.
 - Data schema migration coverage.
-
