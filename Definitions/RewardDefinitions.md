@@ -41,6 +41,17 @@ RewardBundle
 | `reward_ep01_optional_005_agriculture_monitoring` | `25` | None | None | None | None | `journal_ep01_theos_agriculture_monitoring` | `lore_ep01_theos_agriculture_monitoring` | Once per player per optional objective. |
 | `reward_ep01_hidden_space_inspirium_secret` | `100` | None | None | None | None | `journal_ep01_hidden_space_inspirium_secret` | None | Once per player per hidden discovery. |
 
+## Discovery Reward Bundles
+
+| RewardBundleId | ExplorerScore | Items[] | Badges[] | UnlockZones[] | UnlockEpisodes[] | JournalUnlocks[] | LoreUnlocks[] | DuplicatePolicy |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `reward_ep01_discovery_theos_satellite_history` | `25` | None | None | None | None | `journal_ep01_theos_satellite_history` | `lore_ep01_theos_satellite_history` | Once per player per discovery. |
+| `reward_ep01_discovery_theos_theos_1` | `25` | None | None | None | None | `journal_ep01_theos_theos_1` | `lore_ep01_theos_theos_1` | Once per player per discovery. |
+| `reward_ep01_discovery_theos_theos_2` | `25` | None | None | None | None | `journal_ep01_theos_theos_2` | `lore_ep01_theos_theos_2` | Once per player per discovery. |
+| `reward_ep01_discovery_theos_thailand_map` | `25` | None | None | None | None | `journal_ep01_theos_thailand_map` | `lore_ep01_theos_thailand_map` | Once per player per discovery. |
+| `reward_ep01_discovery_theos_water_resource_monitoring` | `25` | None | None | None | None | `journal_ep01_theos_water_resource_monitoring` | `lore_ep01_theos_water_resource_monitoring` | Once per player per discovery. |
+| `reward_ep01_discovery_theos_forest_monitoring` | `25` | None | None | None | None | `journal_ep01_theos_forest_monitoring` | `lore_ep01_theos_forest_monitoring` | Once per player per discovery. |
+
 ## Teamwork Reward Bundles
 
 | RewardBundleId | ExplorerScore | Items[] | Badges[] | UnlockZones[] | UnlockEpisodes[] | JournalUnlocks[] | LoreUnlocks[] | DuplicatePolicy |

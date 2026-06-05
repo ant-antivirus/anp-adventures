@@ -31,15 +31,15 @@ DiscoveryDefinition
 | `disc_ep01_terrain_observation_point` | `zone_ep01_terrain_sandbox` | `25` | Included in `reward_ep01_main_004` | None | None |
 | `disc_ep01_theos_calibration_console` | `zone_ep01_theos_satellite_center` | `25` | Included in `reward_ep01_main_005` | `lore_ep01_theos_calibration_console` | None |
 | `disc_ep01_theos_fragment` | `zone_ep01_theos_satellite_center` | `25` | Included in `reward_ep01_main_005` | `lore_ep01_theos_fragment` | `journal_ep01_fragment_theos` |
-| `disc_ep01_theos_satellite_history` | `zone_ep01_theos_satellite_center` | `25` | None | `lore_ep01_theos_satellite_history` | `journal_ep01_theos_satellite_history` |
-| `disc_ep01_theos_theos_1` | `zone_ep01_theos_satellite_center` | `25` | None | `lore_ep01_theos_theos_1` | `journal_ep01_theos_theos_1` |
-| `disc_ep01_theos_theos_2` | `zone_ep01_theos_satellite_center` | `25` | None | `lore_ep01_theos_theos_2` | `journal_ep01_theos_theos_2` |
-| `disc_ep01_theos_thailand_map` | `zone_ep01_theos_satellite_center` | `25` | None | `lore_ep01_theos_thailand_map` | `journal_ep01_theos_thailand_map` |
+| `disc_ep01_theos_satellite_history` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_discovery_theos_satellite_history` | `lore_ep01_theos_satellite_history` | `journal_ep01_theos_satellite_history` |
+| `disc_ep01_theos_theos_1` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_discovery_theos_theos_1` | `lore_ep01_theos_theos_1` | `journal_ep01_theos_theos_1` |
+| `disc_ep01_theos_theos_2` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_discovery_theos_theos_2` | `lore_ep01_theos_theos_2` | `journal_ep01_theos_theos_2` |
+| `disc_ep01_theos_thailand_map` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_discovery_theos_thailand_map` | `lore_ep01_theos_thailand_map` | `journal_ep01_theos_thailand_map` |
 | `disc_ep01_theos_satellite_imagery` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_optional_005_satellite_imagery` | `lore_ep01_theos_satellite_imagery` | `journal_ep01_theos_satellite_imagery` |
 | `disc_ep01_theos_disaster_monitoring` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_optional_005_flood_monitoring` | `lore_ep01_theos_disaster_monitoring` | `journal_ep01_theos_flood_monitoring` |
 | `disc_ep01_theos_agriculture_monitoring` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_optional_005_agriculture_monitoring` | `lore_ep01_theos_agriculture_monitoring` | `journal_ep01_theos_agriculture_monitoring` |
-| `disc_ep01_theos_water_resource_monitoring` | `zone_ep01_theos_satellite_center` | `25` | None | `lore_ep01_theos_water_resource_monitoring` | `journal_ep01_theos_water_resource_monitoring` |
-| `disc_ep01_theos_forest_monitoring` | `zone_ep01_theos_satellite_center` | `25` | None | `lore_ep01_theos_forest_monitoring` | `journal_ep01_theos_forest_monitoring` |
+| `disc_ep01_theos_water_resource_monitoring` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_discovery_theos_water_resource_monitoring` | `lore_ep01_theos_water_resource_monitoring` | `journal_ep01_theos_water_resource_monitoring` |
+| `disc_ep01_theos_forest_monitoring` | `zone_ep01_theos_satellite_center` | `25` | `reward_ep01_discovery_theos_forest_monitoring` | `lore_ep01_theos_forest_monitoring` | `journal_ep01_theos_forest_monitoring` |
 | `disc_ep01_rocket_preflight_console` | `zone_ep01_rocket_mission` | `25` | Included in `reward_ep01_main_006` | None | None |
 | `disc_ep01_rocket_launch_platform` | `zone_ep01_rocket_mission` | `25` | Included in `reward_ep01_main_006` | None | None |
 | `disc_ep01_rocket_fragment` | `zone_ep01_rocket_mission` | `25` | Included in `reward_ep01_main_006` | None | `journal_ep01_fragment_rocket` |
