@@ -1,0 +1,68 @@
+export type PlayerData = {
+	SchemaVersion: number,
+	Profile: {
+		UserId: number,
+		CreatedAt: number,
+		LastLoginAt: number,
+		TotalPlaytimeSeconds: number,
+	},
+	Progression: {
+		ExplorerScore: number,
+		ExplorerRankId: string,
+		LifetimeExplorerScore: number,
+	},
+	Episodes: {
+		ActiveEpisodeId: string?,
+		UnlockedEpisodeIds: { [string]: boolean },
+		CompletedEpisodeIds: { [string]: boolean },
+		EpisodeProgress: { [string]: any },
+	},
+	Quests: {
+		ActiveQuestIds: { string },
+		CompletedQuestIds: { [string]: boolean },
+		QuestStates: { [string]: any },
+	},
+	Inventory: {
+		Items: { [string]: any },
+	},
+	Discoveries: {
+		FoundDiscoveryIds: { [string]: boolean },
+		ZoneDiscoveryProgress: { [string]: any },
+	},
+	Journal: {
+		UnlockedEntryIds: { [string]: boolean },
+		EntryStates: { [string]: any },
+	},
+	Lore: {
+		UnlockedLoreIds: { [string]: boolean },
+		LoreStates: { [string]: any },
+	},
+	Badges: {
+		AwardedBadgeIds: { [string]: boolean },
+		PendingRobloxBadgeAwards: { string },
+	},
+	Zones: {
+		UnlockedZoneIds: { [string]: boolean },
+		FastTravelUnlockedZoneIds: { [string]: boolean },
+		LastZoneId: string?,
+		LastSpawnPointId: string?,
+	},
+	Companion: {
+		TutorialFlags: { [string]: boolean },
+		HintHistory: { [string]: any },
+		SoloAssistHistory: { [string]: any },
+	},
+	Settings: {
+		InputMode: "Auto" | "KeyboardMouse" | "Gamepad" | "Touch",
+		HintsEnabled: boolean,
+		DialogueSpeed: number,
+		ReducedMotion: boolean,
+	},
+	Timestamps: {
+		CreatedAt: number,
+		LastSavedAt: number,
+		LastLoadedAt: number,
+	},
+}
+
+return {}
