@@ -1,10 +1,17 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Definitions = Shared:WaitForChild("Definitions")
 local Config = Shared:WaitForChild("Config")
 
 local DefinitionValidator = require(script.Parent.Validators.DefinitionValidator)
+local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local ProgressionService = require(script.Parent.Services.ProgressionService)
+local InventoryService = require(script.Parent.Services.InventoryService)
+local RewardService = require(script.Parent.Services.RewardService)
+local Phase2SmokeTest = require(script.Parent.Tests.Phase2SmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -58,3 +65,59 @@ if not validationResult.Success then
 end
 
 print("[ANP] Definition validation passed.")
+
+PlayerDataService.ResetForTests()
+
+ProgressionService.Init({
+	PlayerDataService = PlayerDataService,
+})
+
+InventoryService.Init({
+	PlayerDataService = PlayerDataService,
+})
+
+RewardService.Init({
+	PlayerDataService = PlayerDataService,
+	ProgressionService = ProgressionService,
+	InventoryService = InventoryService,
+})
+
+print("[ANP] Phase 2 in-memory services initialized.")
+
+if RunService:IsStudio() then
+	Phase2SmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		ProgressionService = ProgressionService,
+		InventoryService = InventoryService,
+		RewardService = RewardService,
+	})
+end
+
+local function onPlayerAdded(player)
+	local initResult = PlayerDataService.InitPlayer(player)
+
+	if not initResult.Success then
+		warn("[ANP] Player data init failed for " .. player.Name .. ": " .. initResult.Code)
+		return
+	end
+
+	print("[ANP] Player data initialized for " .. player.Name)
+end
+
+local function onPlayerRemoving(player)
+	local releaseResult = PlayerDataService.ReleasePlayer(player)
+
+	if not releaseResult.Success then
+		warn("[ANP] Player data release failed for " .. player.Name .. ": " .. releaseResult.Code)
+		return
+	end
+
+	print("[ANP] Player data released for " .. player.Name)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerRemoving:Connect(onPlayerRemoving)
+
+for _, player in ipairs(Players:GetPlayers()) do
+	onPlayerAdded(player)
+end
