@@ -14,8 +14,10 @@ local RewardService = require(script.Parent.Services.RewardService)
 local EpisodeService = require(script.Parent.Services.EpisodeService)
 local ZoneService = require(script.Parent.Services.ZoneService)
 local DiscoveryService = require(script.Parent.Services.DiscoveryService)
+local QuestService = require(script.Parent.Services.QuestService)
 local Phase2SmokeTest = require(script.Parent.Tests.Phase2SmokeTest)
 local Phase3ASmokeTest = require(script.Parent.Tests.Phase3ASmokeTest)
+local Phase3BSmokeTest = require(script.Parent.Tests.Phase3BSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -102,7 +104,13 @@ DiscoveryService.Init({
 	ZoneService = ZoneService,
 })
 
-print("[ANP] Phase 2 and Phase 3A in-memory services initialized.")
+QuestService.Init({
+	PlayerDataService = PlayerDataService,
+	RewardService = RewardService,
+	EpisodeService = EpisodeService,
+})
+
+print("[ANP] Phase 2, Phase 3A, and Phase 3B in-memory services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -118,6 +126,13 @@ if RunService:IsStudio() then
 		EpisodeService = EpisodeService,
 		ZoneService = ZoneService,
 		DiscoveryService = DiscoveryService,
+	})
+
+	Phase3BSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		ProgressionService = ProgressionService,
+		InventoryService = InventoryService,
+		QuestService = QuestService,
 	})
 end
 
