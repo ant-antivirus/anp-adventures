@@ -136,7 +136,11 @@ function PlayerDataService.InitPlayer(player)
 end
 
 function PlayerDataService.ReleasePlayer(player)
-	local userId = resolveSessionUserId(player)
+	local userId, invalidCode, invalidMessage = resolveSessionUserId(player)
+	if userId == nil then
+		return result(false, invalidCode or "InvalidUserId", invalidMessage or "Player has an invalid UserId.")
+	end
+
 	local session = sessionsByUserId[userId]
 
 	if not session or session.Released then
@@ -210,10 +214,30 @@ function PlayerDataService.HasRewardClaim(player, rewardClaimId)
 	return session.RewardClaimIds[rewardClaimId] == true
 end
 
+function PlayerDataService.HasRewardBundleClaim(player, rewardBundleId)
+	local session, code = getSession(player)
+	if not session then
+		return false, code
+	end
+
+	local expectedSuffix = ":" .. rewardBundleId
+	for rewardClaimId in pairs(session.RewardClaimIds) do
+		if string.sub(rewardClaimId, -#expectedSuffix) == expectedSuffix then
+			return true
+		end
+	end
+
+	return false
+end
+
 function PlayerDataService.MarkRewardClaim(player, rewardClaimId)
 	local session, code = getSession(player)
 	if not session then
 		return result(false, code, "Player data is not loaded.")
+	end
+
+	if type(rewardClaimId) ~= "string" or rewardClaimId == "" then
+		return result(false, "InvalidRewardClaimId", "RewardClaimId must be a non-empty string.")
 	end
 
 	session.RewardClaimIds[rewardClaimId] = true

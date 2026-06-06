@@ -11,7 +11,11 @@ local PlayerDataService = require(script.Parent.Services.PlayerDataService)
 local ProgressionService = require(script.Parent.Services.ProgressionService)
 local InventoryService = require(script.Parent.Services.InventoryService)
 local RewardService = require(script.Parent.Services.RewardService)
+local EpisodeService = require(script.Parent.Services.EpisodeService)
+local ZoneService = require(script.Parent.Services.ZoneService)
+local DiscoveryService = require(script.Parent.Services.DiscoveryService)
 local Phase2SmokeTest = require(script.Parent.Tests.Phase2SmokeTest)
+local Phase3ASmokeTest = require(script.Parent.Tests.Phase3ASmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -66,7 +70,9 @@ end
 
 print("[ANP] Definition validation passed.")
 
-PlayerDataService.ResetForTests()
+if RunService:IsStudio() then
+	PlayerDataService.ResetForTests()
+end
 
 ProgressionService.Init({
 	PlayerDataService = PlayerDataService,
@@ -82,7 +88,21 @@ RewardService.Init({
 	InventoryService = InventoryService,
 })
 
-print("[ANP] Phase 2 in-memory services initialized.")
+EpisodeService.Init({
+	PlayerDataService = PlayerDataService,
+})
+
+ZoneService.Init({
+	PlayerDataService = PlayerDataService,
+})
+
+DiscoveryService.Init({
+	PlayerDataService = PlayerDataService,
+	RewardService = RewardService,
+	ZoneService = ZoneService,
+})
+
+print("[ANP] Phase 2 and Phase 3A in-memory services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -90,6 +110,14 @@ if RunService:IsStudio() then
 		ProgressionService = ProgressionService,
 		InventoryService = InventoryService,
 		RewardService = RewardService,
+	})
+
+	Phase3ASmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		ProgressionService = ProgressionService,
+		EpisodeService = EpisodeService,
+		ZoneService = ZoneService,
+		DiscoveryService = DiscoveryService,
 	})
 end
 

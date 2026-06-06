@@ -81,18 +81,44 @@ function Phase2SmokeTest.Run(services)
 	}), "InventoryService should add an item.")
 	assertCondition(InventoryService.HasItem(playerA, "item_ep01_fragment_universe", 1), "InventoryService should report owned item.")
 	assertCondition(not InventoryService.HasItem(playerB, "item_ep01_fragment_universe", 1), "Player B must not receive Player A inventory mutation.")
+	assertCondition(
+		RewardService.BuildRewardClaimId("reward_ep01_teamwork_main_002") == "RewardBundle:reward_ep01_teamwork_main_002:reward_ep01_teamwork_main_002",
+		"RewardService should default missing source context into a stable RewardClaimId."
+	)
 
-	local main001 = RewardService.GrantRewardBundle(playerA, "reward_ep01_main_001", {
+	local main001SourceContext = {
 		SourceType = "SmokeTest",
 		SourceId = "reward_ep01_main_001",
-	})
+	}
+	local main001 = RewardService.GrantRewardBundle(playerA, "reward_ep01_main_001", main001SourceContext)
 	assertResultSuccess(main001, "RewardService should grant reward_ep01_main_001 once.")
+	assertCondition(main001.Data.RewardClaimId == "SmokeTest:reward_ep01_main_001:reward_ep01_main_001", "Reward summary should include source-specific RewardClaimId.")
+
+	local exactDuplicateMain001 = RewardService.GrantRewardBundle(playerA, "reward_ep01_main_001", main001SourceContext)
+	assertResultFailure(exactDuplicateMain001, "DuplicateRewardBlocked", "RewardService should block duplicate reward_ep01_main_001 source context.")
 
 	local duplicateMain001 = RewardService.GrantRewardBundle(playerA, "reward_ep01_main_001", {
 		SourceType = "SmokeTest",
 		SourceId = "reward_ep01_main_001_duplicate",
 	})
-	assertResultFailure(duplicateMain001, "DuplicateRewardBlocked", "RewardService should block duplicate reward_ep01_main_001.")
+	assertResultFailure(duplicateMain001, "DuplicateRewardBlocked", "RewardService should block alternate source reward_ep01_main_001 because its DuplicatePolicy is bundle-wide.")
+
+	local teamworkSourceA = {
+		SourceType = "TeamworkContribution",
+		SourceId = "phase2_teamwork_a",
+	}
+	local teamworkRewardA = RewardService.GrantRewardBundle(playerA, "reward_ep01_teamwork_main_001", teamworkSourceA)
+	assertResultSuccess(teamworkRewardA, "Source-specific teamwork reward should grant for first source.")
+	assertCondition(teamworkRewardA.Data.RewardClaimId == "TeamworkContribution:phase2_teamwork_a:reward_ep01_teamwork_main_001", "Teamwork reward should include source-specific RewardClaimId.")
+
+	local duplicateTeamworkRewardA = RewardService.GrantRewardBundle(playerA, "reward_ep01_teamwork_main_001", teamworkSourceA)
+	assertResultFailure(duplicateTeamworkRewardA, "DuplicateRewardBlocked", "Source-specific teamwork reward should block duplicate source context.")
+
+	local teamworkRewardB = RewardService.GrantRewardBundle(playerA, "reward_ep01_teamwork_main_001", {
+		SourceType = "TeamworkContribution",
+		SourceId = "phase2_teamwork_b",
+	})
+	assertResultSuccess(teamworkRewardB, "Source-specific teamwork reward should allow a different valid source context.")
 
 	local discoveryReward = RewardService.GrantRewardBundle(playerA, "reward_ep01_discovery_theos_satellite_history", {
 		SourceType = "SmokeTest",

@@ -27,6 +27,13 @@ local REQUIRED_EP01_ASSEMBLY_ITEMS = {
 	"item_ep01_fragment_moon",
 }
 
+local SOURCE_SPECIFIC_DUPLICATE_POLICIES = {
+	OncePerPlayerPerDiscovery = true,
+	OncePerPlayerPerOptionalObjective = true,
+	OncePerPlayerPerHiddenDiscovery = true,
+	OncePerPlayerPerEligibleQuestTeamworkContribution = true,
+}
+
 local function result(success, code, message, data)
 	return {
 		Success = success,
@@ -36,10 +43,32 @@ local function result(success, code, message, data)
 	}
 end
 
-local function append(target, values)
-	for _, value in ipairs(values) do
-		table.insert(target, value)
+local function normalizeSourceContext(rewardBundleId, sourceContext)
+	local rewardSourceContext = sourceContext or {}
+	local sourceType = rewardSourceContext.SourceType
+	local sourceId = rewardSourceContext.SourceId
+
+	if type(sourceType) ~= "string" or sourceType == "" then
+		sourceType = "RewardBundle"
 	end
+
+	if type(sourceId) ~= "string" or sourceId == "" then
+		sourceId = rewardBundleId
+	end
+
+	return {
+		SourceType = sourceType,
+		SourceId = sourceId,
+	}
+end
+
+local function buildRewardClaimId(rewardBundleId, sourceContext)
+	local rewardSourceContext = normalizeSourceContext(rewardBundleId, sourceContext)
+	return rewardSourceContext.SourceType .. ":" .. rewardSourceContext.SourceId .. ":" .. rewardBundleId, rewardSourceContext
+end
+
+local function usesSourceSpecificDuplicateClaims(rewardDefinition)
+	return SOURCE_SPECIFIC_DUPLICATE_POLICIES[rewardDefinition.DuplicatePolicy] == true
 end
 
 local function validateRewardDefinition(rewardBundleId, rewardDefinition)
@@ -116,6 +145,24 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 		return validationResult
 	end
 
+	local rewardClaimId, rewardSourceContext = buildRewardClaimId(rewardBundleId, sourceContext)
+
+	if playerDataService.HasRewardClaim(player, rewardClaimId) then
+		return result(false, "DuplicateRewardBlocked", "Reward claim has already been granted.", {
+			RewardBundleId = rewardBundleId,
+			RewardClaimId = rewardClaimId,
+			SkippedDuplicate = true,
+		})
+	end
+
+	if not usesSourceSpecificDuplicateClaims(rewardDefinition) and playerDataService.HasRewardBundleClaim(player, rewardBundleId) then
+		return result(false, "DuplicateRewardBlocked", "Reward bundle has already been granted for this duplicate policy.", {
+			RewardBundleId = rewardBundleId,
+			RewardClaimId = rewardClaimId,
+			SkippedDuplicate = true,
+		})
+	end
+
 	if rewardBundleId == "reward_ep01_main_008" then
 		local canGrant, missingItemId = canGrantEpisodeOneFinalReward(player)
 		if not canGrant then
@@ -123,20 +170,9 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 		end
 	end
 
-	if playerDataService.HasRewardClaim(player, rewardBundleId) then
-		return result(false, "DuplicateRewardBlocked", "Reward bundle has already been granted.", {
-			RewardBundleId = rewardBundleId,
-			SkippedDuplicate = true,
-		})
-	end
-
-	local rewardSourceContext = sourceContext or {
-		SourceType = "RewardBundle",
-		SourceId = rewardBundleId,
-	}
-
 	local summary = {
 		RewardBundleId = rewardBundleId,
+		RewardClaimId = rewardClaimId,
 		GrantedExplorerScore = 0,
 		GrantedItems = {},
 		GrantedBadges = {},
@@ -147,6 +183,7 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 		SkippedDuplicates = {},
 	}
 
+	-- TODO: Replace this in-memory sequence with an atomic DataStore transaction or rollback ledger before persistence ships.
 	if rewardDefinition.ExplorerScore > 0 then
 		local scoreResult = progressionService.AddExplorerScore(player, rewardDefinition.ExplorerScore, rewardSourceContext)
 		if not scoreResult.Success then
@@ -230,12 +267,17 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 		return stateResult
 	end
 
-	local claimResult = playerDataService.MarkRewardClaim(player, rewardBundleId)
+	local claimResult = playerDataService.MarkRewardClaim(player, rewardClaimId)
 	if not claimResult.Success then
 		return claimResult
 	end
 
 	return result(true, "RewardGranted", nil, summary)
+end
+
+function RewardService.BuildRewardClaimId(rewardBundleId, sourceContext)
+	local rewardClaimId = buildRewardClaimId(rewardBundleId, sourceContext)
+	return rewardClaimId
 end
 
 function RewardService.GetRewardDefinition(rewardBundleId)
