@@ -16,12 +16,15 @@ local ZoneService = require(script.Parent.Services.ZoneService)
 local DiscoveryService = require(script.Parent.Services.DiscoveryService)
 local QuestService = require(script.Parent.Services.QuestService)
 local WorldRegistryService = require(script.Parent.Services.WorldRegistryService)
+local InteractionService = require(script.Parent.Services.InteractionService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
+local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
 local Phase2SmokeTest = require(script.Parent.Tests.Phase2SmokeTest)
 local Phase3ASmokeTest = require(script.Parent.Tests.Phase3ASmokeTest)
 local Phase3BSmokeTest = require(script.Parent.Tests.Phase3BSmokeTest)
 local Phase3CSmokeTest = require(script.Parent.Tests.Phase3CSmokeTest)
+local Phase3DSmokeTest = require(script.Parent.Tests.Phase3DSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -123,7 +126,15 @@ if not worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, and Phase 3C services initialized.")
+InteractionService.Init({
+	PlayerDataService = PlayerDataService,
+	WorldRegistryService = WorldRegistryService,
+	QuestService = QuestService,
+	DiscoveryService = DiscoveryService,
+	ZoneService = ZoneService,
+})
+
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, and Phase 3D services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -152,6 +163,16 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 		WorldObjectValidator = WorldObjectValidator,
+	})
+
+	Phase3DSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		ZoneService = ZoneService,
+		InteractionService = InteractionService,
+		InteractionValidator = InteractionValidator,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
 	})
 end
 

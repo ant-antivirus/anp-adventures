@@ -129,6 +129,10 @@ function WorldRegistryService.GetInteractionPoint(interactionId)
 	return result(object ~= nil, object and "InteractionPointRead" or "InteractionPointMissing", nil, object)
 end
 
+function WorldRegistryService.GetInteraction(interactionId)
+	return WorldRegistryService.GetInteractionPoint(interactionId)
+end
+
 function WorldRegistryService.GetDiscoveryPoints()
 	return result(true, "DiscoveryPointsRead", nil, registry.DiscoveryPoints)
 end

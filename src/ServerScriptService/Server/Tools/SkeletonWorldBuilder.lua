@@ -87,6 +87,13 @@ local MINIMUM_INTERACTION_POINTS = {
 		ObjectiveId = "obj_ep01_main_008_005",
 		ZoneId = "zone_ep01_moon_walk",
 	},
+	{
+		InteractionId = "interaction_travel_ep01_universe_explorer",
+		QuestId = "quest_ep01_main_002",
+		ObjectiveId = "obj_ep01_main_002_002",
+		ZoneId = "zone_ep01_universe_explorer",
+		Type = "ZoneTravel",
+	},
 }
 
 local NPC_MARKERS = {
