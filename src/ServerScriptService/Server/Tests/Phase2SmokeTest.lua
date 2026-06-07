@@ -85,11 +85,16 @@ function Phase2SmokeTest.Run(services)
 		RewardService.BuildRewardClaimId("reward_ep01_teamwork_main_002") == "RewardBundle:reward_ep01_teamwork_main_002:reward_ep01_teamwork_main_002",
 		"RewardService should default missing source context into a stable RewardClaimId."
 	)
+	assertResultFailure(RewardService.CanGrantRewardBundle(playerA, "reward_ep01_teamwork_main_002", {
+		SourceType = "SmokeTest",
+		SourceId = "invalid:source",
+	}), "InvalidRewardClaimIdPart", "RewardService should reject claim ID delimiter in source context.")
 
 	local main001SourceContext = {
 		SourceType = "SmokeTest",
 		SourceId = "reward_ep01_main_001",
 	}
+	assertResultSuccess(RewardService.CanGrantRewardBundle(playerA, "reward_ep01_main_001", main001SourceContext), "RewardService preflight should allow reward_ep01_main_001 before grant.")
 	local main001 = RewardService.GrantRewardBundle(playerA, "reward_ep01_main_001", main001SourceContext)
 	assertResultSuccess(main001, "RewardService should grant reward_ep01_main_001 once.")
 	assertCondition(main001.Data.RewardClaimId == "SmokeTest:reward_ep01_main_001:reward_ep01_main_001", "Reward summary should include source-specific RewardClaimId.")

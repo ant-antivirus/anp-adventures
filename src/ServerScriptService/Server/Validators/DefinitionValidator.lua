@@ -151,6 +151,17 @@ local function validateQuestReferences(result, catalog, companionConfig)
 				addError(result, "Quest `" .. questId .. "` has duplicate objective `" .. objectiveId .. "`.")
 			end
 			objectiveSeen[objectiveId] = true
+
+			local objectiveDefinition = quest.ObjectiveDefinitions and quest.ObjectiveDefinitions[objectiveId]
+			if objectiveDefinition and (type(objectiveDefinition.RequiredAmount) ~= "number" or objectiveDefinition.RequiredAmount <= 0) then
+				addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` has invalid RequiredAmount.")
+			end
+		end
+
+		for objectiveId in pairs(quest.ObjectiveDefinitions or {}) do
+			if not objectiveSeen[objectiveId] then
+				addError(result, "Quest `" .. questId .. "` ObjectiveDefinitions contains unknown objective `" .. objectiveId .. "`.")
+			end
 		end
 
 		for _, requiredObjectiveId in ipairs(quest.RequiredObjectiveIds or {}) do

@@ -67,6 +67,9 @@ function Phase3CSmokeTest.Run(services)
 	end
 	assertCondition(validationResult.Success == true, "WorldObjectValidator should pass.")
 	assertCondition(validationResult.Summary.DuplicateIds == 0, "WorldObjectValidator should report no duplicate IDs.")
+	local duplicatesResult = WorldRegistryService.GetDuplicates()
+	assertResultSuccess(duplicatesResult, "WorldRegistryService should expose duplicate ID results.")
+	assertCondition(#duplicatesResult.Data == 0, "WorldRegistryService should report no duplicate IDs.")
 
 	local zonesResult = WorldRegistryService.GetZones()
 	assertResultSuccess(zonesResult, "WorldRegistryService should return zones.")

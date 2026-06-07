@@ -24,6 +24,11 @@ export type QuestDefinition = {
 	EpisodeId: string,
 	ZoneId: string,
 	ObjectiveIds: { string },
+	ObjectiveDefinitions: {
+		[string]: {
+			RequiredAmount: number,
+		},
+	}?,
 	RequiredObjectiveIds: { string },
 	OptionalObjectiveIds: { string }?,
 	RewardBundleIds: { string },

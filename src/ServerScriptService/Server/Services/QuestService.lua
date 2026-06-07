@@ -55,13 +55,33 @@ local function getMainRewardBundleIds(questDefinition)
 	return rewardBundleIds
 end
 
+local function buildQuestCompletionSourceContext(questId, sourceContext)
+	if type(sourceContext) == "table" then
+		return sourceContext
+	end
+
+	return {
+		SourceType = "QuestCompletion",
+		SourceId = questId,
+	}
+end
+
+local function getObjectiveRequiredAmount(questDefinition, objectiveId)
+	local objectiveDefinition = questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[objectiveId]
+	if objectiveDefinition and type(objectiveDefinition.RequiredAmount) == "number" and objectiveDefinition.RequiredAmount > 0 then
+		return objectiveDefinition.RequiredAmount
+	end
+
+	return 1
+end
+
 local function buildObjectiveStates(questDefinition)
 	local objectiveStates = {}
 
 	for _, objectiveId in ipairs(questDefinition.ObjectiveIds or {}) do
 		objectiveStates[objectiveId] = {
 			Current = 0,
-			Required = 1,
+			Required = getObjectiveRequiredAmount(questDefinition, objectiveId),
 			Completed = false,
 			Optional = listContains(questDefinition.OptionalObjectiveIds, objectiveId),
 		}
@@ -332,6 +352,42 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 
 	local questState = stateResult.Data
 	if questState.Status == QuestStatus.Completed then
+		if questState.RewardPending == true then
+			local rewardSourceContext = buildQuestCompletionSourceContext(questId, sourceContext)
+			local pendingRewardBundleIds = questState.RewardBundleIds or getMainRewardBundleIds(questDefinition)
+			local grantedRewardBundleIds = {}
+
+			for _, rewardBundleId in ipairs(pendingRewardBundleIds) do
+				local rewardResult = rewardService.GrantRewardBundle(player, rewardBundleId, rewardSourceContext)
+				if not rewardResult.Success then
+					return result(false, "QuestCompletionRewardFailed", "Pending quest reward retry failed.", {
+						QuestId = questId,
+						RewardBundleId = rewardBundleId,
+						FailureCode = rewardResult.Code,
+					})
+				end
+				table.insert(grantedRewardBundleIds, rewardBundleId)
+			end
+
+			local retryAppliedResult = playerDataService.Mutate(player, "MarkQuestCompletionRewardRetryApplied", rewardSourceContext, function(playerData)
+				local currentQuestState = ensureQuestState(playerData, questDefinition)
+				currentQuestState.RewardPending = false
+				currentQuestState.CompletionRewardFailed = false
+				currentQuestState.RewardFailureCode = nil
+				currentQuestState.LastUpdatedAt = os.time()
+				return true
+			end)
+
+			if not retryAppliedResult.Success then
+				return retryAppliedResult
+			end
+
+			return result(true, "QuestCompletionRewardRetried", nil, {
+				QuestId = questId,
+				GrantedRewardBundleIds = grantedRewardBundleIds,
+			})
+		end
+
 		return result(false, "QuestAlreadyCompleted", "Quest `" .. questId .. "` is already completed.")
 	end
 
@@ -344,26 +400,25 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		return result(false, "RequiredObjectiveIncomplete", "Required objective `" .. missingObjectiveId .. "` is incomplete.")
 	end
 
-	local grantedRewardBundleIds = {}
-	for _, rewardBundleId in ipairs(getMainRewardBundleIds(questDefinition)) do
-		local rewardResult = rewardService.GrantRewardBundle(player, rewardBundleId, sourceContext or {
-			SourceType = "QuestCompletion",
-			SourceId = questId,
-		})
-
-		if not rewardResult.Success then
-			return rewardResult
+	local rewardSourceContext = buildQuestCompletionSourceContext(questId, sourceContext)
+	local rewardBundleIds = getMainRewardBundleIds(questDefinition)
+	for _, rewardBundleId in ipairs(rewardBundleIds) do
+		local preflightResult = rewardService.CanGrantRewardBundle(player, rewardBundleId, rewardSourceContext)
+		if not preflightResult.Success then
+			return preflightResult
 		end
-
-		table.insert(grantedRewardBundleIds, rewardBundleId)
 	end
 
 	local now = os.time()
-	local mutationResult = playerDataService.Mutate(player, "CompleteQuest", sourceContext, function(playerData)
+	local mutationResult = playerDataService.Mutate(player, "CompleteQuest", rewardSourceContext, function(playerData)
 		local currentQuestState = ensureQuestState(playerData, questDefinition)
 		currentQuestState.Status = QuestStatus.Completed
 		currentQuestState.CompletedAt = now
 		currentQuestState.LastUpdatedAt = now
+		currentQuestState.RewardPending = #rewardBundleIds > 0
+		currentQuestState.RewardBundleIds = rewardBundleIds
+		currentQuestState.CompletionRewardFailed = false
+		currentQuestState.RewardFailureCode = nil
 		playerData.Quests.CompletedQuestIds[questId] = true
 		playerData.Quests.ActiveQuestIds[questId] = nil
 
@@ -378,12 +433,50 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 			episodeProgress.CompletedQuestCount = completedCount
 		end
 
-		recordMetadata(currentQuestState, sourceContext, nil)
+		recordMetadata(currentQuestState, rewardSourceContext, nil)
 		return true
 	end)
 
 	if not mutationResult.Success then
 		return mutationResult
+	end
+
+	local grantedRewardBundleIds = {}
+	for _, rewardBundleId in ipairs(rewardBundleIds) do
+		local rewardResult = rewardService.GrantRewardBundle(player, rewardBundleId, rewardSourceContext)
+
+		if not rewardResult.Success then
+			playerDataService.Mutate(player, "MarkQuestCompletionRewardFailed", rewardSourceContext, function(playerData)
+				local currentQuestState = ensureQuestState(playerData, questDefinition)
+				currentQuestState.RewardPending = true
+				currentQuestState.RewardBundleIds = rewardBundleIds
+				currentQuestState.CompletionRewardFailed = true
+				currentQuestState.RewardFailureCode = rewardResult.Code
+				currentQuestState.LastUpdatedAt = os.time()
+				return true
+			end)
+
+			return result(false, "QuestCompletionRewardFailed", "Quest completed but reward grant failed.", {
+				QuestId = questId,
+				RewardBundleId = rewardBundleId,
+				FailureCode = rewardResult.Code,
+			})
+		end
+
+		table.insert(grantedRewardBundleIds, rewardBundleId)
+	end
+
+	local rewardAppliedResult = playerDataService.Mutate(player, "MarkQuestCompletionRewardApplied", rewardSourceContext, function(playerData)
+		local currentQuestState = ensureQuestState(playerData, questDefinition)
+		currentQuestState.RewardPending = false
+		currentQuestState.CompletionRewardFailed = false
+		currentQuestState.RewardFailureCode = nil
+		currentQuestState.LastUpdatedAt = os.time()
+		return true
+	end)
+
+	if not rewardAppliedResult.Success then
+		return rewardAppliedResult
 	end
 
 	local nextQuestId = nil

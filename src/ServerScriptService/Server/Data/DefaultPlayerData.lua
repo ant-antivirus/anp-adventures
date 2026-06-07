@@ -57,6 +57,7 @@ local function buildTemplate(userId, timestamp)
 
 		Discoveries = {
 			FoundDiscoveryIds = {},
+			DiscoveryStates = {},
 			ZoneDiscoveryProgress = {},
 		},
 

@@ -6,12 +6,12 @@ This contract defines the minimum Workspace object structure needed to connect s
 
 ```text
 Workspace
-└── ANP_World
-    ├── Zones
-    ├── SpawnPoints
-    ├── InteractionPoints
-    ├── DiscoveryPoints
-    └── NPCMarkers
++-- ANP_World
+    +-- Zones
+    +-- SpawnPoints
+    +-- InteractionPoints
+    +-- DiscoveryPoints
+    +-- NPCMarkers
 ```
 
 Required folder names are exact and case-sensitive.

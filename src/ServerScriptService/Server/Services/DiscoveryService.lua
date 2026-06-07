@@ -77,12 +77,15 @@ function DiscoveryService.GetDiscoveryState(player, discoveryId)
 	end
 
 	local discoveryData = snapshotResult.Data
+	local discoveryState = discoveryData.DiscoveryStates and discoveryData.DiscoveryStates[discoveryId]
 	return result(true, "DiscoveryStateRead", nil, {
 		DiscoveryId = discoveryId,
 		ZoneId = discoveryDefinition.ZoneId,
 		IsFound = discoveryData.FoundDiscoveryIds[discoveryId] == true,
 		RewardBundleId = discoveryDefinition.RewardBundleId,
 		RewardIncludedInQuestBundle = discoveryDefinition.RewardIncludedInQuestBundle == true,
+		RewardPending = discoveryState and discoveryState.RewardPending == true,
+		RewardFailureCode = discoveryState and discoveryState.RewardFailureCode or nil,
 	})
 end
 
@@ -135,26 +138,76 @@ function DiscoveryService.RecordDiscovery(player, discoveryId, sourceContext)
 		return errorResult
 	end
 
-	local canRecord, blockCode = DiscoveryService.CanRecordDiscovery(player, discoveryId)
-	if not canRecord then
-		return result(false, blockCode, "Cannot record discovery `" .. discoveryId .. "`.")
+	if not zoneService.IsZoneUnlocked(player, discoveryDefinition.ZoneId) then
+		return result(false, "ZoneLocked", "Cannot record discovery in locked zone `" .. discoveryDefinition.ZoneId .. "`.")
 	end
 
-	local rewardResult = nil
-	if discoveryDefinition.RewardBundleId and discoveryDefinition.RewardIncludedInQuestBundle ~= true then
-		rewardResult = rewardService.GrantRewardBundle(player, discoveryDefinition.RewardBundleId, sourceContext or {
-			SourceType = "Discovery",
-			SourceId = discoveryId,
-		})
+	local existingStateResult = DiscoveryService.GetDiscoveryState(player, discoveryId)
+	if not existingStateResult.Success then
+		return existingStateResult
+	end
 
-		if not rewardResult.Success then
-			return rewardResult
+	local rewardSourceContext = sourceContext or {
+		SourceType = "Discovery",
+		SourceId = discoveryId,
+	}
+	local shouldGrantReward = discoveryDefinition.RewardBundleId and discoveryDefinition.RewardIncludedInQuestBundle ~= true
+
+	if existingStateResult.Data.IsFound then
+		if existingStateResult.Data.RewardPending == true and shouldGrantReward then
+			local retryRewardResult = rewardService.GrantRewardBundle(player, discoveryDefinition.RewardBundleId, rewardSourceContext)
+			if not retryRewardResult.Success then
+				return result(false, "DiscoveryRewardRetryFailed", "Pending discovery reward retry failed.", {
+					DiscoveryId = discoveryId,
+					RewardBundleId = discoveryDefinition.RewardBundleId,
+					FailureCode = retryRewardResult.Code,
+				})
+			end
+
+			local retryAppliedResult = playerDataService.Mutate(player, "MarkDiscoveryRewardRetryApplied", rewardSourceContext, function(playerData)
+				playerData.Discoveries.DiscoveryStates = playerData.Discoveries.DiscoveryStates or {}
+				local discoveryState = playerData.Discoveries.DiscoveryStates[discoveryId]
+				if discoveryState then
+					discoveryState.RewardPending = false
+					discoveryState.RewardFailureCode = nil
+					discoveryState.UpdatedAt = os.time()
+				end
+				return true
+			end)
+
+			if not retryAppliedResult.Success then
+				return retryAppliedResult
+			end
+
+			return result(true, "DiscoveryRewardRetried", nil, {
+				DiscoveryId = discoveryId,
+				RewardResult = retryRewardResult,
+			})
+		end
+
+		return result(false, "DiscoveryAlreadyRecorded", "Cannot record duplicate discovery `" .. discoveryId .. "`.")
+	end
+
+	if shouldGrantReward then
+		local preflightResult = rewardService.CanGrantRewardBundle(player, discoveryDefinition.RewardBundleId, rewardSourceContext)
+		if not preflightResult.Success then
+			return preflightResult
 		end
 	end
 
 	local now = os.time()
-	local mutationResult = playerDataService.Mutate(player, "RecordDiscovery", sourceContext, function(playerData)
+	local mutationResult = playerDataService.Mutate(player, "RecordDiscovery", rewardSourceContext, function(playerData)
+		playerData.Discoveries.DiscoveryStates = playerData.Discoveries.DiscoveryStates or {}
 		playerData.Discoveries.FoundDiscoveryIds[discoveryId] = true
+		playerData.Discoveries.DiscoveryStates[discoveryId] = {
+			DiscoveryId = discoveryId,
+			ZoneId = discoveryDefinition.ZoneId,
+			RecordedAt = now,
+			UpdatedAt = now,
+			RewardPending = shouldGrantReward == true,
+			RewardBundleId = discoveryDefinition.RewardBundleId,
+			RewardFailureCode = nil,
+		}
 		playerData.Discoveries.ZoneDiscoveryProgress[discoveryDefinition.ZoneId] = {
 			FoundCount = countFoundZoneDiscoveries(playerData.Discoveries.FoundDiscoveryIds, discoveryDefinition.ZoneId),
 			TotalCount = countZoneDiscoveries(discoveryDefinition.ZoneId),
@@ -165,6 +218,43 @@ function DiscoveryService.RecordDiscovery(player, discoveryId, sourceContext)
 
 	if not mutationResult.Success then
 		return mutationResult
+	end
+
+	local rewardResult = nil
+	if shouldGrantReward then
+		rewardResult = rewardService.GrantRewardBundle(player, discoveryDefinition.RewardBundleId, rewardSourceContext)
+		if not rewardResult.Success then
+			playerDataService.Mutate(player, "MarkDiscoveryRewardFailed", rewardSourceContext, function(playerData)
+				playerData.Discoveries.DiscoveryStates = playerData.Discoveries.DiscoveryStates or {}
+				local discoveryState = playerData.Discoveries.DiscoveryStates[discoveryId]
+				if discoveryState then
+					discoveryState.RewardPending = true
+					discoveryState.RewardFailureCode = rewardResult.Code
+					discoveryState.UpdatedAt = os.time()
+				end
+				return true
+			end)
+
+			return result(false, "DiscoveryRewardFailed", "Discovery recorded but reward grant failed.", {
+				DiscoveryId = discoveryId,
+				RewardBundleId = discoveryDefinition.RewardBundleId,
+				FailureCode = rewardResult.Code,
+			})
+		end
+
+		local rewardAppliedResult = playerDataService.Mutate(player, "MarkDiscoveryRewardApplied", rewardSourceContext, function(playerData)
+			local discoveryState = playerData.Discoveries.DiscoveryStates and playerData.Discoveries.DiscoveryStates[discoveryId]
+			if discoveryState then
+				discoveryState.RewardPending = false
+				discoveryState.RewardFailureCode = nil
+				discoveryState.UpdatedAt = os.time()
+			end
+			return true
+		end)
+
+		if not rewardAppliedResult.Success then
+			return rewardAppliedResult
+		end
 	end
 
 	return result(true, "DiscoveryRecorded", nil, {

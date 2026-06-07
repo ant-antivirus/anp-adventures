@@ -9,6 +9,12 @@ return {
 			"obj_ep01_main_001_003",
 			"obj_ep01_main_001_004",
 		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_001_001 = { RequiredAmount = 1 },
+			obj_ep01_main_001_002 = { RequiredAmount = 1 },
+			obj_ep01_main_001_003 = { RequiredAmount = 1 },
+			obj_ep01_main_001_004 = { RequiredAmount = 1 },
+		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_001_001",
 			"obj_ep01_main_001_002",
@@ -35,6 +41,12 @@ return {
 			"obj_ep01_main_002_002",
 			"obj_ep01_main_002_003",
 			"obj_ep01_main_002_004",
+		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_002_001 = { RequiredAmount = 1 },
+			obj_ep01_main_002_002 = { RequiredAmount = 1 },
+			obj_ep01_main_002_003 = { RequiredAmount = 1 },
+			obj_ep01_main_002_004 = { RequiredAmount = 1 },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_002_001",
@@ -63,6 +75,12 @@ return {
 			"obj_ep01_main_003_003",
 			"obj_ep01_main_003_004",
 		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_003_001 = { RequiredAmount = 1 },
+			obj_ep01_main_003_002 = { RequiredAmount = 1 },
+			obj_ep01_main_003_003 = { RequiredAmount = 1 },
+			obj_ep01_main_003_004 = { RequiredAmount = 1 },
+		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_003_001",
 			"obj_ep01_main_003_002",
@@ -90,6 +108,12 @@ return {
 			"obj_ep01_main_004_002",
 			"obj_ep01_main_004_003",
 			"obj_ep01_main_004_004",
+		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_004_001 = { RequiredAmount = 1 },
+			obj_ep01_main_004_002 = { RequiredAmount = 1 },
+			obj_ep01_main_004_003 = { RequiredAmount = 1 },
+			obj_ep01_main_004_004 = { RequiredAmount = 1 },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_004_001",
@@ -121,6 +145,15 @@ return {
 			"obj_ep01_main_005_optional_001",
 			"obj_ep01_main_005_optional_002",
 			"obj_ep01_main_005_optional_003",
+		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_005_001 = { RequiredAmount = 1 },
+			obj_ep01_main_005_002 = { RequiredAmount = 1 },
+			obj_ep01_main_005_003 = { RequiredAmount = 1 },
+			obj_ep01_main_005_004 = { RequiredAmount = 1 },
+			obj_ep01_main_005_optional_001 = { RequiredAmount = 1 },
+			obj_ep01_main_005_optional_002 = { RequiredAmount = 1 },
+			obj_ep01_main_005_optional_003 = { RequiredAmount = 1 },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_005_001",
@@ -163,6 +196,12 @@ return {
 			"obj_ep01_main_006_003",
 			"obj_ep01_main_006_004",
 		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_006_001 = { RequiredAmount = 1 },
+			obj_ep01_main_006_002 = { RequiredAmount = 1 },
+			obj_ep01_main_006_003 = { RequiredAmount = 1 },
+			obj_ep01_main_006_004 = { RequiredAmount = 1 },
+		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_006_001",
 			"obj_ep01_main_006_002",
@@ -191,6 +230,12 @@ return {
 			"obj_ep01_main_007_003",
 			"obj_ep01_main_007_004",
 		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_007_001 = { RequiredAmount = 1 },
+			obj_ep01_main_007_002 = { RequiredAmount = 1 },
+			obj_ep01_main_007_003 = { RequiredAmount = 1 },
+			obj_ep01_main_007_004 = { RequiredAmount = 1 },
+		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_007_001",
 			"obj_ep01_main_007_002",
@@ -218,6 +263,13 @@ return {
 			"obj_ep01_main_008_003",
 			"obj_ep01_main_008_004",
 			"obj_ep01_main_008_005",
+		},
+		ObjectiveDefinitions = {
+			obj_ep01_main_008_001 = { RequiredAmount = 1 },
+			obj_ep01_main_008_002 = { RequiredAmount = 1 },
+			obj_ep01_main_008_003 = { RequiredAmount = 1 },
+			obj_ep01_main_008_004 = { RequiredAmount = 1 },
+			obj_ep01_main_008_005 = { RequiredAmount = 1 },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_008_001",

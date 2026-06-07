@@ -4,28 +4,13 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local RewardDefinitions = require(Shared.Definitions.RewardDefinitions)
 local ItemDefinitions = require(Shared.Definitions.ItemDefinitions)
 local BadgeConfig = require(Shared.Config.BadgeConfig)
+local AssemblyConfig = require(Shared.Config.AssemblyConfig)
 
 local RewardService = {}
 
 local playerDataService = nil
 local progressionService = nil
 local inventoryService = nil
-
-local EP01_FRAGMENT_IDS = {
-	item_ep01_fragment_universe = true,
-	item_ep01_fragment_earth = true,
-	item_ep01_fragment_theos = true,
-	item_ep01_fragment_rocket = true,
-	item_ep01_fragment_moon = true,
-}
-
-local REQUIRED_EP01_ASSEMBLY_ITEMS = {
-	"item_ep01_fragment_universe",
-	"item_ep01_fragment_earth",
-	"item_ep01_fragment_theos",
-	"item_ep01_fragment_rocket",
-	"item_ep01_fragment_moon",
-}
 
 local SOURCE_SPECIFIC_DUPLICATE_POLICIES = {
 	OncePerPlayerPerDiscovery = true,
@@ -41,6 +26,18 @@ local function result(success, code, message, data)
 		Message = message,
 		Data = data,
 	}
+end
+
+local function validateClaimIdPart(value, label)
+	if type(value) ~= "string" or value == "" then
+		return result(false, "InvalidRewardClaimIdPart", label .. " must be a non-empty string.")
+	end
+
+	if string.find(value, ":", 1, true) then
+		return result(false, "InvalidRewardClaimIdPart", label .. " must not contain `:`.")
+	end
+
+	return result(true, "RewardClaimIdPartValid")
 end
 
 local function normalizeSourceContext(rewardBundleId, sourceContext)
@@ -64,6 +61,21 @@ end
 
 local function buildRewardClaimId(rewardBundleId, sourceContext)
 	local rewardSourceContext = normalizeSourceContext(rewardBundleId, sourceContext)
+	local sourceTypeResult = validateClaimIdPart(rewardSourceContext.SourceType, "SourceType")
+	if not sourceTypeResult.Success then
+		return nil, nil, sourceTypeResult
+	end
+
+	local sourceIdResult = validateClaimIdPart(rewardSourceContext.SourceId, "SourceId")
+	if not sourceIdResult.Success then
+		return nil, nil, sourceIdResult
+	end
+
+	local rewardBundleIdResult = validateClaimIdPart(rewardBundleId, "RewardBundleId")
+	if not rewardBundleIdResult.Success then
+		return nil, nil, rewardBundleIdResult
+	end
+
 	return rewardSourceContext.SourceType .. ":" .. rewardSourceContext.SourceId .. ":" .. rewardBundleId, rewardSourceContext
 end
 
@@ -109,7 +121,7 @@ local function validateRewardDefinition(rewardBundleId, rewardDefinition)
 	end
 
 	for _, consumedItemId in ipairs(rewardDefinition.ConsumesItems or {}) do
-		if EP01_FRAGMENT_IDS[consumedItemId] then
+		if AssemblyConfig.EpisodeOne.RetainedFragmentItemIds[consumedItemId] then
 			return result(false, "RewardConsumesRetainedFragment", "Reward bundle may not consume Episode 1 fragment `" .. consumedItemId .. "`.")
 		end
 	end
@@ -118,7 +130,7 @@ local function validateRewardDefinition(rewardBundleId, rewardDefinition)
 end
 
 local function canGrantEpisodeOneFinalReward(player)
-	for _, itemId in ipairs(REQUIRED_EP01_ASSEMBLY_ITEMS) do
+	for _, itemId in ipairs(AssemblyConfig.EpisodeOne.RequiredFragmentItemIds) do
 		if not inventoryService.HasItem(player, itemId, 1) then
 			return false, itemId
 		end
@@ -137,7 +149,7 @@ function RewardService.Init(dependencies)
 	assert(inventoryService, "RewardService requires InventoryService.")
 end
 
-function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
+function RewardService.CanGrantRewardBundle(player, rewardBundleId, sourceContext)
 	local rewardDefinition = RewardDefinitions[rewardBundleId]
 	local validationResult = validateRewardDefinition(rewardBundleId, rewardDefinition)
 
@@ -145,7 +157,10 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 		return validationResult
 	end
 
-	local rewardClaimId, rewardSourceContext = buildRewardClaimId(rewardBundleId, sourceContext)
+	local rewardClaimId, rewardSourceContext, claimError = buildRewardClaimId(rewardBundleId, sourceContext)
+	if claimError then
+		return claimError
+	end
 
 	if playerDataService.HasRewardClaim(player, rewardClaimId) then
 		return result(false, "DuplicateRewardBlocked", "Reward claim has already been granted.", {
@@ -163,12 +178,30 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 		})
 	end
 
-	if rewardBundleId == "reward_ep01_main_008" then
+	if rewardBundleId == AssemblyConfig.EpisodeOne.FinalRewardBundleId then
 		local canGrant, missingItemId = canGrantEpisodeOneFinalReward(player)
 		if not canGrant then
 			return result(false, "MissingEpisodeOneAssemblyItem", "Cannot grant Episode 1 final reward without `" .. missingItemId .. "`.")
 		end
 	end
+
+	return result(true, "RewardGrantAllowed", nil, {
+		RewardBundleId = rewardBundleId,
+		RewardClaimId = rewardClaimId,
+		RewardSourceContext = rewardSourceContext,
+		RewardDefinition = rewardDefinition,
+	})
+end
+
+function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
+	local preflightResult = RewardService.CanGrantRewardBundle(player, rewardBundleId, sourceContext)
+	if not preflightResult.Success then
+		return preflightResult
+	end
+
+	local rewardDefinition = preflightResult.Data.RewardDefinition
+	local rewardClaimId = preflightResult.Data.RewardClaimId
+	local rewardSourceContext = preflightResult.Data.RewardSourceContext
 
 	local summary = {
 		RewardBundleId = rewardBundleId,

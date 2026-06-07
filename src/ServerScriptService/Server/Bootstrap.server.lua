@@ -114,7 +114,14 @@ QuestService.Init({
 	EpisodeService = EpisodeService,
 })
 
-WorldRegistryService.Init()
+local worldRegistryResult = WorldRegistryService.Init()
+if not worldRegistryResult.Success then
+	if RunService:IsStudio() then
+		warn("[ANP] World registry init warning: " .. worldRegistryResult.Code .. ". Studio smoke test may build the skeleton world.")
+	else
+		error("[ANP] World registry initialization failed: " .. worldRegistryResult.Code)
+	end
+end
 
 print("[ANP] Phase 2, Phase 3A, Phase 3B, and Phase 3C services initialized.")
 

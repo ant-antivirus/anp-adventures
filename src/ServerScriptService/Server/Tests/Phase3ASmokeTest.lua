@@ -95,6 +95,7 @@ function Phase3ASmokeTest.Run(services)
 	local playerSnapshot = PlayerDataService.GetSnapshot(player)
 	assertResultSuccess(playerSnapshot, "Full player snapshot should read.")
 	assertCondition(playerSnapshot.Data.Discoveries.FoundDiscoveryIds[DISCOVERY_ID] == true, "Discovery should be persisted in player discovery state.")
+	assertCondition(playerSnapshot.Data.Discoveries.DiscoveryStates[DISCOVERY_ID].RewardPending == false, "Discovery reward should not remain pending after successful grant.")
 	assertCondition(playerSnapshot.Data.Journal.UnlockedEntryIds.journal_ep01_theos_satellite_history == true, "Discovery reward should unlock journal entry.")
 	assertCondition(playerSnapshot.Data.Lore.UnlockedLoreIds.lore_ep01_theos_satellite_history == true, "Discovery reward should unlock lore entry.")
 

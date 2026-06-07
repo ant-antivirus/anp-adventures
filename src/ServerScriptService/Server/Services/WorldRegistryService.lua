@@ -19,6 +19,7 @@ local registry = {
 	InteractionPoints = {},
 	DiscoveryPoints = {},
 	NPCMarkers = {},
+	Duplicates = {},
 }
 
 local function result(success, code, message, data)
@@ -38,17 +39,30 @@ local function resetRegistry()
 	table.clear(registry.InteractionPoints)
 	table.clear(registry.DiscoveryPoints)
 	table.clear(registry.NPCMarkers)
+	table.clear(registry.Duplicates)
 end
 
-local function registerChildrenByAttribute(folder, attributeName, target)
+local function recordDuplicate(idType, id, object)
+	table.insert(registry.Duplicates, {
+		IdType = idType,
+		Id = id,
+		Object = object,
+	})
+end
+
+local function registerChildrenByAttribute(folder, attributeName, idType, target)
 	if not folder then
 		return
 	end
 
 	for _, object in ipairs(folder:GetChildren()) do
 		local id = object:GetAttribute(attributeName)
-		if type(id) == "string" and id ~= "" and target[id] == nil then
-			target[id] = object
+		if type(id) == "string" and id ~= "" then
+			if target[id] == nil then
+				target[id] = object
+			else
+				recordDuplicate(idType, id, object)
+			end
 		end
 	end
 end
@@ -67,11 +81,11 @@ function WorldRegistryService.Init()
 		registry.Folders[folderName] = worldRoot:FindFirstChild(folderName)
 	end
 
-	registerChildrenByAttribute(registry.Folders.Zones, "ZoneId", registry.Zones)
-	registerChildrenByAttribute(registry.Folders.SpawnPoints, "SpawnPointId", registry.SpawnPoints)
-	registerChildrenByAttribute(registry.Folders.InteractionPoints, "InteractionId", registry.InteractionPoints)
-	registerChildrenByAttribute(registry.Folders.DiscoveryPoints, "DiscoveryId", registry.DiscoveryPoints)
-	registerChildrenByAttribute(registry.Folders.NPCMarkers, "CharacterId", registry.NPCMarkers)
+	registerChildrenByAttribute(registry.Folders.Zones, "ZoneId", "ZoneId", registry.Zones)
+	registerChildrenByAttribute(registry.Folders.SpawnPoints, "SpawnPointId", "SpawnPointId", registry.SpawnPoints)
+	registerChildrenByAttribute(registry.Folders.InteractionPoints, "InteractionId", "InteractionId", registry.InteractionPoints)
+	registerChildrenByAttribute(registry.Folders.DiscoveryPoints, "DiscoveryId", "DiscoveryId", registry.DiscoveryPoints)
+	registerChildrenByAttribute(registry.Folders.NPCMarkers, "CharacterId", "CharacterId", registry.NPCMarkers)
 
 	return result(true, "WorldRegistered", nil, {
 		WorldRoot = worldRoot,
@@ -80,6 +94,7 @@ function WorldRegistryService.Init()
 		InteractionPointCount = if registry.Folders.InteractionPoints then #registry.Folders.InteractionPoints:GetChildren() else 0,
 		DiscoveryPointCount = if registry.Folders.DiscoveryPoints then #registry.Folders.DiscoveryPoints:GetChildren() else 0,
 		NPCMarkerCount = if registry.Folders.NPCMarkers then #registry.Folders.NPCMarkers:GetChildren() else 0,
+		Duplicates = registry.Duplicates,
 	})
 end
 
@@ -130,6 +145,10 @@ end
 function WorldRegistryService.GetNPCMarker(characterId)
 	local object = registry.NPCMarkers[characterId]
 	return result(object ~= nil, object and "NPCMarkerRead" or "NPCMarkerMissing", nil, object)
+end
+
+function WorldRegistryService.GetDuplicates()
+	return result(true, "WorldRegistryDuplicatesRead", nil, registry.Duplicates)
 end
 
 WorldRegistryService.WorldRootName = WORLD_ROOT_NAME
