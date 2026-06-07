@@ -15,9 +15,13 @@ local EpisodeService = require(script.Parent.Services.EpisodeService)
 local ZoneService = require(script.Parent.Services.ZoneService)
 local DiscoveryService = require(script.Parent.Services.DiscoveryService)
 local QuestService = require(script.Parent.Services.QuestService)
+local WorldRegistryService = require(script.Parent.Services.WorldRegistryService)
+local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
+local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
 local Phase2SmokeTest = require(script.Parent.Tests.Phase2SmokeTest)
 local Phase3ASmokeTest = require(script.Parent.Tests.Phase3ASmokeTest)
 local Phase3BSmokeTest = require(script.Parent.Tests.Phase3BSmokeTest)
+local Phase3CSmokeTest = require(script.Parent.Tests.Phase3CSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -110,7 +114,9 @@ QuestService.Init({
 	EpisodeService = EpisodeService,
 })
 
-print("[ANP] Phase 2, Phase 3A, and Phase 3B in-memory services initialized.")
+WorldRegistryService.Init()
+
+print("[ANP] Phase 2, Phase 3A, Phase 3B, and Phase 3C services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -133,6 +139,12 @@ if RunService:IsStudio() then
 		ProgressionService = ProgressionService,
 		InventoryService = InventoryService,
 		QuestService = QuestService,
+	})
+
+	Phase3CSmokeTest.Run({
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+		WorldObjectValidator = WorldObjectValidator,
 	})
 end
 
