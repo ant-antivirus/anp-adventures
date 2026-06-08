@@ -56,36 +56,42 @@ local MINIMUM_INTERACTION_POINTS = {
 		QuestId = "quest_ep01_main_001",
 		ObjectiveId = "obj_ep01_main_001_001",
 		ZoneId = "zone_ep01_command_center",
+		Type = "QuestObjective",
 	},
 	{
 		InteractionId = "interaction_ep01_main_001_002",
 		QuestId = "quest_ep01_main_001",
 		ObjectiveId = "obj_ep01_main_001_002",
 		ZoneId = "zone_ep01_command_center",
+		Type = "QuestObjective",
 	},
 	{
 		InteractionId = "interaction_ep01_main_001_003",
 		QuestId = "quest_ep01_main_001",
 		ObjectiveId = "obj_ep01_main_001_003",
 		ZoneId = "zone_ep01_command_center",
+		Type = "QuestObjective",
 	},
 	{
 		InteractionId = "interaction_ep01_main_002_002",
 		QuestId = "quest_ep01_main_002",
 		ObjectiveId = "obj_ep01_main_002_002",
 		ZoneId = "zone_ep01_universe_explorer",
+		Type = "QuestObjective",
 	},
 	{
 		InteractionId = "interaction_ep01_main_005_003",
 		QuestId = "quest_ep01_main_005",
 		ObjectiveId = "obj_ep01_main_005_003",
 		ZoneId = "zone_ep01_theos_satellite_center",
+		Type = "QuestObjective",
 	},
 	{
 		InteractionId = "interaction_ep01_main_008_005",
 		QuestId = "quest_ep01_main_008",
 		ObjectiveId = "obj_ep01_main_008_005",
 		ZoneId = "zone_ep01_moon_walk",
+		Type = "QuestObjective",
 	},
 	{
 		InteractionId = "interaction_travel_ep01_universe_explorer",
@@ -160,6 +166,18 @@ local function setAttributes(instance, attributes)
 	end
 end
 
+local function ensurePartShape(object, size, color, transparency)
+	if not object:IsA("BasePart") then
+		return
+	end
+
+	object.Anchored = true
+	object.CanCollide = false
+	object.Size = size
+	object.Color = color
+	object.Transparency = transparency
+end
+
 local function getOrCreatePartByAttribute(folder, attributeName, value, name, position, size, color, transparency, attributes)
 	local object = findChildByAttribute(folder, attributeName, value)
 	if not object then
@@ -170,6 +188,7 @@ local function getOrCreatePartByAttribute(folder, attributeName, value, name, po
 		object = createPart(folder, name, position, size, color, transparency)
 	end
 
+	ensurePartShape(object, size, color, transparency)
 	setAttributes(object, attributes)
 	return object
 end
@@ -245,7 +264,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			interaction.InteractionId,
 			"Interaction_" .. interaction.InteractionId,
 			Vector3.new((index - 1) * 18, 7, -70),
-			Vector3.new(5, 5, 5),
+			Vector3.new(8, 6, 8),
 			Color3.fromRGB(110, 170, 240),
 			0.35,
 			interaction

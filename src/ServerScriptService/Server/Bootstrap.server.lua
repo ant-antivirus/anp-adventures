@@ -17,6 +17,7 @@ local DiscoveryService = require(script.Parent.Services.DiscoveryService)
 local QuestService = require(script.Parent.Services.QuestService)
 local WorldRegistryService = require(script.Parent.Services.WorldRegistryService)
 local InteractionService = require(script.Parent.Services.InteractionService)
+local PromptBindingService = require(script.Parent.Services.PromptBindingService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
@@ -25,6 +26,7 @@ local Phase3ASmokeTest = require(script.Parent.Tests.Phase3ASmokeTest)
 local Phase3BSmokeTest = require(script.Parent.Tests.Phase3BSmokeTest)
 local Phase3CSmokeTest = require(script.Parent.Tests.Phase3CSmokeTest)
 local Phase3DSmokeTest = require(script.Parent.Tests.Phase3DSmokeTest)
+local Phase3ESmokeTest = require(script.Parent.Tests.Phase3ESmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -134,7 +136,25 @@ InteractionService.Init({
 	ZoneService = ZoneService,
 })
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, and Phase 3D services initialized.")
+PromptBindingService.Init({
+	WorldRegistryService = WorldRegistryService,
+	InteractionService = InteractionService,
+})
+
+if worldRegistryResult.Success then
+	local promptBindingResult = PromptBindingService.BindAllPrompts()
+	if not promptBindingResult.Success then
+		for _, promptError in ipairs(promptBindingResult.Data.Errors or {}) do
+			warn("[ANP] Prompt binding failed for " .. promptError.InteractionId .. ": " .. promptError.Code)
+		end
+
+		if not RunService:IsStudio() then
+			error("[ANP] Prompt binding failed in production server bootstrap.")
+		end
+	end
+end
+
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, and Phase 3E services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -171,6 +191,15 @@ if RunService:IsStudio() then
 		ZoneService = ZoneService,
 		InteractionService = InteractionService,
 		InteractionValidator = InteractionValidator,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	Phase3ESmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		ZoneService = ZoneService,
+		PromptBindingService = PromptBindingService,
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
