@@ -1,0 +1,172 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local QuestDefinitions = require(Shared.Definitions.QuestDefinitions)
+local CharacterConfig = require(Shared.Config.CharacterConfig)
+
+local GuidanceService = {}
+
+local playerDataService = nil
+local questService = nil
+
+local CHARACTER_NAMES = {
+	[CharacterConfig.Ids.Atom] = "Atom",
+	[CharacterConfig.Ids.Neutron] = "Neutron",
+	[CharacterConfig.Ids.Proton] = "Proton",
+}
+
+local function result(success, code, message, data)
+	return {
+		Success = success,
+		Code = code,
+		Message = message,
+		Data = data,
+	}
+end
+
+local function characterName(characterId)
+	return CHARACTER_NAMES[characterId] or "Guide"
+end
+
+local function getObjectiveText(questDefinition, objectiveId)
+	local objectiveDefinition = questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[objectiveId]
+	if objectiveDefinition and objectiveDefinition.ObjectiveText then
+		return objectiveDefinition.ObjectiveText
+	end
+
+	return objectiveId
+end
+
+local function buildCharacterHint(characterId, guidanceType, objectiveText)
+	if guidanceType == "StartQuest001" then
+		if characterId == CharacterConfig.Ids.Proton then
+			return "Look for the green Quest Start marker in the Command Center."
+		elseif characterId == CharacterConfig.Ids.Neutron then
+			return "We need to begin the expedition before analyzing clues."
+		end
+
+		return "Start your first ANP expedition at the Quest 001 start point."
+	elseif guidanceType == "NextObjective" then
+		if characterId == CharacterConfig.Ids.Proton then
+			return "Next step: " .. objectiveText
+		elseif characterId == CharacterConfig.Ids.Neutron then
+			return "Let's investigate this next clue: " .. objectiveText
+		end
+
+		return "Keep moving. Your next objective is: " .. objectiveText
+	elseif guidanceType == "CompleteQuest" then
+		return "Return to the mission flow and complete the quest."
+	elseif guidanceType == "Quest002Available" then
+		return "Quest 002 is now available. Look for the next green Quest Start marker."
+	end
+
+	return "Explore nearby discoveries or return to the Command Center."
+end
+
+local function getActiveQuestId(questSnapshot)
+	local activeQuestIds = {}
+	for questId in pairs(questSnapshot.ActiveQuestIds or {}) do
+		table.insert(activeQuestIds, questId)
+	end
+	table.sort(activeQuestIds)
+
+	return activeQuestIds[1]
+end
+
+local function getNextIncompleteRequiredObjective(questDefinition, questState)
+	for _, objectiveId in ipairs(questDefinition.RequiredObjectiveIds or {}) do
+		local objectiveState = questState.ObjectiveStates and questState.ObjectiveStates[objectiveId]
+		if not objectiveState or objectiveState.Completed ~= true then
+			return objectiveId
+		end
+	end
+
+	return nil
+end
+
+function GuidanceService.Init(dependencies)
+	playerDataService = dependencies.PlayerDataService
+	questService = dependencies.QuestService
+
+	assert(playerDataService, "GuidanceService requires PlayerDataService.")
+	assert(questService, "GuidanceService requires QuestService.")
+end
+
+function GuidanceService.GetPlayerGuidance(player, characterId)
+	local questSnapshot = playerDataService.GetSnapshot(player, "Quests")
+	if not questSnapshot.Success then
+		return questSnapshot
+	end
+
+	local guideCharacterId = characterId
+	local activeQuestId = getActiveQuestId(questSnapshot.Data)
+
+	if activeQuestId then
+		local questDefinition = QuestDefinitions[activeQuestId]
+		local questStateResult = questService.GetQuestState(player, activeQuestId)
+		if not questStateResult.Success then
+			return questStateResult
+		end
+
+		local nextObjectiveId = getNextIncompleteRequiredObjective(questDefinition, questStateResult.Data)
+		if nextObjectiveId then
+			local objectiveText = getObjectiveText(questDefinition, nextObjectiveId)
+			return result(true, "GuidanceReady", nil, {
+				CharacterId = guideCharacterId,
+				ActiveQuestId = activeQuestId,
+				ActiveQuestTitle = questDefinition.Title or activeQuestId,
+				NextObjectiveId = nextObjectiveId,
+				NextObjectiveText = objectiveText,
+				HintText = buildCharacterHint(guideCharacterId, "NextObjective", objectiveText),
+			})
+		end
+
+		return result(true, "GuidanceReady", nil, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = activeQuestId,
+			ActiveQuestTitle = questDefinition.Title or activeQuestId,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "CompleteQuest"),
+		})
+	end
+
+	local canStartQuest001 = questService.CanStartQuest(player, "quest_ep01_main_001")
+	if canStartQuest001 then
+		return result(true, "GuidanceReady", nil, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "StartQuest001"),
+		})
+	end
+
+	local canStartQuest002 = questService.CanStartQuest(player, "quest_ep01_main_002")
+	if canStartQuest002 then
+		return result(true, "GuidanceReady", nil, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest002Available"),
+		})
+	end
+
+	return result(true, "GuidanceReady", nil, {
+		CharacterId = guideCharacterId,
+		ActiveQuestId = nil,
+		ActiveQuestTitle = nil,
+		NextObjectiveId = nil,
+		NextObjectiveText = nil,
+		HintText = buildCharacterHint(guideCharacterId, "Explore"),
+	})
+end
+
+function GuidanceService.GetCharacterName(characterId)
+	return characterName(characterId)
+end
+
+return GuidanceService

@@ -15,6 +15,7 @@ local QuestStatus = {
 local playerDataService = nil
 local rewardService = nil
 local episodeService = nil
+local interactionVisibilityService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -182,10 +183,21 @@ function QuestService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	rewardService = dependencies.RewardService
 	episodeService = dependencies.EpisodeService
+	interactionVisibilityService = dependencies.InteractionVisibilityService
 
 	assert(playerDataService, "QuestService requires PlayerDataService.")
 	assert(rewardService, "QuestService requires RewardService.")
 	assert(episodeService, "QuestService requires EpisodeService.")
+end
+
+function QuestService.SetInteractionVisibilityService(service)
+	interactionVisibilityService = service
+end
+
+local function refreshInteractionVisibility(player)
+	if interactionVisibilityService then
+		interactionVisibilityService.RefreshPlayer(player)
+	end
 end
 
 function QuestService.CanStartQuest(player, questId)
@@ -195,7 +207,7 @@ function QuestService.CanStartQuest(player, questId)
 	end
 
 	if not episodeService.IsEpisodeUnlocked(player, questDefinition.EpisodeId) then
-		return false, "EpisodeLocked"
+		return false, "QuestLocked"
 	end
 
 	local snapshotResult = playerDataService.GetSnapshot(player, "Quests")
@@ -214,7 +226,7 @@ function QuestService.CanStartQuest(player, questId)
 
 	local previousQuestId = findPreviousQuestId(questDefinition)
 	if previousQuestId and not snapshotResult.Data.CompletedQuestIds[previousQuestId] then
-		return false, "PreviousQuestIncomplete"
+		return false, "QuestPrerequisiteMissing"
 	end
 
 	return true
@@ -246,6 +258,8 @@ function QuestService.StartQuest(player, questId, sourceContext)
 	if not mutationResult.Success then
 		return mutationResult
 	end
+
+	refreshInteractionVisibility(player)
 
 	return result(true, "QuestStarted", nil, {
 		QuestId = questId,
@@ -382,6 +396,8 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 				return retryAppliedResult
 			end
 
+			refreshInteractionVisibility(player)
+
 			return result(true, "QuestCompletionRewardRetried", nil, {
 				QuestId = questId,
 				GrantedRewardBundleIds = grantedRewardBundleIds,
@@ -479,6 +495,8 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		return rewardAppliedResult
 	end
 
+	refreshInteractionVisibility(player)
+
 	local nextQuestId = nil
 	local episodeDefinition = EpisodeDefinitions[questDefinition.EpisodeId]
 	if episodeDefinition then
@@ -527,6 +545,8 @@ function QuestService.AbandonQuest(player, questId, reason)
 	if not mutationResult.Success then
 		return mutationResult
 	end
+
+	refreshInteractionVisibility(player)
 
 	return result(true, "QuestAbandoned", nil, {
 		QuestId = questId,

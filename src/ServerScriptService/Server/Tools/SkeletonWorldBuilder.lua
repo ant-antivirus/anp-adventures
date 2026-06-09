@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local ZoneDefinitions = require(Shared.Definitions.ZoneDefinitions)
+local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
 local CharacterConfig = require(Shared.Config.CharacterConfig)
 
 local SkeletonWorldBuilder = {}
@@ -15,6 +16,31 @@ local REQUIRED_FOLDERS = {
 	"InteractionPoints",
 	"DiscoveryPoints",
 	"NPCMarkers",
+}
+
+local DEVELOPER_LABEL_NAME = "ANP_DeveloperLabel"
+
+local PLACEHOLDER_COLORS = {
+	QuestStart = Color3.fromRGB(80, 220, 120),
+	QuestObjective = Color3.fromRGB(90, 155, 255),
+	Discovery = Color3.fromRGB(245, 210, 80),
+	ZoneTravel = Color3.fromRGB(170, 110, 245),
+	NPCMarker = Color3.fromRGB(245, 145, 65),
+	SpawnPoint = Color3.fromRGB(245, 245, 245),
+}
+
+local CHARACTER_FRIENDLY_NAMES = {
+	[CharacterConfig.Ids.Atom] = "Atom",
+	[CharacterConfig.Ids.Neutron] = "Neutron",
+	[CharacterConfig.Ids.Proton] = "Proton",
+}
+
+local DISCOVERY_FRIENDLY_NAMES = {
+	disc_ep01_command_expedition_terminal = "Expedition Terminal",
+	disc_ep01_command_star_core_display = "Star Core Display",
+	disc_ep01_universe_first_signal_marker = "First Signal Marker",
+	disc_ep01_theos_satellite_history = "THEOS Satellite History",
+	disc_ep01_moon_star_core_segment_restoration_point = "Star Core Restoration Point",
 }
 
 local EPISODE_ONE_ZONE_IDS = {
@@ -51,6 +77,20 @@ local MINIMUM_DISCOVERY_POINTS = {
 }
 
 local MINIMUM_INTERACTION_POINTS = {
+	{
+		InteractionId = "interaction_start_ep01_main_001",
+		QuestId = "quest_ep01_main_001",
+		ZoneId = "zone_ep01_command_center",
+		Type = "QuestStart",
+		Name = "StartQuest_001",
+	},
+	{
+		InteractionId = "interaction_start_ep01_main_002",
+		QuestId = "quest_ep01_main_002",
+		ZoneId = "zone_ep01_universe_explorer",
+		Type = "QuestStart",
+		Name = "StartQuest_002",
+	},
 	{
 		InteractionId = "interaction_ep01_main_001_001",
 		QuestId = "quest_ep01_main_001",
@@ -105,14 +145,17 @@ local MINIMUM_INTERACTION_POINTS = {
 local NPC_MARKERS = {
 	{
 		CharacterId = CharacterConfig.Ids.Atom,
+		InteractionId = "interaction_npc_atom_guide",
 		ZoneId = "zone_ep01_command_center",
 	},
 	{
 		CharacterId = CharacterConfig.Ids.Neutron,
+		InteractionId = "interaction_npc_neutron_guide",
 		ZoneId = "zone_ep01_command_center",
 	},
 	{
 		CharacterId = CharacterConfig.Ids.Proton,
+		InteractionId = "interaction_npc_proton_guide",
 		ZoneId = "zone_ep01_command_center",
 	},
 }
@@ -166,6 +209,47 @@ local function setAttributes(instance, attributes)
 	end
 end
 
+local function getOrCreateDeveloperLabel(part)
+	local label = part:FindFirstChild(DEVELOPER_LABEL_NAME)
+	if label and label:IsA("BillboardGui") then
+		return label
+	end
+
+	label = Instance.new("BillboardGui")
+	label.Name = DEVELOPER_LABEL_NAME
+	label.AlwaysOnTop = true
+	label.Size = UDim2.new(0, 260, 0, 76)
+	label.Parent = part
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Name = "Text"
+	textLabel.BackgroundColor3 = Color3.fromRGB(20, 24, 30)
+	textLabel.BackgroundTransparency = 0.15
+	textLabel.BorderSizePixel = 0
+	textLabel.Font = Enum.Font.GothamMedium
+	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel.TextScaled = true
+	textLabel.TextWrapped = true
+	textLabel.Size = UDim2.fromScale(1, 1)
+	textLabel.Parent = label
+
+	return label
+end
+
+local function setDeveloperLabel(object, category, friendlyName, internalId)
+	if not object:IsA("BasePart") then
+		return
+	end
+
+	local label = getOrCreateDeveloperLabel(object)
+	label.StudsOffset = Vector3.new(0, object.Size.Y / 2 + 3, 0)
+
+	local textLabel = label:FindFirstChild("Text")
+	if textLabel and textLabel:IsA("TextLabel") then
+		textLabel.Text = "[" .. category .. "]\n" .. friendlyName .. "\n" .. internalId
+	end
+end
+
 local function ensurePartShape(object, size, color, transparency)
 	if not object:IsA("BasePart") then
 		return
@@ -191,6 +275,70 @@ local function getOrCreatePartByAttribute(folder, attributeName, value, name, po
 	ensurePartShape(object, size, color, transparency)
 	setAttributes(object, attributes)
 	return object
+end
+
+local function questFriendlyName(questId)
+	local questNumber = string.match(questId or "", "main_(%d+)")
+	if questNumber then
+		return "Quest " .. questNumber
+	end
+
+	return questId or "Quest"
+end
+
+local function getInteractionFriendlyName(interaction)
+	if interaction.Type == "QuestStart" then
+		return questFriendlyName(interaction.QuestId)
+	end
+
+	local definition = InteractionDefinitions[interaction.InteractionId]
+	if definition and definition.PromptObjectText then
+		return definition.PromptObjectText
+	end
+
+	if interaction.Type == "ZoneTravel" then
+		return "Zone Travel"
+	end
+
+	return interaction.ObjectiveId or interaction.InteractionId
+end
+
+local function getInteractionLabelCategory(interactionType)
+	if interactionType == "QuestStart" then
+		return "QUEST START"
+	elseif interactionType == "QuestObjective" then
+		return "QUEST OBJECTIVE"
+	elseif interactionType == "ZoneTravel" then
+		return "ZONE TRAVEL"
+	elseif interactionType == "Discovery" then
+		return "DISCOVERY"
+	end
+
+	return "INTERACTION"
+end
+
+local function buildInteractionAttributes(interaction)
+	local attributes = {
+		InteractionId = interaction.InteractionId,
+		QuestId = interaction.QuestId,
+		ZoneId = interaction.ZoneId,
+		InteractionType = interaction.Type,
+	}
+
+	if interaction.ObjectiveId then
+		attributes.ObjectiveId = interaction.ObjectiveId
+	end
+
+	return attributes
+end
+
+local function buildNPCMarkerAttributes(marker)
+	return {
+		CharacterId = marker.CharacterId,
+		InteractionId = marker.InteractionId,
+		ZoneId = marker.ZoneId,
+		InteractionType = "NPCGuide",
+	}
 end
 
 function SkeletonWorldBuilder.BuildIfMissing()
@@ -226,62 +374,87 @@ function SkeletonWorldBuilder.BuildIfMissing()
 		)
 
 		for spawnIndex, spawnPointId in ipairs((ZoneDefinitions[zoneId] and ZoneDefinitions[zoneId].SpawnPoints) or {}) do
-			getOrCreatePartByAttribute(
+			local spawnObject = getOrCreatePartByAttribute(
 				folders.SpawnPoints,
 				"SpawnPointId",
 				spawnPointId,
 				"Spawn_" .. spawnPointId,
 				Vector3.new((index - 1) * 80, 6, spawnIndex * 8),
 				Vector3.new(6, 1, 6),
-				Color3.fromRGB(90, 210, 140),
+				PLACEHOLDER_COLORS.SpawnPoint,
 				0.55,
 				{
 					SpawnPointId = spawnPointId,
 					ZoneId = zoneId,
 				}
 			)
+			setDeveloperLabel(
+				spawnObject,
+				"SPAWN",
+				spawnPointId,
+				spawnPointId
+			)
 		end
 	end
 
 	for index, discovery in ipairs(MINIMUM_DISCOVERY_POINTS) do
-		getOrCreatePartByAttribute(
+		local discoveryObject = getOrCreatePartByAttribute(
 			folders.DiscoveryPoints,
 			"DiscoveryId",
 			discovery.DiscoveryId,
 			"Discovery_" .. discovery.DiscoveryId,
 			Vector3.new((index - 1) * 20, 8, 70),
 			Vector3.new(5, 5, 5),
-			Color3.fromRGB(235, 190, 80),
+			PLACEHOLDER_COLORS.Discovery,
 			0.35,
 			discovery
+		)
+		setDeveloperLabel(
+			discoveryObject,
+			"DISCOVERY",
+			DISCOVERY_FRIENDLY_NAMES[discovery.DiscoveryId] or discovery.DiscoveryId,
+			discovery.DiscoveryId
 		)
 	end
 
 	for index, interaction in ipairs(MINIMUM_INTERACTION_POINTS) do
-		getOrCreatePartByAttribute(
+		local partName = interaction.Name or ("Interaction_" .. interaction.InteractionId)
+		local interactionObject = getOrCreatePartByAttribute(
 			folders.InteractionPoints,
 			"InteractionId",
 			interaction.InteractionId,
-			"Interaction_" .. interaction.InteractionId,
+			partName,
 			Vector3.new((index - 1) * 18, 7, -70),
 			Vector3.new(8, 6, 8),
-			Color3.fromRGB(110, 170, 240),
+			PLACEHOLDER_COLORS[interaction.Type] or PLACEHOLDER_COLORS.QuestObjective,
 			0.35,
-			interaction
+			buildInteractionAttributes(interaction)
+		)
+		setDeveloperLabel(
+			interactionObject,
+			getInteractionLabelCategory(interaction.Type),
+			getInteractionFriendlyName(interaction),
+			interaction.InteractionId
 		)
 	end
 
 	for index, marker in ipairs(NPC_MARKERS) do
-		getOrCreatePartByAttribute(
+		local markerObject = getOrCreatePartByAttribute(
 			folders.NPCMarkers,
 			"CharacterId",
 			marker.CharacterId,
 			"NPCMarker_" .. marker.CharacterId,
 			Vector3.new((index - 1) * 8, 7, -18),
 			Vector3.new(4, 6, 4),
-			Color3.fromRGB(210, 120, 210),
+			PLACEHOLDER_COLORS.NPCMarker,
 			0.45,
-			marker
+			buildNPCMarkerAttributes(marker)
+		)
+		setDeveloperLabel(
+			markerObject,
+			"NPC GUIDE",
+			CHARACTER_FRIENDLY_NAMES[marker.CharacterId] or marker.CharacterId,
+			marker.InteractionId
 		)
 	end
 

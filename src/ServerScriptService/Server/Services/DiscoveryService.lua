@@ -9,6 +9,7 @@ local DiscoveryService = {}
 local playerDataService = nil
 local rewardService = nil
 local zoneService = nil
+local interactionVisibilityService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -59,10 +60,21 @@ function DiscoveryService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	rewardService = dependencies.RewardService
 	zoneService = dependencies.ZoneService
+	interactionVisibilityService = dependencies.InteractionVisibilityService
 
 	assert(playerDataService, "DiscoveryService requires PlayerDataService.")
 	assert(rewardService, "DiscoveryService requires RewardService.")
 	assert(zoneService, "DiscoveryService requires ZoneService.")
+end
+
+function DiscoveryService.SetInteractionVisibilityService(service)
+	interactionVisibilityService = service
+end
+
+local function refreshInteractionVisibility(player)
+	if interactionVisibilityService then
+		interactionVisibilityService.RefreshPlayer(player)
+	end
 end
 
 function DiscoveryService.GetDiscoveryState(player, discoveryId)
@@ -179,6 +191,8 @@ function DiscoveryService.RecordDiscovery(player, discoveryId, sourceContext)
 				return retryAppliedResult
 			end
 
+			refreshInteractionVisibility(player)
+
 			return result(true, "DiscoveryRewardRetried", nil, {
 				DiscoveryId = discoveryId,
 				RewardResult = retryRewardResult,
@@ -256,6 +270,8 @@ function DiscoveryService.RecordDiscovery(player, discoveryId, sourceContext)
 			return rewardAppliedResult
 		end
 	end
+
+	refreshInteractionVisibility(player)
 
 	return result(true, "DiscoveryRecorded", nil, {
 		DiscoveryId = discoveryId,

@@ -18,6 +18,8 @@ local QuestService = require(script.Parent.Services.QuestService)
 local WorldRegistryService = require(script.Parent.Services.WorldRegistryService)
 local InteractionService = require(script.Parent.Services.InteractionService)
 local PromptBindingService = require(script.Parent.Services.PromptBindingService)
+local InteractionVisibilityService = require(script.Parent.Services.InteractionVisibilityService)
+local GuidanceService = require(script.Parent.Services.GuidanceService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
@@ -27,6 +29,11 @@ local Phase3BSmokeTest = require(script.Parent.Tests.Phase3BSmokeTest)
 local Phase3CSmokeTest = require(script.Parent.Tests.Phase3CSmokeTest)
 local Phase3DSmokeTest = require(script.Parent.Tests.Phase3DSmokeTest)
 local Phase3ESmokeTest = require(script.Parent.Tests.Phase3ESmokeTest)
+local Phase3FSmokeTest = require(script.Parent.Tests.Phase3FSmokeTest)
+local Phase3FBSmokeTest = require(script.Parent.Tests.Phase3FBSmokeTest)
+local Phase3FBBugfixSmokeTest = require(script.Parent.Tests.Phase3FBBugfixSmokeTest)
+local DeveloperWorldUXSmokeTest = require(script.Parent.Tests.DeveloperWorldUXSmokeTest)
+local Phase3FCSmokeTest = require(script.Parent.Tests.Phase3FCSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -119,6 +126,11 @@ QuestService.Init({
 	EpisodeService = EpisodeService,
 })
 
+GuidanceService.Init({
+	PlayerDataService = PlayerDataService,
+	QuestService = QuestService,
+})
+
 local worldRegistryResult = WorldRegistryService.Init()
 if not worldRegistryResult.Success then
 	if RunService:IsStudio() then
@@ -134,12 +146,27 @@ InteractionService.Init({
 	QuestService = QuestService,
 	DiscoveryService = DiscoveryService,
 	ZoneService = ZoneService,
+	GuidanceService = GuidanceService,
 })
 
 PromptBindingService.Init({
 	WorldRegistryService = WorldRegistryService,
 	InteractionService = InteractionService,
 })
+
+InteractionVisibilityService.Initialize({
+	PlayerDataService = PlayerDataService,
+	QuestService = QuestService,
+	DiscoveryService = DiscoveryService,
+	ZoneService = ZoneService,
+	PromptBindingService = PromptBindingService,
+})
+
+PromptBindingService.SetInteractionVisibilityService(InteractionVisibilityService)
+InteractionService.SetInteractionVisibilityService(InteractionVisibilityService)
+QuestService.SetInteractionVisibilityService(InteractionVisibilityService)
+DiscoveryService.SetInteractionVisibilityService(InteractionVisibilityService)
+ZoneService.SetInteractionVisibilityService(InteractionVisibilityService)
 
 if worldRegistryResult.Success then
 	local promptBindingResult = PromptBindingService.BindAllPrompts()
@@ -154,7 +181,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, and Phase 3E services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, and Phase 3F-B services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -203,6 +230,53 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+
+	Phase3FSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	Phase3FBSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		DiscoveryService = DiscoveryService,
+		ZoneService = ZoneService,
+		InteractionVisibilityService = InteractionVisibilityService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	Phase3FBBugfixSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		InteractionVisibilityService = InteractionVisibilityService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	DeveloperWorldUXSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	Phase3FCSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		GuidanceService = GuidanceService,
+		InteractionService = InteractionService,
+		InteractionValidator = InteractionValidator,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
 end
 
 local function onPlayerAdded(player)
@@ -211,6 +285,11 @@ local function onPlayerAdded(player)
 	if not initResult.Success then
 		warn("[ANP] Player data init failed for " .. player.Name .. ": " .. initResult.Code)
 		return
+	end
+
+	local visibilityResult = InteractionVisibilityService.RefreshPlayer(player)
+	if not visibilityResult.Success then
+		warn("[ANP] Player interaction visibility refresh failed for " .. player.Name .. ": " .. visibilityResult.Code)
 	end
 
 	print("[ANP] Player data initialized for " .. player.Name)

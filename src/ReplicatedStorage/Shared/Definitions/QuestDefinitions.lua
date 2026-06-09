@@ -3,6 +3,7 @@ return {
 		QuestId = "quest_ep01_main_001",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_command_center",
+		Title = "Quest 001",
 		ObjectiveIds = {
 			"obj_ep01_main_001_001",
 			"obj_ep01_main_001_002",
@@ -10,10 +11,10 @@ return {
 			"obj_ep01_main_001_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_001_001 = { RequiredAmount = 1 },
-			obj_ep01_main_001_002 = { RequiredAmount = 1 },
-			obj_ep01_main_001_003 = { RequiredAmount = 1 },
-			obj_ep01_main_001_004 = { RequiredAmount = 1 },
+			obj_ep01_main_001_001 = { RequiredAmount = 1, ObjectiveText = "Use the Expedition Terminal." },
+			obj_ep01_main_001_002 = { RequiredAmount = 1, ObjectiveText = "Review the mission briefing." },
+			obj_ep01_main_001_003 = { RequiredAmount = 1, ObjectiveText = "Check the launch console." },
+			obj_ep01_main_001_004 = { RequiredAmount = 1, ObjectiveText = "Inspect the Star Core Display." },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_001_001",
@@ -36,6 +37,7 @@ return {
 		QuestId = "quest_ep01_main_002",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_universe_explorer",
+		Title = "Quest 002",
 		ObjectiveIds = {
 			"obj_ep01_main_002_001",
 			"obj_ep01_main_002_002",
@@ -43,10 +45,10 @@ return {
 			"obj_ep01_main_002_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_002_001 = { RequiredAmount = 1 },
-			obj_ep01_main_002_002 = { RequiredAmount = 1 },
-			obj_ep01_main_002_003 = { RequiredAmount = 1 },
-			obj_ep01_main_002_004 = { RequiredAmount = 1 },
+			obj_ep01_main_002_001 = { RequiredAmount = 1, ObjectiveText = "Prepare for the Universe Explorer mission." },
+			obj_ep01_main_002_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the signal marker." },
+			obj_ep01_main_002_003 = { RequiredAmount = 1, ObjectiveText = "Analyze the signal clues." },
+			obj_ep01_main_002_004 = { RequiredAmount = 1, ObjectiveText = "Confirm the next expedition route." },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_002_001",

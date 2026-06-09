@@ -2,10 +2,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
+local QuestDefinitions = require(Shared.Definitions.QuestDefinitions)
 
 local InteractionService = {}
 
 local VALID_TYPES = {
+	NPCGuide = true,
+	QuestStart = true,
 	QuestObjective = true,
 	Discovery = true,
 	ZoneTravel = true,
@@ -17,12 +20,16 @@ local worldRegistryService = nil
 local questService = nil
 local discoveryService = nil
 local zoneService = nil
+local guidanceService = nil
+local interactionVisibilityService = nil
+local refreshInteractionVisibility = nil
 
 local function result(success, code, failureReason, data)
 	local response = {
 		Success = success,
 		Code = code,
 		FailureReason = failureReason,
+		GrantedQuestStart = false,
 		GrantedQuestProgress = false,
 		GrantedDiscovery = false,
 		GrantedZoneTravel = false,
@@ -30,6 +37,9 @@ local function result(success, code, failureReason, data)
 	}
 
 	if data then
+		if data.GrantedQuestStart ~= nil then
+			response.GrantedQuestStart = data.GrantedQuestStart
+		end
 		if data.GrantedQuestProgress ~= nil then
 			response.GrantedQuestProgress = data.GrantedQuestProgress
 		end
@@ -61,6 +71,14 @@ local function buildSourceContext(interactionId)
 end
 
 local function validateWorldObject(definition)
+	if definition.Type == "NPCGuide" then
+		local npcMarkerResult = worldRegistryService.GetNPCMarker(definition.CharacterId)
+		if not npcMarkerResult.Success then
+			return result(false, "InteractionWorldObjectMissing", "InteractionWorldObjectMissing")
+		end
+		return nil
+	end
+
 	if definition.Type == "Discovery" then
 		local discoveryPointResult = worldRegistryService.GetDiscoveryPoint(definition.DiscoveryId)
 		if not discoveryPointResult.Success then
@@ -77,18 +95,113 @@ local function validateWorldObject(definition)
 	return nil
 end
 
+local function findQuestIdForObjective(objectiveId)
+	for questId, questDefinition in pairs(QuestDefinitions) do
+		for _, questObjectiveId in ipairs(questDefinition.ObjectiveIds or {}) do
+			if questObjectiveId == objectiveId then
+				return questId
+			end
+		end
+	end
+
+	return nil
+end
+
+local function applyObjectiveProgressBridge(player, definition, sourceContext, metadata)
+	local objectiveProgressResults = {}
+	local skippedObjectiveProgressResults = {}
+
+	for _, objectiveId in ipairs(definition.ObjectiveProgressIds or {}) do
+		local questId = findQuestIdForObjective(objectiveId)
+		if not questId then
+			return result(false, "InvalidObjectiveProgressId", "InvalidObjectiveProgressId", {
+				ObjectiveId = objectiveId,
+			})
+		end
+
+		local progressResult = questService.ApplyObjectiveProgress(
+			player,
+			questId,
+			objectiveId,
+			1,
+			sourceContext,
+			metadata
+		)
+
+		if not progressResult.Success then
+			if progressResult.Code == "QuestNotActive" or progressResult.Code == "QuestAlreadyCompleted" then
+				table.insert(skippedObjectiveProgressResults, {
+					QuestId = questId,
+					ObjectiveId = objectiveId,
+					Code = progressResult.Code,
+				})
+				continue
+			end
+
+			return result(false, progressResult.Code, progressResult.Code, {
+				ObjectiveId = objectiveId,
+				QuestId = questId,
+				ServiceResult = progressResult,
+			})
+		end
+
+		table.insert(objectiveProgressResults, {
+			QuestId = questId,
+			ObjectiveId = objectiveId,
+			ServiceResult = progressResult,
+		})
+	end
+
+	return result(true, "ObjectiveProgressBridgeApplied", nil, {
+		ObjectiveProgressResults = objectiveProgressResults,
+		SkippedObjectiveProgressResults = skippedObjectiveProgressResults,
+		GrantedQuestProgress = #objectiveProgressResults > 0,
+	})
+end
+
+local function finishSuccessfulInteraction(player, definition, sourceContext, metadata, successCode, data)
+	local bridgeResult = applyObjectiveProgressBridge(player, definition, sourceContext, metadata)
+	if not bridgeResult.Success then
+		return bridgeResult
+	end
+
+	data = data or {}
+	data.ObjectiveProgressResults = bridgeResult.Data.ObjectiveProgressResults
+	data.SkippedObjectiveProgressResults = bridgeResult.Data.SkippedObjectiveProgressResults
+	if bridgeResult.Data.GrantedQuestProgress == true then
+		data.GrantedQuestProgress = true
+	end
+
+	return refreshInteractionVisibility(player, result(true, successCode, nil, data))
+end
+
 function InteractionService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	worldRegistryService = dependencies.WorldRegistryService
 	questService = dependencies.QuestService
 	discoveryService = dependencies.DiscoveryService
 	zoneService = dependencies.ZoneService
+	guidanceService = dependencies.GuidanceService
+	interactionVisibilityService = dependencies.InteractionVisibilityService
 
 	assert(playerDataService, "InteractionService requires PlayerDataService.")
 	assert(worldRegistryService, "InteractionService requires WorldRegistryService.")
 	assert(questService, "InteractionService requires QuestService.")
 	assert(discoveryService, "InteractionService requires DiscoveryService.")
 	assert(zoneService, "InteractionService requires ZoneService.")
+	assert(guidanceService, "InteractionService requires GuidanceService.")
+end
+
+function InteractionService.SetInteractionVisibilityService(service)
+	interactionVisibilityService = service
+end
+
+refreshInteractionVisibility = function(player, interactionResult)
+	if interactionResult.Success and interactionVisibilityService then
+		interactionVisibilityService.RefreshPlayer(player)
+	end
+
+	return interactionResult
 end
 
 function InteractionService.GetInteractionDefinition(interactionId)
@@ -138,7 +251,34 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 	local sourceContext = buildSourceContext(interactionId)
 	local safeMetadata = if type(metadata) == "table" then metadata else {}
 
-	if definition.Type == "QuestObjective" then
+	if definition.Type == "NPCGuide" then
+		local guidanceResult = guidanceService.GetPlayerGuidance(player, definition.CharacterId)
+		if not guidanceResult.Success then
+			return result(false, guidanceResult.Code, guidanceResult.Code, {
+				ServiceResult = guidanceResult,
+			})
+		end
+
+		local speakerName = guidanceService.GetCharacterName(definition.CharacterId)
+		print("[ANP Guidance] " .. speakerName .. " -> " .. guidanceResult.Data.HintText)
+
+		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionGuidanceProvided", {
+			Guidance = guidanceResult.Data,
+			ServiceResult = guidanceResult,
+		})
+	elseif definition.Type == "QuestStart" then
+		local startResult = questService.StartQuest(player, definition.QuestId, sourceContext)
+		if not startResult.Success then
+			return result(false, startResult.Code, startResult.Code, {
+				ServiceResult = startResult,
+			})
+		end
+
+		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionQuestStarted", {
+			GrantedQuestStart = true,
+			ServiceResult = startResult,
+		})
+	elseif definition.Type == "QuestObjective" then
 		local progressResult = questService.ApplyObjectiveProgress(
 			player,
 			definition.QuestId,
@@ -154,7 +294,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 			})
 		end
 
-		return result(true, "InteractionQuestProgressApplied", nil, {
+		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionQuestProgressApplied", {
 			GrantedQuestProgress = true,
 			ServiceResult = progressResult,
 		})
@@ -166,7 +306,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 			})
 		end
 
-		return result(true, "InteractionDiscoveryRecorded", nil, {
+		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionDiscoveryRecorded", {
 			GrantedDiscovery = true,
 			ServiceResult = discoveryResult,
 		})
@@ -185,13 +325,13 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 			})
 		end
 
-		return result(true, "InteractionZoneTravelRecorded", nil, {
+		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionZoneTravelRecorded", {
 			GrantedZoneTravel = true,
 			ServiceResult = travelResult,
 		})
 	end
 
-	return result(true, "InteractionGenericHandled", nil, {})
+	return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionGenericHandled", {})
 end
 
 return InteractionService

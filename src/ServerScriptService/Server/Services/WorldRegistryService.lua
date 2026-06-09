@@ -19,6 +19,7 @@ local registry = {
 	InteractionPoints = {},
 	DiscoveryPoints = {},
 	NPCMarkers = {},
+	NPCMarkersByInteractionId = {},
 	Duplicates = {},
 }
 
@@ -39,6 +40,7 @@ local function resetRegistry()
 	table.clear(registry.InteractionPoints)
 	table.clear(registry.DiscoveryPoints)
 	table.clear(registry.NPCMarkers)
+	table.clear(registry.NPCMarkersByInteractionId)
 	table.clear(registry.Duplicates)
 end
 
@@ -67,6 +69,23 @@ local function registerChildrenByAttribute(folder, attributeName, idType, target
 	end
 end
 
+local function registerNPCMarkerInteractionHosts(folder)
+	if not folder then
+		return
+	end
+
+	for _, object in ipairs(folder:GetChildren()) do
+		local interactionId = object:GetAttribute("InteractionId")
+		if type(interactionId) == "string" and interactionId ~= "" then
+			if registry.NPCMarkersByInteractionId[interactionId] == nil then
+				registry.NPCMarkersByInteractionId[interactionId] = object
+			else
+				recordDuplicate("NPCMarkerInteractionId", interactionId, object)
+			end
+		end
+	end
+end
+
 function WorldRegistryService.Init()
 	resetRegistry()
 
@@ -86,6 +105,7 @@ function WorldRegistryService.Init()
 	registerChildrenByAttribute(registry.Folders.InteractionPoints, "InteractionId", "InteractionId", registry.InteractionPoints)
 	registerChildrenByAttribute(registry.Folders.DiscoveryPoints, "DiscoveryId", "DiscoveryId", registry.DiscoveryPoints)
 	registerChildrenByAttribute(registry.Folders.NPCMarkers, "CharacterId", "CharacterId", registry.NPCMarkers)
+	registerNPCMarkerInteractionHosts(registry.Folders.NPCMarkers)
 
 	return result(true, "WorldRegistered", nil, {
 		WorldRoot = worldRoot,
@@ -124,6 +144,24 @@ function WorldRegistryService.GetInteractionPoints()
 	return result(true, "InteractionPointsRead", nil, registry.InteractionPoints)
 end
 
+function WorldRegistryService.GetInteractions()
+	local interactionIds = {}
+	for interactionId in pairs(registry.InteractionPoints) do
+		table.insert(interactionIds, interactionId)
+	end
+	table.sort(interactionIds)
+
+	local interactions = {}
+	for _, interactionId in ipairs(interactionIds) do
+		table.insert(interactions, {
+			InteractionId = interactionId,
+			Object = registry.InteractionPoints[interactionId],
+		})
+	end
+
+	return result(true, "InteractionsRead", nil, interactions)
+end
+
 function WorldRegistryService.GetInteractionPoint(interactionId)
 	local object = registry.InteractionPoints[interactionId]
 	return result(object ~= nil, object and "InteractionPointRead" or "InteractionPointMissing", nil, object)
@@ -149,6 +187,11 @@ end
 function WorldRegistryService.GetNPCMarker(characterId)
 	local object = registry.NPCMarkers[characterId]
 	return result(object ~= nil, object and "NPCMarkerRead" or "NPCMarkerMissing", nil, object)
+end
+
+function WorldRegistryService.GetNPCMarkerByInteractionId(interactionId)
+	local object = registry.NPCMarkersByInteractionId[interactionId]
+	return result(object ~= nil, object and "NPCMarkerInteractionRead" or "NPCMarkerInteractionMissing", nil, object)
 end
 
 function WorldRegistryService.GetDuplicates()

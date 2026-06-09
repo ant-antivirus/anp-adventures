@@ -9,6 +9,7 @@ local PROMPT_NAME = "ANP_InteractionPrompt"
 
 local worldRegistryService = nil
 local interactionService = nil
+local interactionVisibilityService = nil
 local boundPromptsByInteractionId = {}
 local boundConnectionsByInteractionId = {}
 
@@ -21,11 +22,27 @@ local function result(success, code, message, data)
 	}
 end
 
+local function hostResult(success, code, message, instance)
+	return {
+		Success = success,
+		Code = code,
+		Message = message,
+		Instance = instance,
+		Data = instance,
+	}
+end
+
 local function getDefaultActionText(interactionType)
-	if interactionType == "Discovery" then
-		return "Discover"
+	if interactionType == "NPCGuide" then
+		return "Ask"
+	elseif interactionType == "QuestStart" then
+		return "Start Quest"
+	elseif interactionType == "Discovery" then
+		return "Inspect"
 	elseif interactionType == "ZoneTravel" then
 		return "Travel"
+	elseif interactionType == "NPC" or interactionType == "NPCMarker" then
+		return "Talk"
 	elseif interactionType == "Generic" then
 		return "Use"
 	end
@@ -34,7 +51,11 @@ local function getDefaultActionText(interactionType)
 end
 
 local function getDefaultObjectText(definition)
-	if definition.Type == "Discovery" then
+	if definition.Type == "NPCGuide" then
+		return definition.CharacterId or definition.InteractionId
+	elseif definition.Type == "QuestStart" then
+		return definition.QuestId or definition.InteractionId
+	elseif definition.Type == "Discovery" then
 		return definition.DiscoveryId or definition.InteractionId
 	elseif definition.Type == "ZoneTravel" then
 		return definition.ZoneId or definition.InteractionId
@@ -45,12 +66,49 @@ local function getDefaultObjectText(definition)
 	return definition.InteractionId
 end
 
-local function getWorldObjectForDefinition(definition)
-	if definition.Type == "Discovery" then
-		return worldRegistryService.GetDiscoveryPoint(definition.DiscoveryId)
+local function resolvePromptHost(definition)
+	if not definition then
+		return hostResult(false, "InteractionDefinitionMissing", "Interaction definition is required.")
 	end
 
-	return worldRegistryService.GetInteractionPoint(definition.InteractionId)
+	if definition.Type == "NPCGuide" then
+		if type(definition.CharacterId) == "string" and definition.CharacterId ~= "" then
+			local markerByCharacter = worldRegistryService.GetNPCMarker(definition.CharacterId)
+			if markerByCharacter.Success then
+				return hostResult(true, "PromptHostResolved", nil, markerByCharacter.Data)
+			end
+		end
+
+		if worldRegistryService.GetNPCMarkerByInteractionId then
+			local markerByInteraction = worldRegistryService.GetNPCMarkerByInteractionId(definition.InteractionId)
+			if markerByInteraction.Success then
+				return hostResult(true, "PromptHostResolved", nil, markerByInteraction.Data)
+			end
+		end
+
+		return hostResult(false, "NPCGuidePromptHostMissing", "NPCGuide prompt host was not found.")
+	end
+
+	if definition.Type == "Discovery" then
+		local discoveryPoint = worldRegistryService.GetDiscoveryPoint(definition.DiscoveryId)
+		if discoveryPoint.Success then
+			return hostResult(true, "PromptHostResolved", nil, discoveryPoint.Data)
+		end
+
+		local interactionPoint = worldRegistryService.GetInteractionPoint(definition.InteractionId)
+		if interactionPoint.Success then
+			return hostResult(true, "PromptHostResolved", nil, interactionPoint.Data)
+		end
+
+		return hostResult(false, "DiscoveryPromptHostMissing", "Discovery prompt host was not found.")
+	end
+
+	local interactionPoint = worldRegistryService.GetInteractionPoint(definition.InteractionId)
+	if interactionPoint.Success then
+		return hostResult(true, "PromptHostResolved", nil, interactionPoint.Data)
+	end
+
+	return hostResult(false, "InteractionPointMissing", "Interaction prompt host was not found.")
 end
 
 local function getExistingPrompt(object, interactionId)
@@ -75,7 +133,7 @@ local function configurePrompt(prompt, definition)
 	prompt.HoldDuration = 0
 	prompt.RequiresLineOfSight = false
 	prompt.MaxActivationDistance = 12
-	prompt.Enabled = definition.Enabled == true
+	prompt.Enabled = false
 	prompt:SetAttribute("InteractionId", definition.InteractionId)
 end
 
@@ -99,6 +157,9 @@ local function handlePromptTriggered(player, interactionId, metadata)
 	local playerName = player and player.Name or "UnknownPlayer"
 	if interactionResult.Success then
 		print("[ANP PromptBindingService] Interaction `" .. interactionId .. "` succeeded for " .. playerName .. ".")
+		if interactionVisibilityService then
+			interactionVisibilityService.RefreshPlayer(player)
+		end
 	else
 		warn("[ANP PromptBindingService] Interaction `" .. interactionId .. "` failed for " .. playerName .. ": " .. tostring(interactionResult.Code))
 	end
@@ -129,9 +190,14 @@ end
 function PromptBindingService.Init(dependencies)
 	worldRegistryService = dependencies.WorldRegistryService
 	interactionService = dependencies.InteractionService
+	interactionVisibilityService = dependencies.InteractionVisibilityService
 
 	assert(worldRegistryService, "PromptBindingService requires WorldRegistryService.")
 	assert(interactionService, "PromptBindingService requires InteractionService.")
+end
+
+function PromptBindingService.SetInteractionVisibilityService(service)
+	interactionVisibilityService = service
 end
 
 function PromptBindingService.BindAllPrompts()
@@ -145,7 +211,7 @@ function PromptBindingService.BindAllPrompts()
 			continue
 		end
 
-		local objectResult = getWorldObjectForDefinition(definition)
+		local objectResult = resolvePromptHost(definition)
 		if not objectResult.Success then
 			table.insert(errors, {
 				InteractionId = interactionId,
@@ -174,9 +240,34 @@ function PromptBindingService.BindAllPrompts()
 	})
 end
 
+function PromptBindingService.ResolvePromptHost(interactionDefinition)
+	return resolvePromptHost(interactionDefinition)
+end
+
 function PromptBindingService.GetPromptForInteraction(interactionId)
 	local prompt = boundPromptsByInteractionId[interactionId]
 	return result(prompt ~= nil, prompt and "PromptRead" or "PromptMissing", nil, prompt)
+end
+
+function PromptBindingService.SetPromptEnabled(interactionId, enabled)
+	local prompt = boundPromptsByInteractionId[interactionId]
+	if not prompt then
+		return result(false, "PromptMissing", "Interaction prompt is not bound.")
+	end
+
+	prompt.Enabled = enabled == true
+	return result(true, "PromptEnabledStateUpdated", nil, {
+		InteractionId = interactionId,
+		Enabled = prompt.Enabled,
+	})
+end
+
+function PromptBindingService.RefreshPlayer(player)
+	if not interactionVisibilityService then
+		return result(false, "InteractionVisibilityServiceMissing", "InteractionVisibilityService has not been configured.")
+	end
+
+	return interactionVisibilityService.RefreshPlayer(player)
 end
 
 function PromptBindingService.SimulatePromptTrigger(player, interactionId, metadata)

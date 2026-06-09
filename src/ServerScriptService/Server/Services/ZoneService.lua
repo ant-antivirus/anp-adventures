@@ -6,6 +6,7 @@ local ZoneDefinitions = require(Shared.Definitions.ZoneDefinitions)
 local ZoneService = {}
 
 local playerDataService = nil
+local interactionVisibilityService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -37,8 +38,19 @@ end
 
 function ZoneService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
+	interactionVisibilityService = dependencies.InteractionVisibilityService
 
 	assert(playerDataService, "ZoneService requires PlayerDataService.")
+end
+
+function ZoneService.SetInteractionVisibilityService(service)
+	interactionVisibilityService = service
+end
+
+local function refreshInteractionVisibility(player)
+	if interactionVisibilityService then
+		interactionVisibilityService.RefreshPlayer(player)
+	end
 end
 
 function ZoneService.GetZoneState(player, zoneId)
@@ -88,6 +100,8 @@ function ZoneService.UnlockZone(player, zoneId, sourceContext)
 	if not mutationResult.Success then
 		return mutationResult
 	end
+
+	refreshInteractionVisibility(player)
 
 	return result(true, "ZoneUnlocked", nil, {
 		ZoneId = zoneId,
@@ -180,6 +194,8 @@ function ZoneService.UnlockFastTravel(player, zoneId, sourceContext)
 	if not mutationResult.Success then
 		return mutationResult
 	end
+
+	refreshInteractionVisibility(player)
 
 	return result(true, "FastTravelUnlocked", nil, {
 		ZoneId = zoneId,

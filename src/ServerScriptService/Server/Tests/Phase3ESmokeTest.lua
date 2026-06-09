@@ -39,14 +39,6 @@ local function countProximityPrompts(object)
 	return count
 end
 
-local function getPromptHost(WorldRegistryService, definition)
-	if definition.Type == "Discovery" then
-		return WorldRegistryService.GetDiscoveryPoint(definition.DiscoveryId)
-	end
-
-	return WorldRegistryService.GetInteractionPoint(definition.InteractionId)
-end
-
 function Phase3ESmokeTest.Run(services)
 	local PlayerDataService = services.PlayerDataService
 	local QuestService = services.QuestService
@@ -74,10 +66,10 @@ function Phase3ESmokeTest.Run(services)
 
 	for _, definition in pairs(InteractionDefinitions) do
 		if definition.EnabledInWorld ~= false then
-			local hostResult = getPromptHost(WorldRegistryService, definition)
+			local hostResult = PromptBindingService.ResolvePromptHost(definition)
 			assertResultSuccess(hostResult, "Prompt host should exist for interaction `" .. definition.InteractionId .. "`.")
 			assertCondition(
-				countProximityPrompts(hostResult.Data) == 1,
+				countProximityPrompts(hostResult.Instance) == 1,
 				"Prompt host should have exactly one ProximityPrompt for `" .. definition.InteractionId .. "`."
 			)
 		end

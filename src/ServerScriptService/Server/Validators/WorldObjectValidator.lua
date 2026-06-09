@@ -172,6 +172,7 @@ function WorldObjectValidator.Validate()
 			local questId = object:GetAttribute("QuestId")
 			local objectiveId = object:GetAttribute("ObjectiveId")
 			local zoneId = object:GetAttribute("ZoneId")
+			local interactionType = object:GetAttribute("InteractionType") or object:GetAttribute("Type")
 			local questDefinition = QuestDefinitions[questId]
 
 			if type(interactionId) ~= "string" or interactionId == "" then
@@ -182,7 +183,7 @@ function WorldObjectValidator.Validate()
 
 			if not questDefinition then
 				addError(validationResult, "Interaction point `" .. object:GetFullName() .. "` has invalid QuestId `" .. tostring(questId) .. "`.")
-			elseif not questContainsObjective(questDefinition, objectiveId) then
+			elseif interactionType ~= "QuestStart" and not questContainsObjective(questDefinition, objectiveId) then
 				addError(validationResult, "Interaction point `" .. object:GetFullName() .. "` has ObjectiveId not present in QuestDefinitions.")
 			end
 
@@ -198,6 +199,7 @@ function WorldObjectValidator.Validate()
 			validationResult.Summary.NPCMarkers += 1
 			local characterId = object:GetAttribute("CharacterId")
 			local zoneId = object:GetAttribute("ZoneId")
+			local interactionId = object:GetAttribute("InteractionId")
 			if type(characterId) ~= "string" or characterId == "" then
 				addError(validationResult, "NPC marker `" .. object:GetFullName() .. "` is missing CharacterId.")
 			else
@@ -208,6 +210,10 @@ function WorldObjectValidator.Validate()
 			end
 			if type(zoneId) ~= "string" or not ZoneDefinitions[zoneId] then
 				addError(validationResult, "NPC marker `" .. object:GetFullName() .. "` has invalid ZoneId `" .. tostring(zoneId) .. "`.")
+			end
+
+			if interactionId ~= nil and (type(interactionId) ~= "string" or interactionId == "") then
+				addError(validationResult, "NPC marker `" .. object:GetFullName() .. "` has invalid InteractionId `" .. tostring(interactionId) .. "`.")
 			end
 		end
 	end
