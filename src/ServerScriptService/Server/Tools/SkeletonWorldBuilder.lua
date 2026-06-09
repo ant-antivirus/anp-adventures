@@ -40,6 +40,7 @@ local DISCOVERY_FRIENDLY_NAMES = {
 	disc_ep01_command_expedition_terminal = "Expedition Terminal",
 	disc_ep01_command_star_core_display = "Star Core Display",
 	disc_ep01_universe_first_signal_marker = "First Signal Marker",
+	disc_ep01_universe_analysis_station = "Neutron Analysis Station",
 	disc_ep01_theos_satellite_history = "THEOS Satellite History",
 	disc_ep01_moon_star_core_segment_restoration_point = "Star Core Restoration Point",
 }
@@ -65,6 +66,10 @@ local MINIMUM_DISCOVERY_POINTS = {
 	},
 	{
 		DiscoveryId = "disc_ep01_universe_first_signal_marker",
+		ZoneId = "zone_ep01_universe_explorer",
+	},
+	{
+		DiscoveryId = "disc_ep01_universe_analysis_station",
 		ZoneId = "zone_ep01_universe_explorer",
 	},
 	{
@@ -126,6 +131,35 @@ local MINIMUM_INTERACTION_POINTS = {
 		ObjectiveId = "obj_ep01_main_002_002",
 		ZoneId = "zone_ep01_universe_explorer",
 		Type = "QuestObjective",
+		Name = "Quest002_LocateSignalMarker",
+		FriendlyName = "Quest 002 - Locate Signal Marker",
+	},
+	{
+		InteractionId = "interaction_ep01_main_002_001",
+		QuestId = "quest_ep01_main_002",
+		ObjectiveId = "obj_ep01_main_002_001",
+		ZoneId = "zone_ep01_universe_explorer",
+		Type = "QuestObjective",
+		Name = "Quest002_EnterUniverseExplorer",
+		FriendlyName = "Quest 002 - Enter Universe Explorer",
+	},
+	{
+		InteractionId = "interaction_ep01_main_002_003",
+		QuestId = "quest_ep01_main_002",
+		ObjectiveId = "obj_ep01_main_002_003",
+		ZoneId = "zone_ep01_universe_explorer",
+		Type = "QuestObjective",
+		Name = "Quest002_ScanSignalMarker",
+		FriendlyName = "Quest 002 - Scan Signal Marker",
+	},
+	{
+		InteractionId = "interaction_ep01_main_002_004",
+		QuestId = "quest_ep01_main_002",
+		ObjectiveId = "obj_ep01_main_002_004",
+		ZoneId = "zone_ep01_universe_explorer",
+		Type = "QuestObjective",
+		Name = "Quest002_AnalysisStation",
+		FriendlyName = "Quest 002 - Analysis Station",
 	},
 	{
 		InteractionId = "interaction_ep01_main_005_003",
@@ -147,6 +181,13 @@ local MINIMUM_INTERACTION_POINTS = {
 		ObjectiveId = "obj_ep01_main_002_002",
 		ZoneId = "zone_ep01_universe_explorer",
 		Type = "ZoneTravel",
+	},
+	{
+		InteractionId = "interaction_complete_ep01_main_002",
+		QuestId = "quest_ep01_main_002",
+		ZoneId = "zone_ep01_universe_explorer",
+		Type = "QuestComplete",
+		Name = "CompleteQuest_002",
 	},
 }
 
@@ -295,6 +336,10 @@ local function questFriendlyName(questId)
 end
 
 local function getInteractionFriendlyName(interaction)
+	if interaction.FriendlyName then
+		return interaction.FriendlyName
+	end
+
 	if interaction.Type == "QuestStart" then
 		return questFriendlyName(interaction.QuestId)
 	elseif interaction.Type == "QuestComplete" then
@@ -303,6 +348,10 @@ local function getInteractionFriendlyName(interaction)
 
 	local definition = InteractionDefinitions[interaction.InteractionId]
 	if definition and definition.PromptObjectText then
+		if interaction.QuestId == "quest_ep01_main_002" and interaction.Type == "QuestObjective" then
+			return "Quest 002 - " .. definition.PromptObjectText
+		end
+
 		return definition.PromptObjectText
 	end
 

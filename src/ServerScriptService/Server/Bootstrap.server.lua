@@ -35,6 +35,7 @@ local Phase3FBBugfixSmokeTest = require(script.Parent.Tests.Phase3FBBugfixSmokeT
 local DeveloperWorldUXSmokeTest = require(script.Parent.Tests.DeveloperWorldUXSmokeTest)
 local Phase3FCSmokeTest = require(script.Parent.Tests.Phase3FCSmokeTest)
 local Phase3FDSmokeTest = require(script.Parent.Tests.Phase3FDSmokeTest)
+local Phase3G1SmokeTest = require(script.Parent.Tests.Phase3G1SmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -182,7 +183,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, and Phase 3F-D services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, and Phase 3G-1 services initialized.")
 
 if RunService:IsStudio() then
 	Phase2SmokeTest.Run({
@@ -280,6 +281,16 @@ if RunService:IsStudio() then
 	})
 
 	Phase3FDSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		InteractionValidator = InteractionValidator,
+		InteractionVisibilityService = InteractionVisibilityService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	Phase3G1SmokeTest.Run({
 		PlayerDataService = PlayerDataService,
 		QuestService = QuestService,
 		InteractionValidator = InteractionValidator,

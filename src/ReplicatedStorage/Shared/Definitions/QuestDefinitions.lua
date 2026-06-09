@@ -37,7 +37,7 @@ return {
 		QuestId = "quest_ep01_main_002",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_universe_explorer",
-		Title = "Quest 002",
+		Title = "Map the Broken Star Signal",
 		ObjectiveIds = {
 			"obj_ep01_main_002_001",
 			"obj_ep01_main_002_002",
@@ -45,10 +45,10 @@ return {
 			"obj_ep01_main_002_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_002_001 = { RequiredAmount = 1, ObjectiveText = "Prepare for the Universe Explorer mission." },
-			obj_ep01_main_002_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the signal marker." },
-			obj_ep01_main_002_003 = { RequiredAmount = 1, ObjectiveText = "Analyze the signal clues." },
-			obj_ep01_main_002_004 = { RequiredAmount = 1, ObjectiveText = "Confirm the next expedition route." },
+			obj_ep01_main_002_001 = { RequiredAmount = 1, ObjectiveText = "Enter the Universe Explorer zone." },
+			obj_ep01_main_002_002 = { RequiredAmount = 1, ObjectiveText = "Locate the first signal marker." },
+			obj_ep01_main_002_003 = { RequiredAmount = 1, ObjectiveText = "Scan the signal marker." },
+			obj_ep01_main_002_004 = { RequiredAmount = 1, ObjectiveText = "Return signal data to Neutron's analysis station." },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_002_001",

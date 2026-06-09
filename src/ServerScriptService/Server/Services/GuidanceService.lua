@@ -62,11 +62,79 @@ local function buildCharacterHint(characterId, guidanceType, objectiveText)
 		end
 
 		return "Great work. Return to the cyan Quest Complete marker to finish this mission."
+	elseif guidanceType == "CompleteQuest002" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "All signal data is mapped. Finish the quest at the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The signal map is complete. Use the cyan Quest Complete marker to finish strong."
+		end
+
+		return "All signal data is mapped. Look for the cyan Quest Complete marker."
 	elseif guidanceType == "Quest002Available" then
-		return "Quest 002 is now available. Look for the next green Quest Start marker."
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "Quest 002 is available. The next signal trace begins in the Universe Explorer area."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Quest 002 is ready. Head for the green Quest Start marker in Universe Explorer."
+		end
+
+		return "Quest 002 is available. Look for the green Quest Start marker in the Universe Explorer area."
+	elseif guidanceType == "Quest003Available" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The broken signal is mapped. Future route analysis can continue when the next quest marker is ready."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Great mapping work. The next expedition step will open from the Universe Explorer path."
+		end
+
+		return "Quest 002 is complete. Continue exploring Universe Explorer until the next quest marker is available."
 	end
 
 	return "Explore nearby discoveries or return to the Command Center."
+end
+
+local QUEST_002_OBJECTIVE_HINTS = {
+	obj_ep01_main_002_001 = {
+		Atom = "Move out. Travel to the Universe Explorer zone and enter the mission area.",
+		Neutron = "We need fresh signal context. Enter the Universe Explorer zone first.",
+		Proton = "Travel to the Universe Explorer zone and enter the mission area.",
+	},
+	obj_ep01_main_002_002 = {
+		Atom = "Track the signal. Find the first signal marker in Universe Explorer.",
+		Neutron = "The signal source should be nearby. Locate the first signal marker.",
+		Proton = "Find the first signal marker in the Universe Explorer zone.",
+	},
+	obj_ep01_main_002_003 = {
+		Atom = "Scan the marker and secure that data.",
+		Neutron = "Scan the signal marker so we can study its pattern.",
+		Proton = "Scan the signal marker to collect signal data.",
+	},
+	obj_ep01_main_002_004 = {
+		Atom = "Bring the signal data back for analysis.",
+		Neutron = "Return the signal data to my analysis station.",
+		Proton = "Return the signal data to Neutron's analysis station.",
+	},
+}
+
+local function getCharacterToneKey(characterId)
+	if characterId == CharacterConfig.Ids.Atom then
+		return "Atom"
+	elseif characterId == CharacterConfig.Ids.Neutron then
+		return "Neutron"
+	elseif characterId == CharacterConfig.Ids.Proton then
+		return "Proton"
+	end
+
+	return "Proton"
+end
+
+local function buildQuestObjectiveHint(characterId, questId, objectiveId, objectiveText)
+	if questId == "quest_ep01_main_002" then
+		local objectiveHints = QUEST_002_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	end
+
+	return buildCharacterHint(characterId, "NextObjective", objectiveText)
 end
 
 local function getActiveQuestId(questSnapshot)
@@ -123,7 +191,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 				ActiveQuestTitle = questDefinition.Title or activeQuestId,
 				NextObjectiveId = nextObjectiveId,
 				NextObjectiveText = objectiveText,
-				HintText = buildCharacterHint(guideCharacterId, "NextObjective", objectiveText),
+				HintText = buildQuestObjectiveHint(guideCharacterId, activeQuestId, nextObjectiveId, objectiveText),
 			})
 		end
 
@@ -133,7 +201,10 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			ActiveQuestTitle = questDefinition.Title or activeQuestId,
 			NextObjectiveId = nil,
 			NextObjectiveText = nil,
-			HintText = buildCharacterHint(guideCharacterId, "CompleteQuest"),
+			HintText = buildCharacterHint(
+				guideCharacterId,
+				if activeQuestId == "quest_ep01_main_002" then "CompleteQuest002" else "CompleteQuest"
+			),
 		})
 	end
 
@@ -158,6 +229,18 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			NextObjectiveId = nil,
 			NextObjectiveText = nil,
 			HintText = buildCharacterHint(guideCharacterId, "Quest002Available"),
+		})
+	end
+
+	local canStartQuest003 = questService.CanStartQuest(player, "quest_ep01_main_003")
+	if canStartQuest003 then
+		return result(true, "GuidanceReady", nil, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest003Available"),
 		})
 	end
 
