@@ -4,6 +4,7 @@ local DeveloperWorldUXSmokeTest = {}
 
 local EXPECTED_COLORS = {
 	QuestStart = Color3.fromRGB(80, 220, 120),
+	QuestComplete = Color3.fromRGB(80, 230, 235),
 	QuestObjective = Color3.fromRGB(90, 155, 255),
 	Discovery = Color3.fromRGB(245, 210, 80),
 	ZoneTravel = Color3.fromRGB(170, 110, 245),
@@ -73,6 +74,11 @@ function DeveloperWorldUXSmokeTest.Run(services)
 	assertColor(questStart.Data, EXPECTED_COLORS.QuestStart, "QuestStart placeholder")
 	assertDeveloperLabel(questStart.Data, "[QUEST START]", "Quest 001", "interaction_start_ep01_main_001")
 
+	local questComplete = WorldRegistryService.GetInteractionPoint("interaction_complete_ep01_main_001")
+	assertResultSuccess(questComplete, "Quest complete interaction point should exist.")
+	assertColor(questComplete.Data, EXPECTED_COLORS.QuestComplete, "QuestComplete placeholder")
+	assertDeveloperLabel(questComplete.Data, "[QUEST COMPLETE]", "Quest 001", "interaction_complete_ep01_main_001")
+
 	local questObjective = WorldRegistryService.GetInteractionPoint("interaction_ep01_main_001_001")
 	assertResultSuccess(questObjective, "Quest objective interaction point should exist.")
 	assertColor(questObjective.Data, EXPECTED_COLORS.QuestObjective, "QuestObjective placeholder")
@@ -98,6 +104,7 @@ function DeveloperWorldUXSmokeTest.Run(services)
 	assertDeveloperLabel(npc.Data, "[NPC GUIDE]", "Proton", "interaction_npc_proton_guide")
 
 	assertPromptText(PromptBindingService, "interaction_start_ep01_main_001", "Start Quest")
+	assertPromptText(PromptBindingService, "interaction_complete_ep01_main_001", "Complete Quest")
 	assertPromptText(PromptBindingService, "interaction_ep01_main_001_001", "Interact")
 	assertPromptText(PromptBindingService, "interaction_disc_ep01_command_star_core_display", "Inspect")
 	assertPromptText(PromptBindingService, "interaction_travel_ep01_universe_explorer", "Travel")

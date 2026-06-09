@@ -183,7 +183,7 @@ function WorldObjectValidator.Validate()
 
 			if not questDefinition then
 				addError(validationResult, "Interaction point `" .. object:GetFullName() .. "` has invalid QuestId `" .. tostring(questId) .. "`.")
-			elseif interactionType ~= "QuestStart" and not questContainsObjective(questDefinition, objectiveId) then
+			elseif interactionType ~= "QuestStart" and interactionType ~= "QuestComplete" and not questContainsObjective(questDefinition, objectiveId) then
 				addError(validationResult, "Interaction point `" .. object:GetFullName() .. "` has ObjectiveId not present in QuestDefinitions.")
 			end
 

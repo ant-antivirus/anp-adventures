@@ -37,6 +37,8 @@ local function getDefaultActionText(interactionType)
 		return "Ask"
 	elseif interactionType == "QuestStart" then
 		return "Start Quest"
+	elseif interactionType == "QuestComplete" then
+		return "Complete Quest"
 	elseif interactionType == "Discovery" then
 		return "Inspect"
 	elseif interactionType == "ZoneTravel" then
@@ -54,6 +56,8 @@ local function getDefaultObjectText(definition)
 	if definition.Type == "NPCGuide" then
 		return definition.CharacterId or definition.InteractionId
 	elseif definition.Type == "QuestStart" then
+		return definition.QuestId or definition.InteractionId
+	elseif definition.Type == "QuestComplete" then
 		return definition.QuestId or definition.InteractionId
 	elseif definition.Type == "Discovery" then
 		return definition.DiscoveryId or definition.InteractionId

@@ -55,7 +55,13 @@ local function buildCharacterHint(characterId, guidanceType, objectiveText)
 
 		return "Keep moving. Your next objective is: " .. objectiveText
 	elseif guidanceType == "CompleteQuest" then
-		return "Return to the mission flow and complete the quest."
+		if characterId == CharacterConfig.Ids.Proton then
+			return "All objectives are complete. Look for the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Neutron then
+			return "The required data is complete. Finish the quest at the Quest Complete marker."
+		end
+
+		return "Great work. Return to the cyan Quest Complete marker to finish this mission."
 	elseif guidanceType == "Quest002Available" then
 		return "Quest 002 is now available. Look for the next green Quest Start marker."
 	end

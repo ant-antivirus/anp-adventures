@@ -22,6 +22,7 @@ local DEVELOPER_LABEL_NAME = "ANP_DeveloperLabel"
 
 local PLACEHOLDER_COLORS = {
 	QuestStart = Color3.fromRGB(80, 220, 120),
+	QuestComplete = Color3.fromRGB(80, 230, 235),
 	QuestObjective = Color3.fromRGB(90, 155, 255),
 	Discovery = Color3.fromRGB(245, 210, 80),
 	ZoneTravel = Color3.fromRGB(170, 110, 245),
@@ -90,6 +91,13 @@ local MINIMUM_INTERACTION_POINTS = {
 		ZoneId = "zone_ep01_universe_explorer",
 		Type = "QuestStart",
 		Name = "StartQuest_002",
+	},
+	{
+		InteractionId = "interaction_complete_ep01_main_001",
+		QuestId = "quest_ep01_main_001",
+		ZoneId = "zone_ep01_command_center",
+		Type = "QuestComplete",
+		Name = "CompleteQuest_001",
 	},
 	{
 		InteractionId = "interaction_ep01_main_001_001",
@@ -289,6 +297,8 @@ end
 local function getInteractionFriendlyName(interaction)
 	if interaction.Type == "QuestStart" then
 		return questFriendlyName(interaction.QuestId)
+	elseif interaction.Type == "QuestComplete" then
+		return questFriendlyName(interaction.QuestId)
 	end
 
 	local definition = InteractionDefinitions[interaction.InteractionId]
@@ -306,6 +316,8 @@ end
 local function getInteractionLabelCategory(interactionType)
 	if interactionType == "QuestStart" then
 		return "QUEST START"
+	elseif interactionType == "QuestComplete" then
+		return "QUEST COMPLETE"
 	elseif interactionType == "QuestObjective" then
 		return "QUEST OBJECTIVE"
 	elseif interactionType == "ZoneTravel" then

@@ -9,6 +9,7 @@ local InteractionService = {}
 local VALID_TYPES = {
 	NPCGuide = true,
 	QuestStart = true,
+	QuestComplete = true,
 	QuestObjective = true,
 	Discovery = true,
 	ZoneTravel = true,
@@ -30,6 +31,7 @@ local function result(success, code, failureReason, data)
 		Code = code,
 		FailureReason = failureReason,
 		GrantedQuestStart = false,
+		GrantedQuestComplete = false,
 		GrantedQuestProgress = false,
 		GrantedDiscovery = false,
 		GrantedZoneTravel = false,
@@ -39,6 +41,9 @@ local function result(success, code, failureReason, data)
 	if data then
 		if data.GrantedQuestStart ~= nil then
 			response.GrantedQuestStart = data.GrantedQuestStart
+		end
+		if data.GrantedQuestComplete ~= nil then
+			response.GrantedQuestComplete = data.GrantedQuestComplete
 		end
 		if data.GrantedQuestProgress ~= nil then
 			response.GrantedQuestProgress = data.GrantedQuestProgress
@@ -277,6 +282,23 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionQuestStarted", {
 			GrantedQuestStart = true,
 			ServiceResult = startResult,
+		})
+	elseif definition.Type == "QuestComplete" then
+		local completeResult = questService.CompleteQuest(player, definition.QuestId, sourceContext)
+		if not completeResult.Success then
+			local failureCode = completeResult.Code
+			if failureCode == "RequiredObjectiveIncomplete" then
+				failureCode = "QuestObjectivesIncomplete"
+			end
+
+			return result(false, failureCode, failureCode, {
+				ServiceResult = completeResult,
+			})
+		end
+
+		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionQuestCompleted", {
+			GrantedQuestComplete = true,
+			ServiceResult = completeResult,
 		})
 	elseif definition.Type == "QuestObjective" then
 		local progressResult = questService.ApplyObjectiveProgress(

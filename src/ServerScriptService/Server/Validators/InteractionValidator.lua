@@ -13,6 +13,7 @@ local InteractionValidator = {}
 local VALID_TYPES = {
 	NPCGuide = true,
 	QuestStart = true,
+	QuestComplete = true,
 	QuestObjective = true,
 	Discovery = true,
 	ZoneTravel = true,
@@ -22,6 +23,7 @@ local VALID_TYPES = {
 local VALID_VISIBILITY_POLICIES = {
 	NPCGuide = true,
 	QuestStart = true,
+	QuestComplete = true,
 	QuestObjective = true,
 	Discovery = true,
 	ZoneTravel = true,
@@ -153,7 +155,7 @@ local function validateInteractionWorldObject(validationResult, definition, worl
 		addError(validationResult, "Interaction `" .. definition.InteractionId .. "` ZoneId does not match world object.")
 	end
 
-	if definition.Type == "QuestStart" or definition.Type == "QuestObjective" then
+	if definition.Type == "QuestStart" or definition.Type == "QuestComplete" or definition.Type == "QuestObjective" then
 		if object:GetAttribute("QuestId") ~= definition.QuestId then
 			addError(validationResult, "Interaction `" .. definition.InteractionId .. "` QuestId does not match world object.")
 		end
@@ -204,9 +206,13 @@ function InteractionValidator.Validate(worldRegistryService)
 			elseif not characterIdExists(definition.CharacterId) then
 				addError(validationResult, "Interaction `" .. definition.InteractionId .. "` references invalid CharacterId `" .. tostring(definition.CharacterId) .. "`.")
 			end
-		elseif definition.Type == "QuestStart" then
+		elseif definition.Type == "QuestStart" or definition.Type == "QuestComplete" then
 			if not QuestDefinitions[definition.QuestId] then
 				addError(validationResult, "Interaction `" .. definition.InteractionId .. "` references invalid QuestId `" .. tostring(definition.QuestId) .. "`.")
+			end
+
+			if definition.Type == "QuestComplete" and definition.CharacterId ~= nil and not characterIdExists(definition.CharacterId) then
+				addError(validationResult, "Interaction `" .. definition.InteractionId .. "` references invalid CharacterId `" .. tostring(definition.CharacterId) .. "`.")
 			end
 		elseif definition.Type == "QuestObjective" then
 			local questDefinition = QuestDefinitions[definition.QuestId]

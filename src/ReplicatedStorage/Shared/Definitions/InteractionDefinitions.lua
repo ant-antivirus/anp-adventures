@@ -54,6 +54,17 @@ return {
 		PromptObjectText = "Universe Signal Mission",
 		QuestId = "quest_ep01_main_002",
 	},
+	interaction_complete_ep01_main_001 = {
+		InteractionId = "interaction_complete_ep01_main_001",
+		Type = "QuestComplete",
+		VisibilityPolicy = "QuestComplete",
+		ZoneId = "zone_ep01_command_center",
+		Enabled = true,
+		EnabledInWorld = true,
+		PromptActionText = "Complete Quest",
+		PromptObjectText = "Complete Quest 001",
+		QuestId = "quest_ep01_main_001",
+	},
 	interaction_ep01_main_001_001 = {
 		InteractionId = "interaction_ep01_main_001_001",
 		Type = "QuestObjective",

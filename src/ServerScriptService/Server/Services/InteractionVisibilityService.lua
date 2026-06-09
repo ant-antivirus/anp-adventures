@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
+local QuestDefinitions = require(Shared.Definitions.QuestDefinitions)
 
 local InteractionVisibilityService = {}
 
@@ -144,6 +145,47 @@ local function getQuestObjectiveState(player, definition)
 	return interactionState(true, true, "QuestObjectiveAvailable")
 end
 
+local function requiredQuestObjectivesComplete(questDefinition, questState)
+	for _, objectiveId in ipairs(questDefinition.RequiredObjectiveIds or {}) do
+		local objectiveState = questState.ObjectiveStates and questState.ObjectiveStates[objectiveId]
+		if not objectiveState or objectiveState.Completed ~= true then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function getQuestCompleteState(player, definition)
+	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
+		return interactionState(false, false, "ZoneLocked")
+	end
+
+	local questDefinition = QuestDefinitions[definition.QuestId]
+	if not questDefinition then
+		return interactionState(false, false, "UnknownQuestId")
+	end
+
+	local questStateResult = questService.GetQuestState(player, definition.QuestId)
+	if not questStateResult.Success then
+		return interactionState(false, false, questStateResult.Code)
+	end
+
+	if questStateResult.Data.Status == questService.QuestStatus.Completed then
+		return interactionState(false, false, "QuestAlreadyCompleted")
+	end
+
+	if questStateResult.Data.Status ~= questService.QuestStatus.Active then
+		return interactionState(false, false, "QuestNotActive")
+	end
+
+	if not requiredQuestObjectivesComplete(questDefinition, questStateResult.Data) then
+		return interactionState(false, false, "QuestObjectivesIncomplete")
+	end
+
+	return interactionState(true, true, "QuestCompleteAvailable")
+end
+
 local function getDiscoveryState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
 		return interactionState(false, false, "ZoneLocked")
@@ -226,6 +268,8 @@ function InteractionVisibilityService.GetInteractionState(player, interactionId)
 		state = getNPCGuideState(player, definition)
 	elseif policy == "QuestStart" then
 		state = getQuestStartState(player, definition)
+	elseif policy == "QuestComplete" then
+		state = getQuestCompleteState(player, definition)
 	elseif policy == "QuestObjective" then
 		state = getQuestObjectiveState(player, definition)
 	elseif policy == "Discovery" then
