@@ -158,6 +158,35 @@ local function getQuestObjectiveState(player, definition)
 	return interactionState(true, true, "QuestObjectiveAvailable")
 end
 
+local function findQuestIdForObjective(objectiveId)
+	for questId, questDefinition in pairs(QuestDefinitions) do
+		for _, questObjectiveId in ipairs(questDefinition.ObjectiveIds or {}) do
+			if questObjectiveId == objectiveId then
+				return questId
+			end
+		end
+	end
+
+	return nil
+end
+
+local function hasActiveIncompleteLinkedObjective(player, definition)
+	for _, objectiveId in ipairs(definition.ObjectiveProgressIds or {}) do
+		local questId = findQuestIdForObjective(objectiveId)
+		if questId then
+			local questStateResult = questService.GetQuestState(player, questId)
+			if questStateResult.Success and questStateResult.Data.Status == questService.QuestStatus.Active then
+				local objectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[objectiveId]
+				if objectiveState and objectiveState.Completed ~= true then
+					return true
+				end
+			end
+		end
+	end
+
+	return false
+end
+
 local function requiredQuestObjectivesComplete(questDefinition, questState)
 	for _, objectiveId in ipairs(questDefinition.RequiredObjectiveIds or {}) do
 		local objectiveState = questState.ObjectiveStates and questState.ObjectiveStates[objectiveId]
@@ -210,6 +239,10 @@ local function getDiscoveryState(player, definition)
 	end
 
 	if discoveryStateResult.Data.IsFound == true then
+		if hasActiveIncompleteLinkedObjective(player, definition) then
+			return interactionState(true, true, "DiscoveryRecordedObjectiveAvailable")
+		end
+
 		return interactionState(false, false, "DiscoveryAlreadyRecorded")
 	end
 

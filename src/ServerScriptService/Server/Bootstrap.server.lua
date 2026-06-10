@@ -36,6 +36,7 @@ local Phase3FBBugfixSmokeTest = require(script.Parent.Tests.Phase3FBBugfixSmokeT
 local DeveloperWorldUXSmokeTest = require(script.Parent.Tests.DeveloperWorldUXSmokeTest)
 local Phase3FCSmokeTest = require(script.Parent.Tests.Phase3FCSmokeTest)
 local Phase3FDSmokeTest = require(script.Parent.Tests.Phase3FDSmokeTest)
+local DiscoveryBridgeRegressionSmokeTest = require(script.Parent.Tests.DiscoveryBridgeRegressionSmokeTest)
 local Phase3G1SmokeTest = require(script.Parent.Tests.Phase3G1SmokeTest)
 local FutureProofSmokeTest = require(script.Parent.Tests.FutureProofSmokeTest)
 local Phase3G2SmokeTest = require(script.Parent.Tests.Phase3G2SmokeTest)
@@ -295,6 +296,17 @@ if RunService:IsStudio() then
 		PlayerDataService = PlayerDataService,
 		QuestService = QuestService,
 		InteractionValidator = InteractionValidator,
+		InteractionVisibilityService = InteractionVisibilityService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+
+	DiscoveryBridgeRegressionSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		DiscoveryService = DiscoveryService,
+		InteractionService = InteractionService,
 		InteractionVisibilityService = InteractionVisibilityService,
 		PromptBindingService = PromptBindingService,
 		SkeletonWorldBuilder = SkeletonWorldBuilder,

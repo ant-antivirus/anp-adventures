@@ -601,10 +601,24 @@ return {
 		EnabledInWorld = true,
 		PromptActionText = "Inspect",
 		PromptObjectText = "Star Core Display",
+		UnavailableHintText = "The Star Core is quiet for now. Start the expedition first.",
+		QuestNotActiveHintText = "The Star Core Display has been recorded. Start Quest 001 to continue this investigation.",
+		AlreadyCompletedHintText = "You already inspected the Star Core Display.",
 		DiscoveryId = "disc_ep01_command_star_core_display",
 		ObjectiveProgressIds = {
 			"obj_ep01_main_001_004",
 		},
+	},
+	interaction_disc_ep01_command_expedition_terminal = {
+		InteractionId = "interaction_disc_ep01_command_expedition_terminal",
+		Type = "Discovery",
+		VisibilityPolicy = "Discovery",
+		ZoneId = "zone_ep01_command_center",
+		Enabled = true,
+		EnabledInWorld = false,
+		PromptActionText = "Inspect",
+		PromptObjectText = "Expedition Terminal",
+		DiscoveryId = "disc_ep01_command_expedition_terminal",
 	},
 	interaction_disc_ep01_universe_first_signal_marker = {
 		InteractionId = "interaction_disc_ep01_universe_first_signal_marker",
@@ -615,6 +629,7 @@ return {
 		EnabledInWorld = false,
 		PromptActionText = "Inspect",
 		PromptObjectText = "First Signal Marker",
+		QuestNotActiveHintText = "The signal marker has been recorded. Start the Universe Signal Mission to analyze it.",
 		DiscoveryId = "disc_ep01_universe_first_signal_marker",
 		ObjectiveProgressIds = {
 			"obj_ep01_main_002_002",
@@ -629,6 +644,7 @@ return {
 		EnabledInWorld = false,
 		PromptActionText = "Inspect",
 		PromptObjectText = "Neutron Analysis Station",
+		QuestNotActiveHintText = "The analysis station is ready, but the signal mission has not started yet.",
 		DiscoveryId = "disc_ep01_universe_analysis_station",
 		ObjectiveProgressIds = {
 			"obj_ep01_main_002_004",

@@ -27,6 +27,19 @@ local refreshInteractionVisibility = nil
 local cooldownsByPlayerInteraction = {}
 local cooldownDurationSeconds = 1
 
+local FALLBACK_HINTS = {
+	QuestNotActive = "This clue is useful, but the expedition has not started yet.",
+	ObjectiveDependencyMissing = "You need to complete the previous step first.",
+	QuestPrerequisiteMissing = "This quest is not ready yet. Finish the previous expedition step first.",
+	QuestLocked = "This quest is not ready yet. Finish the previous expedition step first.",
+	RequiredObjectiveIncomplete = "This quest is not ready to complete yet. Finish the remaining objective first.",
+	DiscoveryAlreadyRecorded = "You already discovered this.",
+	QuestAlreadyCompleted = "This quest is already complete.",
+	QuestAlreadyActive = "This quest is already active.",
+	ZoneLocked = "This area is not available yet.",
+	InteractionDisabled = "This interaction is not available right now.",
+}
+
 local function result(success, code, failureReason, data)
 	local response = {
 		Success = success,
@@ -60,6 +73,37 @@ local function result(success, code, failureReason, data)
 	end
 
 	return response
+end
+
+local function getHintText(definition, code)
+	if not definition then
+		return FALLBACK_HINTS[code]
+	end
+
+	if code == "QuestNotActive" then
+		return definition.QuestNotActiveHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "ObjectiveDependencyMissing" then
+		return definition.DependencyMissingHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "QuestPrerequisiteMissing" or code == "QuestLocked" then
+		return definition.QuestPrerequisiteMissingHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "RequiredObjectiveIncomplete" then
+		return definition.RequiredObjectiveIncompleteHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "DiscoveryAlreadyRecorded" or code == "QuestAlreadyCompleted" then
+		return definition.AlreadyCompletedHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "QuestAlreadyActive" then
+		return definition.AlreadyActiveHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	end
+
+	return definition.UnavailableHintText or FALLBACK_HINTS[code]
+end
+
+local function withHint(definition, code, data)
+	data = data or {}
+	if data.HintText == nil then
+		data.HintText = getHintText(definition, code)
+	end
+
+	return data
 end
 
 local function getInteractionDefinition(interactionId)
@@ -165,6 +209,34 @@ local function applyObjectiveProgressBridge(player, definition, sourceContext, m
 			})
 		end
 
+		local questStateResult = questService.GetQuestState(player, questId)
+		if not questStateResult.Success then
+			return result(false, questStateResult.Code, questStateResult.Code, {
+				ObjectiveId = objectiveId,
+				QuestId = questId,
+				ServiceResult = questStateResult,
+			})
+		end
+
+		if questStateResult.Data.Status ~= questService.QuestStatus.Active then
+			table.insert(skippedObjectiveProgressResults, {
+				QuestId = questId,
+				ObjectiveId = objectiveId,
+				Code = questStateResult.Data.Status == questService.QuestStatus.Completed and "QuestAlreadyCompleted" or "QuestNotActive",
+			})
+			continue
+		end
+
+		local objectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[objectiveId]
+		if objectiveState and objectiveState.Completed == true then
+			table.insert(skippedObjectiveProgressResults, {
+				QuestId = questId,
+				ObjectiveId = objectiveId,
+				Code = "ObjectiveAlreadyCompleted",
+			})
+			continue
+		end
+
 		local progressResult = questService.ApplyObjectiveProgress(
 			player,
 			questId,
@@ -188,6 +260,8 @@ local function applyObjectiveProgressBridge(player, definition, sourceContext, m
 				ObjectiveId = objectiveId,
 				QuestId = questId,
 				ServiceResult = progressResult,
+				HintText = getHintText(definition, progressResult.Code),
+				MissingObjectiveId = progressResult.Data and progressResult.Data.MissingObjectiveId,
 			})
 		end
 
@@ -216,11 +290,47 @@ local function finishSuccessfulInteraction(player, definition, sourceContext, me
 	data.SkippedObjectiveProgressResults = bridgeResult.Data.SkippedObjectiveProgressResults
 	if bridgeResult.Data.GrantedQuestProgress == true then
 		data.GrantedQuestProgress = true
+	elseif successCode == "InteractionDiscoveryRecorded" and #bridgeResult.Data.SkippedObjectiveProgressResults > 0 then
+		for _, skippedObjectiveProgressResult in ipairs(bridgeResult.Data.SkippedObjectiveProgressResults) do
+			if skippedObjectiveProgressResult.Code == "QuestNotActive" then
+				data.HintText = getHintText(definition, "QuestNotActive")
+				successCode = "DiscoveryRecordedQuestNotActive"
+				break
+			end
+		end
 	end
 
 	markInteractionCooldown(player, definition.InteractionId, metadata)
 
 	return refreshInteractionVisibility(player, result(true, successCode, nil, data))
+end
+
+local function finishDuplicateDiscoveryBridgeInteraction(player, definition, sourceContext, metadata, discoveryResult)
+	local bridgeResult = applyObjectiveProgressBridge(player, definition, sourceContext, metadata)
+	if not bridgeResult.Success then
+		return bridgeResult
+	end
+
+	if bridgeResult.Data.GrantedQuestProgress ~= true then
+		return result(false, "DiscoveryAlreadyRecorded", "DiscoveryAlreadyRecorded", {
+			ServiceResult = discoveryResult,
+			ObjectiveProgressResults = bridgeResult.Data.ObjectiveProgressResults,
+			SkippedObjectiveProgressResults = bridgeResult.Data.SkippedObjectiveProgressResults,
+			HintText = getHintText(definition, "DiscoveryAlreadyRecorded"),
+		})
+	end
+
+	local data = {
+		GrantedDiscovery = false,
+		GrantedQuestProgress = true,
+		ServiceResult = discoveryResult,
+		ObjectiveProgressResults = bridgeResult.Data.ObjectiveProgressResults,
+		SkippedObjectiveProgressResults = bridgeResult.Data.SkippedObjectiveProgressResults,
+	}
+
+	markInteractionCooldown(player, definition.InteractionId, metadata)
+
+	return refreshInteractionVisibility(player, result(true, "DiscoveryObjectiveProgressApplied", nil, data))
 end
 
 function InteractionService.Init(dependencies)
@@ -280,7 +390,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 	end
 
 	if definition.Enabled ~= true then
-		return result(false, "InteractionDisabled", "InteractionDisabled")
+		return result(false, "InteractionDisabled", "InteractionDisabled", withHint(definition, "InteractionDisabled"))
 	end
 
 	local cooldownResult = checkInteractionCooldown(player, interactionId, metadata)
@@ -298,7 +408,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 	end
 
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return result(false, "ZoneLocked", "ZoneLocked")
+		return result(false, "ZoneLocked", "ZoneLocked", withHint(definition, "ZoneLocked"))
 	end
 
 	local sourceContext = buildSourceContext(interactionId)
@@ -324,6 +434,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		if not startResult.Success then
 			return result(false, startResult.Code, startResult.Code, {
 				ServiceResult = startResult,
+				HintText = getHintText(definition, startResult.Code),
 			})
 		end
 
@@ -335,12 +446,11 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		local completeResult = questService.CompleteQuest(player, definition.QuestId, sourceContext)
 		if not completeResult.Success then
 			local failureCode = completeResult.Code
-			if failureCode == "RequiredObjectiveIncomplete" then
-				failureCode = "QuestObjectivesIncomplete"
-			end
 
 			return result(false, failureCode, failureCode, {
 				ServiceResult = completeResult,
+				HintText = getHintText(definition, failureCode),
+				MissingObjectiveId = completeResult.Data and completeResult.Data.MissingObjectiveId,
 			})
 		end
 
@@ -361,6 +471,8 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		if not progressResult.Success then
 			return result(false, progressResult.Code, progressResult.Code, {
 				ServiceResult = progressResult,
+				HintText = getHintText(definition, progressResult.Code),
+				MissingObjectiveId = progressResult.Data and progressResult.Data.MissingObjectiveId,
 			})
 		end
 
@@ -371,8 +483,13 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 	elseif definition.Type == "Discovery" then
 		local discoveryResult = discoveryService.RecordDiscovery(player, definition.DiscoveryId, sourceContext)
 		if not discoveryResult.Success then
+			if discoveryResult.Code == "DiscoveryAlreadyRecorded" and #(definition.ObjectiveProgressIds or {}) > 0 then
+				return finishDuplicateDiscoveryBridgeInteraction(player, definition, sourceContext, safeMetadata, discoveryResult)
+			end
+
 			return result(false, discoveryResult.Code, discoveryResult.Code, {
 				ServiceResult = discoveryResult,
+				HintText = getHintText(definition, discoveryResult.Code),
 			})
 		end
 
@@ -392,6 +509,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		if not travelResult.Success then
 			return result(false, travelResult.Code, travelResult.Code, {
 				ServiceResult = travelResult,
+				HintText = getHintText(definition, travelResult.Code),
 			})
 		end
 

@@ -521,7 +521,10 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 
 	local allRequiredComplete, missingObjectiveId = requiredObjectivesComplete(questDefinition, questState)
 	if not allRequiredComplete then
-		return result(false, "RequiredObjectiveIncomplete", "Required objective `" .. missingObjectiveId .. "` is incomplete.")
+		return result(false, "RequiredObjectiveIncomplete", "Required objective `" .. missingObjectiveId .. "` is incomplete.", {
+			QuestId = questId,
+			MissingObjectiveId = missingObjectiveId,
+		})
 	end
 
 	local rewardSourceContext = buildQuestCompletionSourceContext(questId, sourceContext)
