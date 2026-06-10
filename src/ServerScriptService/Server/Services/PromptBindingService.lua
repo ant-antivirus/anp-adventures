@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
+local Logger = require(script.Parent.Parent.Utils.Logger)
 
 local PromptBindingService = {}
 
@@ -160,12 +161,12 @@ local function handlePromptTriggered(player, interactionId, metadata)
 
 	local playerName = player and player.Name or "UnknownPlayer"
 	if interactionResult.Success then
-		print("[ANP PromptBindingService] Interaction `" .. interactionId .. "` succeeded for " .. playerName .. ".")
+		Logger.PromptSuccess("Interaction `" .. interactionId .. "` succeeded for " .. playerName .. ".")
 		if interactionVisibilityService then
 			interactionVisibilityService.RefreshPlayer(player)
 		end
 	else
-		warn("[ANP PromptBindingService] Interaction `" .. interactionId .. "` failed for " .. playerName .. ": " .. tostring(interactionResult.Code))
+		Logger.PromptFailure("Interaction `" .. interactionId .. "` failed for " .. playerName .. ": " .. tostring(interactionResult.Code))
 	end
 
 	return interactionResult

@@ -1,5 +1,7 @@
 local AnalyticsService = {}
 
+local Logger = require(script.Parent.Parent.Utils.Logger)
+
 local function formatValue(value)
 	if type(value) == "string" then
 		return "\"" .. value .. "\""
@@ -20,7 +22,7 @@ function AnalyticsService.Track(player, eventName, metadata)
 	local safeMetadata = if type(metadata) == "table" then metadata else {}
 	local playerName = player and player.Name or "UnknownPlayer"
 
-	print("[ANP Analytics] " .. safeEventName .. " " .. formatValue(safeMetadata) .. " Player = " .. playerName)
+	Logger.Analytics(safeEventName .. " " .. formatValue(safeMetadata) .. " Player = " .. playerName)
 
 	return {
 		Success = true,

@@ -94,6 +94,14 @@ Players receive rewards for:
 * Completing optional objectives
 * Exploring all zones
 
+Discovery recording and quest objective progress are independent. If a discovery is found before its related quest objective is active, the discovery remains recorded and the interaction must become usable again when an active linked objective needs it.
+
+---
+
+## Playtest Polish Rules
+
+Phase 3H adds developer log noise control, structured blocked hints, Episode 1 anti-stuck smoke coverage, and clearer placeholder prompt text. Blocked server-side interactions should preserve their existing result codes and include `HintText` when a player action is unavailable because of quest prerequisites, objective dependencies, incomplete turn-in requirements, or duplicate discoveries.
+
 ---
 
 ## Badge System

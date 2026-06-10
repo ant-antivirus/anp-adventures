@@ -6,6 +6,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Definitions = Shared:WaitForChild("Definitions")
 local Config = Shared:WaitForChild("Config")
 
+local Logger = require(script.Parent.Utils.Logger)
 local DefinitionValidator = require(script.Parent.Validators.DefinitionValidator)
 local PlayerDataService = require(script.Parent.Services.PlayerDataService)
 local ProgressionService = require(script.Parent.Services.ProgressionService)
@@ -42,6 +43,7 @@ local FutureProofSmokeTest = require(script.Parent.Tests.FutureProofSmokeTest)
 local Phase3G2SmokeTest = require(script.Parent.Tests.Phase3G2SmokeTest)
 local Phase3G3SmokeTest = require(script.Parent.Tests.Phase3G3SmokeTest)
 local Phase3G4SmokeTest = require(script.Parent.Tests.Phase3G4SmokeTest)
+local Phase3HPlaytestPolishSmokeTest = require(script.Parent.Tests.Phase3HPlaytestPolishSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -195,15 +197,18 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, and Phase 3G-4 services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, and Phase 3H services initialized.")
 
 if RunService:IsStudio() then
+	local passedSmokeTests = {}
+
 	Phase2SmokeTest.Run({
 		PlayerDataService = PlayerDataService,
 		ProgressionService = ProgressionService,
 		InventoryService = InventoryService,
 		RewardService = RewardService,
 	})
+	table.insert(passedSmokeTests, "Phase2SmokeTest")
 
 	Phase3ASmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -212,6 +217,7 @@ if RunService:IsStudio() then
 		ZoneService = ZoneService,
 		DiscoveryService = DiscoveryService,
 	})
+	table.insert(passedSmokeTests, "Phase3ASmokeTest")
 
 	Phase3BSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -219,12 +225,14 @@ if RunService:IsStudio() then
 		InventoryService = InventoryService,
 		QuestService = QuestService,
 	})
+	table.insert(passedSmokeTests, "Phase3BSmokeTest")
 
 	Phase3CSmokeTest.Run({
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 		WorldObjectValidator = WorldObjectValidator,
 	})
+	table.insert(passedSmokeTests, "Phase3CSmokeTest")
 
 	Phase3DSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -235,6 +243,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3DSmokeTest")
 
 	Phase3ESmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -244,6 +253,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3ESmokeTest")
 
 	Phase3FSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -252,6 +262,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3FSmokeTest")
 
 	Phase3FBSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -263,6 +274,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3FBSmokeTest")
 
 	Phase3FBBugfixSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -272,6 +284,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3FBBugfixSmokeTest")
 
 	DeveloperWorldUXSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -280,6 +293,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "DeveloperWorldUXSmokeTest")
 
 	Phase3FCSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -291,6 +305,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3FCSmokeTest")
 
 	Phase3FDSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -301,6 +316,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3FDSmokeTest")
 
 	DiscoveryBridgeRegressionSmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -312,6 +328,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "DiscoveryBridgeRegressionSmokeTest")
 
 	Phase3G1SmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -322,6 +339,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3G1SmokeTest")
 
 	FutureProofSmokeTest.Run({
 		AnalyticsService = AnalyticsService,
@@ -337,6 +355,7 @@ if RunService:IsStudio() then
 		BadgeConfig = BadgeConfig,
 		CompanionConfig = CompanionConfig,
 	})
+	table.insert(passedSmokeTests, "FutureProofSmokeTest")
 
 	Phase3G2SmokeTest.Run({
 		AnalyticsService = AnalyticsService,
@@ -350,6 +369,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3G2SmokeTest")
 
 	Phase3G3SmokeTest.Run({
 		AnalyticsService = AnalyticsService,
@@ -363,6 +383,7 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3G3SmokeTest")
 
 	Phase3G4SmokeTest.Run({
 		AnalyticsService = AnalyticsService,
@@ -377,6 +398,26 @@ if RunService:IsStudio() then
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
 	})
+	table.insert(passedSmokeTests, "Phase3G4SmokeTest")
+
+	Phase3HPlaytestPolishSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+		ZoneService = ZoneService,
+		InteractionVisibilityService = InteractionVisibilityService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase3HPlaytestPolishSmokeTest")
+
+	Logger.Smoke("[ANP SmokeTestSummary]")
+	Logger.Smoke("Passed:")
+	for _, smokeTestName in ipairs(passedSmokeTests) do
+		Logger.Smoke("* " .. smokeTestName)
+	end
+	Logger.Smoke("All Studio smoke tests passed.")
 end
 
 local function onPlayerAdded(player)

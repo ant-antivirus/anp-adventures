@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
 local QuestDefinitions = require(Shared.Definitions.QuestDefinitions)
+local Logger = require(script.Parent.Parent.Utils.Logger)
 
 local InteractionService = {}
 
@@ -423,7 +424,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		end
 
 		local speakerName = guidanceService.GetCharacterName(definition.CharacterId)
-		print("[ANP Guidance] " .. speakerName .. " -> " .. guidanceResult.Data.HintText)
+		Logger.Guidance(speakerName .. " -> " .. guidanceResult.Data.HintText)
 
 		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionGuidanceProvided", {
 			Guidance = guidanceResult.Data,
