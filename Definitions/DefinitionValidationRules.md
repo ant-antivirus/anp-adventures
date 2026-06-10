@@ -68,6 +68,8 @@ This document defines validation requirements for ANP Adventures content definit
 - Zone unlock rules must reference known quests, rewards, or default setup rules.
 - Zone spawn point IDs must be stable strings and unique within the zone.
 - Fast travel eligibility must not unlock a zone by itself.
+- Reserved disabled zones are allowed only when `Reserved = true` and `Enabled = false`.
+- Current quests, rewards, discoveries, interactions, and Episode 1 zone lists must not reference reserved future zones.
 
 ## Invalid Episode Reference Validation
 

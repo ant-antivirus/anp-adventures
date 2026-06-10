@@ -20,6 +20,7 @@ local InteractionService = require(script.Parent.Services.InteractionService)
 local PromptBindingService = require(script.Parent.Services.PromptBindingService)
 local InteractionVisibilityService = require(script.Parent.Services.InteractionVisibilityService)
 local GuidanceService = require(script.Parent.Services.GuidanceService)
+local AnalyticsService = require(script.Parent.Services.AnalyticsService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
@@ -36,6 +37,7 @@ local DeveloperWorldUXSmokeTest = require(script.Parent.Tests.DeveloperWorldUXSm
 local Phase3FCSmokeTest = require(script.Parent.Tests.Phase3FCSmokeTest)
 local Phase3FDSmokeTest = require(script.Parent.Tests.Phase3FDSmokeTest)
 local Phase3G1SmokeTest = require(script.Parent.Tests.Phase3G1SmokeTest)
+local FutureProofSmokeTest = require(script.Parent.Tests.FutureProofSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -45,6 +47,7 @@ local ItemDefinitions = require(Definitions.ItemDefinitions)
 local DiscoveryDefinitions = require(Definitions.DiscoveryDefinitions)
 local LoreDefinitions = require(Definitions.LoreDefinitions)
 local JournalDefinitions = require(Definitions.JournalDefinitions)
+local InteractionDefinitions = require(Definitions.InteractionDefinitions)
 
 local BadgeConfig = require(Config.BadgeConfig)
 local CompanionConfig = require(Config.CompanionConfig)
@@ -58,6 +61,7 @@ local catalog = {
 	Discoveries = DiscoveryDefinitions,
 	Lore = LoreDefinitions,
 	Journal = JournalDefinitions,
+	Interactions = InteractionDefinitions,
 }
 
 local validationResult = DefinitionValidator.Validate(catalog, {
@@ -114,23 +118,27 @@ EpisodeService.Init({
 
 ZoneService.Init({
 	PlayerDataService = PlayerDataService,
+	AnalyticsService = AnalyticsService,
 })
 
 DiscoveryService.Init({
 	PlayerDataService = PlayerDataService,
 	RewardService = RewardService,
 	ZoneService = ZoneService,
+	AnalyticsService = AnalyticsService,
 })
 
 QuestService.Init({
 	PlayerDataService = PlayerDataService,
 	RewardService = RewardService,
 	EpisodeService = EpisodeService,
+	AnalyticsService = AnalyticsService,
 })
 
 GuidanceService.Init({
 	PlayerDataService = PlayerDataService,
 	QuestService = QuestService,
+	AnalyticsService = AnalyticsService,
 })
 
 local worldRegistryResult = WorldRegistryService.Init()
@@ -298,6 +306,21 @@ if RunService:IsStudio() then
 		PromptBindingService = PromptBindingService,
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
+	})
+
+	FutureProofSmokeTest.Run({
+		AnalyticsService = AnalyticsService,
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		DiscoveryService = DiscoveryService,
+		ZoneService = ZoneService,
+		GuidanceService = GuidanceService,
+		InteractionService = InteractionService,
+		DefinitionValidator = DefinitionValidator,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+		BadgeConfig = BadgeConfig,
+		CompanionConfig = CompanionConfig,
 	})
 end
 

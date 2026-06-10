@@ -15,6 +15,7 @@ export type QuestState = {
 	CompletedAt: number?,
 	LastUpdatedAt: number?,
 	AssistedByCompanion: boolean,
+	ParticipantUserIds: { number },
 	CoopParticipantUserIds: { number },
 	RewardClaimIds: { [string]: boolean },
 }

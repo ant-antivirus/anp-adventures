@@ -10,6 +10,7 @@ local playerDataService = nil
 local rewardService = nil
 local zoneService = nil
 local interactionVisibilityService = nil
+local analyticsService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -61,10 +62,28 @@ function DiscoveryService.Init(dependencies)
 	rewardService = dependencies.RewardService
 	zoneService = dependencies.ZoneService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
+	analyticsService = dependencies.AnalyticsService
 
 	assert(playerDataService, "DiscoveryService requires PlayerDataService.")
 	assert(rewardService, "DiscoveryService requires RewardService.")
 	assert(zoneService, "DiscoveryService requires ZoneService.")
+end
+
+local function incrementSessionStat(player, statName)
+	playerDataService.Mutate(player, "IncrementSessionStat", {
+		SourceType = "SessionStats",
+		SourceId = statName,
+	}, function(playerData)
+		playerData.SessionStats = playerData.SessionStats or {}
+		playerData.SessionStats[statName] = (playerData.SessionStats[statName] or 0) + 1
+		return true
+	end)
+end
+
+local function trackAnalytics(player, eventName, metadata)
+	if analyticsService then
+		analyticsService.Track(player, eventName, metadata)
+	end
 end
 
 function DiscoveryService.SetInteractionVisibilityService(service)
@@ -271,6 +290,12 @@ function DiscoveryService.RecordDiscovery(player, discoveryId, sourceContext)
 		end
 	end
 
+	incrementSessionStat(player, "DiscoveriesFound")
+	trackAnalytics(player, "DiscoveryRecorded", {
+		DiscoveryId = discoveryId,
+		ZoneId = discoveryDefinition.ZoneId,
+		RewardIncludedInQuestBundle = discoveryDefinition.RewardIncludedInQuestBundle == true,
+	})
 	refreshInteractionVisibility(player)
 
 	return result(true, "DiscoveryRecorded", nil, {

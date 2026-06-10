@@ -11,6 +11,14 @@ export type PlayerData = {
 		ExplorerRankId: string,
 		LifetimeExplorerScore: number,
 	},
+	SessionStats: {
+		SessionStartTime: number,
+		DiscoveriesFound: number,
+		QuestsStarted: number,
+		QuestsCompleted: number,
+		NPCInteractions: number,
+		ZoneTravels: number,
+	},
 	Episodes: {
 		ActiveEpisodeId: string?,
 		UnlockedEpisodeIds: { [string]: boolean },
@@ -32,6 +40,9 @@ export type PlayerData = {
 	Journal: {
 		UnlockedEntryIds: { [string]: boolean },
 		EntryStates: { [string]: any },
+		UnlockedLore: { [string]: boolean },
+		UnlockedCharacters: { [string]: boolean },
+		UnlockedZones: { [string]: boolean },
 	},
 	Lore: {
 		UnlockedLoreIds: { [string]: boolean },
@@ -40,6 +51,15 @@ export type PlayerData = {
 	Badges: {
 		AwardedBadgeIds: { [string]: boolean },
 		PendingRobloxBadgeAwards: { string },
+	},
+	Memories: {
+		FirstQuestCompletedId: string?,
+		FirstDiscoveryId: string?,
+		FirstEpisodeCompletedId: string?,
+		FirstPartyQuestCompletedId: string?,
+		FavoriteCompanionId: string?,
+		SharedMoments: { [string]: any },
+		Milestones: { [string]: any },
 	},
 	Zones: {
 		UnlockedZoneIds: { [string]: boolean },

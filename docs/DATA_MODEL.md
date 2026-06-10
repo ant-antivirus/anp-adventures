@@ -28,6 +28,7 @@ PlayerData
   SchemaVersion
   Profile
   Progression
+  SessionStats
   Episodes
   Quests
   Inventory
@@ -35,6 +36,7 @@ PlayerData
   Journal
   Lore
   Badges
+  Memories
   Zones
   Companion
   Settings
@@ -67,6 +69,22 @@ Progression
 `ExplorerScore` is the active progression value. `LifetimeExplorerScore` may be used for analytics, rank history, or future systems that need total earned score.
 
 Rank thresholds should come from `RankConfig`, not from service-local constants.
+
+### SessionStats
+
+Session-only counters for lightweight runtime observation. These fields are initialized with the player data shape for in-memory services but should not be treated as persistent progression.
+
+```text
+SessionStats
+  SessionStartTime: number
+  DiscoveriesFound: number
+  QuestsStarted: number
+  QuestsCompleted: number
+  NPCInteractions: number
+  ZoneTravels: number
+```
+
+Session stats may support server logs, analytics events, and smoke tests. They must not unlock gameplay, rewards, purchases, or UI by themselves.
 
 ### Episodes
 
@@ -112,6 +130,7 @@ QuestState
   CompletedAt: number?
   LastUpdatedAt: number?
   AssistedByCompanion: boolean
+  ParticipantUserIds: array<number>
   CoopParticipantUserIds: array<number>
   RewardClaimIds: map<string, boolean>
 ```
@@ -125,6 +144,8 @@ ObjectiveState
 ```
 
 Quest definitions should define objective requirements. Saved objective state stores only the player's progress and completion state.
+
+`ParticipantUserIds` is the preferred field name for multiplayer participation metadata. Existing `CoopParticipantUserIds` data remains backward-compatible and should continue to be read during migration.
 
 ### Inventory
 
@@ -189,6 +210,9 @@ Stores persistent player journal unlocks.
 Journal
   UnlockedEntryIds: map<string, boolean>
   EntryStates: map<string, JournalEntryState>
+  UnlockedLore: map<string, boolean>
+  UnlockedCharacters: map<string, boolean>
+  UnlockedZones: map<string, boolean>
 ```
 
 ```text
@@ -201,6 +225,8 @@ JournalEntryState
 ```
 
 Journal entries may be unlocked by discoveries, quest milestones, fragment collection, Star Core Segment restoration, or approved server-authored events.
+
+`UnlockedLore`, `UnlockedCharacters`, and `UnlockedZones` are reserved hooks for future journal presentation. Current gameplay should not rely on them until a journal UI/content phase defines ownership rules.
 
 ### Lore
 
@@ -249,6 +275,21 @@ Zones
 ```
 
 Zone access rules should be checked by `ZoneService`.
+
+### Memories
+
+Reserved lightweight hooks for future memory-preserving features. Current gameplay should not mutate these fields until a dedicated memory/social phase defines ownership rules.
+
+```text
+Memories
+  FirstQuestCompletedId: string?
+  FirstDiscoveryId: string?
+  FirstEpisodeCompletedId: string?
+  FirstPartyQuestCompletedId: string?
+  FavoriteCompanionId: string?
+  SharedMoments: map<string, any>
+  Milestones: map<string, any>
+```
 
 ### Companion
 

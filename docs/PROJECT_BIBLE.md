@@ -65,6 +65,18 @@ Players should be rewarded for curiosity and exploration.
 
 Playing together should be encouraged.
 
+### Social Before Competition
+
+ANP is not a competition-first game. Central and community features should help players support, share, remember, and revisit adventures together.
+
+### Memories Before Economy
+
+Episode 1 must prove that the world is fun enough to revisit. It does not need a full economy, social hub, or monetization loop.
+
+### Fair Monetization
+
+Future monetization must support identity, memory, and expression. It must not sell power, required progression, or competitive advantage.
+
 ### Solo Friendly
 
 Every quest must be completable by a solo player.

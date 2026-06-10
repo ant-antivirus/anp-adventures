@@ -16,6 +16,7 @@ local playerDataService = nil
 local rewardService = nil
 local episodeService = nil
 local interactionVisibilityService = nil
+local analyticsService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -106,6 +107,7 @@ local function ensureQuestState(playerData, questDefinition)
 			CompletedAt = nil,
 			LastUpdatedAt = nil,
 			AssistedByCompanion = false,
+			ParticipantUserIds = {},
 			CoopParticipantUserIds = {},
 			SourceContexts = {},
 			MetadataEvents = {},
@@ -118,6 +120,11 @@ local function ensureQuestState(playerData, questDefinition)
 	for objectiveId, objectiveState in pairs(buildObjectiveStates(questDefinition)) do
 		questState.ObjectiveStates[objectiveId] = questState.ObjectiveStates[objectiveId] or objectiveState
 	end
+
+	questState.ParticipantUserIds = questState.ParticipantUserIds or {}
+	questState.CoopParticipantUserIds = questState.CoopParticipantUserIds or {}
+	questState.SourceContexts = questState.SourceContexts or {}
+	questState.MetadataEvents = questState.MetadataEvents or {}
 
 	return questState
 end
@@ -137,6 +144,7 @@ local function recordMetadata(questState, sourceContext, metadata)
 	local event = {
 		SourceContext = copySourceContext(sourceContext),
 		CompanionAssisted = false,
+		ParticipantUserIds = {},
 		CoopParticipantUserIds = {},
 		RecordedAt = os.time(),
 	}
@@ -147,9 +155,12 @@ local function recordMetadata(questState, sourceContext, metadata)
 			event.CompanionAssisted = true
 		end
 
-		for _, participantUserId in ipairs(metadata.CoopParticipantUserIds or {}) do
+		local participantUserIds = metadata.ParticipantUserIds or metadata.CoopParticipantUserIds or metadata.CoOpParticipantUserIds or metadata.CoopParticipantIds or metadata.CoOpParticipantIds or {}
+		for _, participantUserId in ipairs(participantUserIds) do
 			if type(participantUserId) == "number" then
+				table.insert(questState.ParticipantUserIds, participantUserId)
 				table.insert(questState.CoopParticipantUserIds, participantUserId)
+				table.insert(event.ParticipantUserIds, participantUserId)
 				table.insert(event.CoopParticipantUserIds, participantUserId)
 			end
 		end
@@ -184,10 +195,28 @@ function QuestService.Init(dependencies)
 	rewardService = dependencies.RewardService
 	episodeService = dependencies.EpisodeService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
+	analyticsService = dependencies.AnalyticsService
 
 	assert(playerDataService, "QuestService requires PlayerDataService.")
 	assert(rewardService, "QuestService requires RewardService.")
 	assert(episodeService, "QuestService requires EpisodeService.")
+end
+
+local function incrementSessionStat(player, statName)
+	playerDataService.Mutate(player, "IncrementSessionStat", {
+		SourceType = "SessionStats",
+		SourceId = statName,
+	}, function(playerData)
+		playerData.SessionStats = playerData.SessionStats or {}
+		playerData.SessionStats[statName] = (playerData.SessionStats[statName] or 0) + 1
+		return true
+	end)
+end
+
+local function trackAnalytics(player, eventName, metadata)
+	if analyticsService then
+		analyticsService.Track(player, eventName, metadata)
+	end
 end
 
 function QuestService.SetInteractionVisibilityService(service)
@@ -259,6 +288,12 @@ function QuestService.StartQuest(player, questId, sourceContext)
 		return mutationResult
 	end
 
+	incrementSessionStat(player, "QuestsStarted")
+	trackAnalytics(player, "QuestStarted", {
+		QuestId = questId,
+		EpisodeId = questDefinition.EpisodeId,
+		ZoneId = questDefinition.ZoneId,
+	})
 	refreshInteractionVisibility(player)
 
 	return result(true, "QuestStarted", nil, {
@@ -495,6 +530,13 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		return rewardAppliedResult
 	end
 
+	incrementSessionStat(player, "QuestsCompleted")
+	trackAnalytics(player, "QuestCompleted", {
+		QuestId = questId,
+		EpisodeId = questDefinition.EpisodeId,
+		ZoneId = questDefinition.ZoneId,
+		RewardBundleIds = grantedRewardBundleIds,
+	})
 	refreshInteractionVisibility(player)
 
 	local nextQuestId = nil

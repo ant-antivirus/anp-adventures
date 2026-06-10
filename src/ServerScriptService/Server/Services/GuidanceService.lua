@@ -8,6 +8,7 @@ local GuidanceService = {}
 
 local playerDataService = nil
 local questService = nil
+local analyticsService = nil
 
 local CHARACTER_NAMES = {
 	[CharacterConfig.Ids.Atom] = "Atom",
@@ -161,9 +162,35 @@ end
 function GuidanceService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	questService = dependencies.QuestService
+	analyticsService = dependencies.AnalyticsService
 
 	assert(playerDataService, "GuidanceService requires PlayerDataService.")
 	assert(questService, "GuidanceService requires QuestService.")
+end
+
+local function recordGuidanceUse(player, characterId, activeQuestId, nextObjectiveId, hintText)
+	playerDataService.Mutate(player, "IncrementSessionStat", {
+		SourceType = "SessionStats",
+		SourceId = "NPCInteractions",
+	}, function(playerData)
+		playerData.SessionStats = playerData.SessionStats or {}
+		playerData.SessionStats.NPCInteractions = (playerData.SessionStats.NPCInteractions or 0) + 1
+		return true
+	end)
+
+	if analyticsService then
+		analyticsService.Track(player, "NPCGuidanceUsed", {
+			CharacterId = characterId,
+			ActiveQuestId = activeQuestId,
+			NextObjectiveId = nextObjectiveId,
+			HintText = hintText,
+		})
+	end
+end
+
+local function guidanceReady(player, data)
+	recordGuidanceUse(player, data.CharacterId, data.ActiveQuestId, data.NextObjectiveId, data.HintText)
+	return result(true, "GuidanceReady", nil, data)
 end
 
 function GuidanceService.GetPlayerGuidance(player, characterId)
@@ -185,7 +212,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 		local nextObjectiveId = getNextIncompleteRequiredObjective(questDefinition, questStateResult.Data)
 		if nextObjectiveId then
 			local objectiveText = getObjectiveText(questDefinition, nextObjectiveId)
-			return result(true, "GuidanceReady", nil, {
+			return guidanceReady(player, {
 				CharacterId = guideCharacterId,
 				ActiveQuestId = activeQuestId,
 				ActiveQuestTitle = questDefinition.Title or activeQuestId,
@@ -195,7 +222,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			})
 		end
 
-		return result(true, "GuidanceReady", nil, {
+		return guidanceReady(player, {
 			CharacterId = guideCharacterId,
 			ActiveQuestId = activeQuestId,
 			ActiveQuestTitle = questDefinition.Title or activeQuestId,
@@ -210,7 +237,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 
 	local canStartQuest001 = questService.CanStartQuest(player, "quest_ep01_main_001")
 	if canStartQuest001 then
-		return result(true, "GuidanceReady", nil, {
+		return guidanceReady(player, {
 			CharacterId = guideCharacterId,
 			ActiveQuestId = nil,
 			ActiveQuestTitle = nil,
@@ -222,7 +249,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 
 	local canStartQuest002 = questService.CanStartQuest(player, "quest_ep01_main_002")
 	if canStartQuest002 then
-		return result(true, "GuidanceReady", nil, {
+		return guidanceReady(player, {
 			CharacterId = guideCharacterId,
 			ActiveQuestId = nil,
 			ActiveQuestTitle = nil,
@@ -234,7 +261,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 
 	local canStartQuest003 = questService.CanStartQuest(player, "quest_ep01_main_003")
 	if canStartQuest003 then
-		return result(true, "GuidanceReady", nil, {
+		return guidanceReady(player, {
 			CharacterId = guideCharacterId,
 			ActiveQuestId = nil,
 			ActiveQuestTitle = nil,
@@ -244,7 +271,7 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 		})
 	end
 
-	return result(true, "GuidanceReady", nil, {
+	return guidanceReady(player, {
 		CharacterId = guideCharacterId,
 		ActiveQuestId = nil,
 		ActiveQuestTitle = nil,

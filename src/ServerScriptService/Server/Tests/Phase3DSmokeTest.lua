@@ -60,6 +60,7 @@ function Phase3DSmokeTest.Run(services)
 	local questProgressResult = InteractionService.AttemptInteraction(player, "interaction_ep01_main_001_001", {
 		CompanionAssisted = false,
 		CoopParticipantUserIds = {},
+		BypassCooldownForTests = true,
 	})
 	assertResultSuccess(questProgressResult, "Quest objective interaction should progress objective.")
 	assertCondition(questProgressResult.GrantedQuestProgress == true, "Quest objective interaction should report quest progress.")
@@ -73,16 +74,24 @@ function Phase3DSmokeTest.Run(services)
 		SourceId = "phase3d_early_complete",
 	}), "RequiredObjectiveIncomplete", "Interaction cannot bypass remaining quest requirements.")
 
-	local discoveryResult = InteractionService.AttemptInteraction(player, "interaction_disc_ep01_command_star_core_display", {})
+	local discoveryResult = InteractionService.AttemptInteraction(player, "interaction_disc_ep01_command_star_core_display", {
+		BypassCooldownForTests = true,
+	})
 	assertResultSuccess(discoveryResult, "Discovery interaction should record discovery.")
 	assertCondition(discoveryResult.GrantedDiscovery == true, "Discovery interaction should report discovery grant.")
 
-	local duplicateDiscoveryResult = InteractionService.AttemptInteraction(player, "interaction_disc_ep01_command_star_core_display", {})
+	local duplicateDiscoveryResult = InteractionService.AttemptInteraction(player, "interaction_disc_ep01_command_star_core_display", {
+		BypassCooldownForTests = true,
+	})
 	assertResultFailure(duplicateDiscoveryResult, "DiscoveryAlreadyRecorded", "Duplicate discovery interaction should be blocked.")
 
-	assertResultFailure(InteractionService.AttemptInteraction(player, "interaction_missing", {}), "UnknownInteractionId", "Invalid interaction should be rejected.")
+	assertResultFailure(InteractionService.AttemptInteraction(player, "interaction_missing", {
+		BypassCooldownForTests = true,
+	}), "UnknownInteractionId", "Invalid interaction should be rejected.")
 
-	local lockedZoneResult = InteractionService.AttemptInteraction(player, "interaction_ep01_main_002_002", {})
+	local lockedZoneResult = InteractionService.AttemptInteraction(player, "interaction_ep01_main_002_002", {
+		BypassCooldownForTests = true,
+	})
 	assertResultFailure(lockedZoneResult, "ZoneLocked", "Locked zone interaction should be rejected before quest progress.")
 
 	assertResultSuccess(ZoneService.UnlockZone(player, "zone_ep01_universe_explorer", {
@@ -93,6 +102,7 @@ function Phase3DSmokeTest.Run(services)
 	local travelResult = InteractionService.AttemptInteraction(player, "interaction_travel_ep01_universe_explorer", {
 		SpawnPointId = "spawn_ep01_universe_default",
 		TravelMode = "Spawn",
+		BypassCooldownForTests = true,
 	})
 	assertResultSuccess(travelResult, "Zone travel interaction should record travel.")
 	assertCondition(travelResult.GrantedZoneTravel == true, "Zone travel interaction should report zone travel.")

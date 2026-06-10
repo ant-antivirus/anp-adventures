@@ -2,6 +2,7 @@ return {
 	zone_ep01_command_center = {
 		ZoneId = "zone_ep01_command_center",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Playable",
 		UnlockRules = {
 			{ Type = "DefaultUnlocked" },
 		},
@@ -19,6 +20,7 @@ return {
 	zone_ep01_universe_explorer = {
 		ZoneId = "zone_ep01_universe_explorer",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Playable",
 		UnlockRules = {
 			{ Type = "QuestCompleted", QuestId = "quest_ep01_main_001" },
 			{ Type = "RewardGranted", RewardBundleId = "reward_ep01_main_001" },
@@ -38,6 +40,7 @@ return {
 	zone_ep01_terrain_sandbox = {
 		ZoneId = "zone_ep01_terrain_sandbox",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Prototype",
 		UnlockRules = {
 			{ Type = "QuestCompleted", QuestId = "quest_ep01_main_003" },
 			{ Type = "RewardGranted", RewardBundleId = "reward_ep01_main_003" },
@@ -56,6 +59,7 @@ return {
 	zone_ep01_theos_satellite_center = {
 		ZoneId = "zone_ep01_theos_satellite_center",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Prototype",
 		UnlockRules = {
 			{ Type = "QuestCompleted", QuestId = "quest_ep01_main_004" },
 			{ Type = "RewardGranted", RewardBundleId = "reward_ep01_main_004" },
@@ -82,6 +86,7 @@ return {
 	zone_ep01_rocket_mission = {
 		ZoneId = "zone_ep01_rocket_mission",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Prototype",
 		UnlockRules = {
 			{ Type = "QuestCompleted", QuestId = "quest_ep01_main_005" },
 			{ Type = "RewardGranted", RewardBundleId = "reward_ep01_main_005" },
@@ -100,6 +105,7 @@ return {
 	zone_ep01_astronaut_training = {
 		ZoneId = "zone_ep01_astronaut_training",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Prototype",
 		UnlockRules = {
 			{ Type = "QuestCompleted", QuestId = "quest_ep01_main_006" },
 			{ Type = "RewardGranted", RewardBundleId = "reward_ep01_main_006" },
@@ -118,6 +124,7 @@ return {
 	zone_ep01_moon_walk = {
 		ZoneId = "zone_ep01_moon_walk",
 		EpisodeId = "ep01_lost_star_core",
+		ContentStatus = "Prototype",
 		UnlockRules = {
 			{ Type = "QuestCompleted", QuestId = "quest_ep01_main_007" },
 			{ Type = "RewardGranted", RewardBundleId = "reward_ep01_main_007" },
@@ -133,5 +140,18 @@ return {
 			"disc_ep01_moon_fragment",
 			"disc_ep01_moon_star_core_segment_restoration_point",
 		},
+	},
+	zone_social_hub_anp_town = {
+		ZoneId = "zone_social_hub_anp_town",
+		DisplayName = "ANP Town",
+		Purpose = "Future central community area for meeting players, showing achievements, organizing parties, seasonal events, and memory-sharing.",
+		Reserved = true,
+		Enabled = false,
+		ContentStatus = "Prototype",
+		EpisodeId = nil,
+		UnlockRules = {},
+		SpawnPoints = {},
+		TravelEligibility = {},
+		DiscoveryRequirements = {},
 	},
 }

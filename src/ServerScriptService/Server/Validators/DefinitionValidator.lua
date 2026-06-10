@@ -11,6 +11,13 @@ local REQUIRED_EP01_FRAGMENTS = {
 local EP01_ID = "ep01_lost_star_core"
 local EP01_RESTORED_SEGMENT_ID = "item_star_core_segment_01"
 local EP01_FINAL_REWARD_ID = "reward_ep01_main_008"
+local RESERVED_SOCIAL_HUB_ZONE_ID = "zone_social_hub_anp_town"
+local VALID_CONTENT_STATUS = {
+	Prototype = true,
+	Playable = true,
+	Polished = true,
+	Deprecated = true,
+}
 
 local function newResult()
 	return {
@@ -109,8 +116,13 @@ end
 
 local function validateZoneReferences(result, catalog)
 	for zoneId, zone in pairs(catalog.Zones or {}) do
-		if not mapHas(catalog.Episodes, zone.EpisodeId) then
+		local isReservedDisabledZone = zone.Reserved == true and zone.Enabled == false
+		if not isReservedDisabledZone and not mapHas(catalog.Episodes, zone.EpisodeId) then
 			addError(result, "Zone `" .. zoneId .. "` references missing episode `" .. tostring(zone.EpisodeId) .. "`.")
+		end
+
+		if zone.ContentStatus ~= nil and not VALID_CONTENT_STATUS[zone.ContentStatus] then
+			addError(result, "Zone `" .. zoneId .. "` has invalid ContentStatus `" .. tostring(zone.ContentStatus) .. "`.")
 		end
 
 		validateIdList(result, "Zone `" .. zoneId .. "` DiscoveryRequirements", zone.DiscoveryRequirements, catalog.Discoveries, "discovery")
@@ -123,6 +135,48 @@ local function validateZoneReferences(result, catalog)
 			if rule.RewardBundleId and not mapHas(catalog.Rewards, rule.RewardBundleId) then
 				addError(result, "Zone `" .. zoneId .. "` unlock rule references missing reward `" .. rule.RewardBundleId .. "`.")
 			end
+		end
+	end
+end
+
+local function validateReservedFutureZones(result, catalog)
+	local socialHub = (catalog.Zones or {})[RESERVED_SOCIAL_HUB_ZONE_ID]
+	if not socialHub then
+		addError(result, "Reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "` is missing.")
+		return
+	end
+
+	if socialHub.Reserved ~= true or socialHub.Enabled ~= false then
+		addError(result, "Reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "` must be Reserved=true and Enabled=false.")
+	end
+
+	for episodeId, episode in pairs(catalog.Episodes or {}) do
+		if contains(episode.Zones, RESERVED_SOCIAL_HUB_ZONE_ID) then
+			addError(result, "Episode `" .. episodeId .. "` must not include reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "`.")
+		end
+	end
+
+	for questId, quest in pairs(catalog.Quests or {}) do
+		if quest.ZoneId == RESERVED_SOCIAL_HUB_ZONE_ID then
+			addError(result, "Quest `" .. questId .. "` must not target reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "`.")
+		end
+	end
+
+	for rewardId, reward in pairs(catalog.Rewards or {}) do
+		if contains(reward.UnlockZones, RESERVED_SOCIAL_HUB_ZONE_ID) then
+			addError(result, "Reward `" .. rewardId .. "` must not unlock reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "`.")
+		end
+	end
+
+	for discoveryId, discovery in pairs(catalog.Discoveries or {}) do
+		if discovery.ZoneId == RESERVED_SOCIAL_HUB_ZONE_ID then
+			addError(result, "Discovery `" .. discoveryId .. "` must not target reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "`.")
+		end
+	end
+
+	for interactionId, interaction in pairs(catalog.Interactions or {}) do
+		if interaction.ZoneId == RESERVED_SOCIAL_HUB_ZONE_ID then
+			addError(result, "Interaction `" .. interactionId .. "` must not target reserved social hub zone `" .. RESERVED_SOCIAL_HUB_ZONE_ID .. "`.")
 		end
 	end
 end
@@ -381,6 +435,7 @@ function DefinitionValidator.Validate(catalog, config)
 
 	validateEpisodeReferences(result, catalog)
 	validateZoneReferences(result, catalog)
+	validateReservedFutureZones(result, catalog)
 	validateQuestReferences(result, catalog, safeConfig.CompanionConfig)
 	validateRewardReferences(result, catalog, safeConfig.BadgeConfig)
 	validateDiscoveryReferences(result, catalog)

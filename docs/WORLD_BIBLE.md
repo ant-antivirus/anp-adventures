@@ -226,3 +226,13 @@ Planned future locations:
 
 * Rama IX Museum
 * Sirindhorn Museum
+
+## Future Community Space
+
+`zone_social_hub_anp_town` is reserved for ANP Town, a future central community area for meeting players, showing achievements, organizing parties, seasonal events, and memory-sharing.
+
+ANP Town is not part of Episode 1 required progression. It is not an Episode 1 blocker and must remain disabled until a later social/community phase defines its systems and world contract.
+
+ANP Adventures is not a competition-first game. Future central features should help families and friends remember, share, and revisit adventures rather than chase power.
+
+Episode 1's world goal is proof of fun, not a full economy. Monetization must support identity, memory, and expression, not power.

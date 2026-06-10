@@ -7,6 +7,7 @@ local ZoneConfig = {
 		RocketMission = "zone_ep01_rocket_mission",
 		AstronautTraining = "zone_ep01_astronaut_training",
 		MoonWalk = "zone_ep01_moon_walk",
+		ReservedSocialHub = "zone_social_hub_anp_town",
 	},
 }
 

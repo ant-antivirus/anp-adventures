@@ -280,10 +280,15 @@ function PromptBindingService.SimulatePromptTrigger(player, interactionId, metad
 		return result(false, "PromptNotBound", "Interaction prompt is not bound.")
 	end
 
-	return handlePromptTriggered(player, interactionId, metadata or {
+	local simulatedMetadata = metadata or {
 		SourceType = "PromptSmokeTest",
 		InteractionId = interactionId,
-	})
+	}
+	if simulatedMetadata.BypassCooldownForTests == nil then
+		simulatedMetadata.BypassCooldownForTests = true
+	end
+
+	return handlePromptTriggered(player, interactionId, simulatedMetadata)
 end
 
 function PromptBindingService.ResetForTests()

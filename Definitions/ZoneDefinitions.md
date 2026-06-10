@@ -2,14 +2,19 @@
 
 ## Purpose
 
-This document defines implementation-facing zone records for Episode 1.
+This document defines implementation-facing zone records for active Episode 1 content and reserved future zone placeholders.
 
 ## Zone Record Schema
 
 ```text
 ZoneDefinition
   ZoneId: string
-  EpisodeId: string
+  EpisodeId: string?
+  DisplayName: string?
+  Purpose: string?
+  Reserved: boolean?
+  Enabled: boolean?
+  ContentStatus: "Prototype" | "Playable" | "Polished" | "Deprecated"?
   UnlockRules: array<Requirement>
   SpawnPoints: array<SpawnPointId>
   TravelEligibility: map
@@ -28,8 +33,17 @@ ZoneDefinition
 | `zone_ep01_astronaut_training` | `ep01_lost_star_core` | Complete `quest_ep01_main_006` or receive `reward_ep01_main_006`. | `spawn_ep01_astronaut_default` | Travel allowed when unlocked. | `disc_ep01_astronaut_training_entry`, `disc_ep01_astronaut_readiness_station`, `disc_ep01_astronaut_badge_terminal` |
 | `zone_ep01_moon_walk` | `ep01_lost_star_core` | Complete `quest_ep01_main_007` or receive `reward_ep01_main_007`. | `spawn_ep01_moon_default` | Travel allowed when unlocked. | `disc_ep01_moon_walk_entry`, `disc_ep01_moon_low_gravity_route`, `disc_ep01_moon_fragment`, `disc_ep01_moon_star_core_segment_restoration_point` |
 
+## Reserved Future Zone Records
+
+Reserved zones are allowed in the definition catalog but are not active Episode 1 content. Disabled reserved zones must not be referenced by current quests, rewards, discoveries, interactions, or Episode 1 zone lists.
+
+| ZoneId | DisplayName | Reserved | Enabled | Purpose | Current Progression Status |
+| --- | --- | --- | --- | --- | --- |
+| `zone_social_hub_anp_town` | ANP Town | true | false | Future central community area for meeting players, showing achievements, organizing parties, seasonal events, and memory-sharing. | Not part of Episode 1 required progression; not unlocked by current rewards or quests. |
+
 ## Zone Rules
 
 - Spawn point IDs are stable implementation IDs and must be defined in zone config before use.
 - Travel requests must be validated by `ZoneService`.
 - Discovery completion may unlock optional journal or analytics milestones but must not block required quest completion unless the quest definition explicitly requires that discovery.
+- Episode 1 active zones remain exactly the seven Episode 1 zones listed above. Reserved future zones are allowed but must not change Episode 1 smoke test requirements.

@@ -7,6 +7,7 @@ local ZoneService = {}
 
 local playerDataService = nil
 local interactionVisibilityService = nil
+local analyticsService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -39,8 +40,26 @@ end
 function ZoneService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
+	analyticsService = dependencies.AnalyticsService
 
 	assert(playerDataService, "ZoneService requires PlayerDataService.")
+end
+
+local function incrementSessionStat(player, statName)
+	playerDataService.Mutate(player, "IncrementSessionStat", {
+		SourceType = "SessionStats",
+		SourceId = statName,
+	}, function(playerData)
+		playerData.SessionStats = playerData.SessionStats or {}
+		playerData.SessionStats[statName] = (playerData.SessionStats[statName] or 0) + 1
+		return true
+	end)
+end
+
+local function trackAnalytics(player, eventName, metadata)
+	if analyticsService then
+		analyticsService.Track(player, eventName, metadata)
+	end
 end
 
 function ZoneService.SetInteractionVisibilityService(service)
@@ -163,6 +182,13 @@ function ZoneService.TravelToZone(player, zoneId, spawnPointId, travelMode, sour
 	if not mutationResult.Success then
 		return mutationResult
 	end
+
+	incrementSessionStat(player, "ZoneTravels")
+	trackAnalytics(player, "ZoneTravelSucceeded", {
+		ZoneId = zoneId,
+		SpawnPointId = targetSpawnPointId,
+		TravelMode = travelMode or "Spawn",
+	})
 
 	return result(true, "ZoneTravelRecorded", nil, {
 		ZoneId = zoneId,

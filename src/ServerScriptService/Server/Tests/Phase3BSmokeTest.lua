@@ -78,7 +78,7 @@ function Phase3BSmokeTest.Run(services)
 		SourceId = "phase3b_progress_001_001",
 	}, {
 		CompanionAssisted = true,
-		CoopParticipantUserIds = { 931001, 931777 },
+		ParticipantUserIds = { 931001, 931777 },
 	}), "Quest 001 first objective should progress with metadata.")
 
 	assertResultFailure(QuestService.CompleteQuest(quest001Player, "quest_ep01_main_001", {
@@ -121,6 +121,7 @@ function Phase3BSmokeTest.Run(services)
 	assertCondition(quest001State.ObjectiveStates.obj_ep01_main_001_001.Optional == false, "Objective state should persist optional flag.")
 	assertCondition(quest001State.AssistedByCompanion == true, "Companion-assisted metadata should persist.")
 	assertCondition(#quest001State.CoopParticipantUserIds >= 2, "Multiplayer metadata should persist without breaking solo state.")
+	assertCondition(#quest001State.ParticipantUserIds >= 2, "Participant metadata should persist using preferred terminology.")
 	assertCondition(#quest001State.SourceContexts > 0, "Source contexts should persist.")
 
 	local optionalPlayer = makeFakePlayer(931002, "Phase3BOptional")

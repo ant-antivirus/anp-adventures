@@ -29,6 +29,15 @@ local function buildTemplate(userId, timestamp)
 			LifetimeExplorerScore = 0,
 		},
 
+		SessionStats = {
+			SessionStartTime = timestamp,
+			DiscoveriesFound = 0,
+			QuestsStarted = 0,
+			QuestsCompleted = 0,
+			NPCInteractions = 0,
+			ZoneTravels = 0,
+		},
+
 		Episodes = {
 			ActiveEpisodeId = activeEpisodeId,
 			UnlockedEpisodeIds = {
@@ -64,6 +73,9 @@ local function buildTemplate(userId, timestamp)
 		Journal = {
 			UnlockedEntryIds = {},
 			EntryStates = {},
+			UnlockedLore = {},
+			UnlockedCharacters = {},
+			UnlockedZones = {},
 		},
 
 		Lore = {
@@ -74,6 +86,16 @@ local function buildTemplate(userId, timestamp)
 		Badges = {
 			AwardedBadgeIds = {},
 			PendingRobloxBadgeAwards = {},
+		},
+
+		Memories = {
+			FirstQuestCompletedId = nil,
+			FirstDiscoveryId = nil,
+			FirstEpisodeCompletedId = nil,
+			FirstPartyQuestCompletedId = nil,
+			FavoriteCompanionId = nil,
+			SharedMoments = {},
+			Milestones = {},
 		},
 
 		Zones = {

@@ -24,11 +24,14 @@ local zoneService = nil
 local guidanceService = nil
 local interactionVisibilityService = nil
 local refreshInteractionVisibility = nil
+local cooldownsByPlayerInteraction = {}
+local cooldownDurationSeconds = 1
 
 local function result(success, code, failureReason, data)
 	local response = {
 		Success = success,
 		Code = code,
+		Reason = failureReason,
 		FailureReason = failureReason,
 		GrantedQuestStart = false,
 		GrantedQuestComplete = false,
@@ -73,6 +76,44 @@ local function buildSourceContext(interactionId)
 		SourceType = "Interaction",
 		SourceId = interactionId,
 	}
+end
+
+local function getPlayerCooldownKey(player)
+	if type(player) == "table" then
+		return tostring(player.UserId or player.Name or player)
+	end
+
+	return tostring(player and player.UserId or player)
+end
+
+local function getCooldownKey(player, interactionId)
+	return getPlayerCooldownKey(player) .. ":" .. tostring(interactionId)
+end
+
+local function checkInteractionCooldown(player, interactionId, metadata)
+	if type(metadata) == "table" and metadata.BypassCooldownForTests == true then
+		return nil
+	end
+
+	local cooldownKey = getCooldownKey(player, interactionId)
+	local now = os.clock()
+	local expiresAt = cooldownsByPlayerInteraction[cooldownKey]
+	if expiresAt and expiresAt > now then
+		return result(false, "InteractionCooldown", "InteractionCooldown", {
+			InteractionId = interactionId,
+			RetryAfterSeconds = expiresAt - now,
+		})
+	end
+
+	return nil
+end
+
+local function markInteractionCooldown(player, interactionId, metadata)
+	if type(metadata) == "table" and metadata.BypassCooldownForTests == true then
+		return
+	end
+
+	cooldownsByPlayerInteraction[getCooldownKey(player, interactionId)] = os.clock() + cooldownDurationSeconds
 end
 
 local function validateWorldObject(definition)
@@ -177,6 +218,8 @@ local function finishSuccessfulInteraction(player, definition, sourceContext, me
 		data.GrantedQuestProgress = true
 	end
 
+	markInteractionCooldown(player, definition.InteractionId, metadata)
+
 	return refreshInteractionVisibility(player, result(true, successCode, nil, data))
 end
 
@@ -238,6 +281,11 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 
 	if definition.Enabled ~= true then
 		return result(false, "InteractionDisabled", "InteractionDisabled")
+	end
+
+	local cooldownResult = checkInteractionCooldown(player, interactionId, metadata)
+	if cooldownResult then
+		return cooldownResult
 	end
 
 	if not VALID_TYPES[definition.Type] then
@@ -354,6 +402,17 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 	end
 
 	return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionGenericHandled", {})
+end
+
+function InteractionService.SetCooldownDurationForTests(seconds)
+	if type(seconds) == "number" and seconds >= 0 then
+		cooldownDurationSeconds = seconds
+	end
+end
+
+function InteractionService.ResetCooldownsForTests()
+	table.clear(cooldownsByPlayerInteraction)
+	cooldownDurationSeconds = 1
 end
 
 return InteractionService
