@@ -145,12 +145,44 @@ local function buildCharacterHint(characterId, guidanceType, objectiveText)
 		return "The Rocket Fragment is ready. Look for the cyan Quest Complete marker."
 	elseif guidanceType == "Quest007Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The Rocket Fragment is secure. Astronaut training should prepare us for the next step."
+			return "The Rocket Fragment is secure. Quest 007 is available. Astronaut training should prepare us for the next step."
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The Rocket Fragment is secure. Prepare for astronaut training."
+			return "The Rocket Fragment is secure. Quest 007 is available. Head to Astronaut Training."
 		end
 
-		return "The Rocket Fragment is secure. Prepare for astronaut training."
+		return "The Rocket Fragment is secure. Quest 007 is available. Head to Astronaut Training."
+	elseif guidanceType == "CompleteQuest007" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "Astronaut training is complete. Finish at the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Astronaut training is complete. Use the cyan Quest Complete marker to clear the mission."
+		end
+
+		return "Astronaut training is complete. Look for the cyan Quest Complete marker."
+	elseif guidanceType == "Quest008Available" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "Quest 008 is available. The Moon Walk mission is ready."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Quest 008 is available. Head to the Moon Walk zone."
+		end
+
+		return "Quest 008 is available. Head to the Moon Walk zone."
+	elseif guidanceType == "CompleteQuest008" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "All Star Core fragments are ready. Complete Episode 1 at the cyan finale marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "All Star Core fragments are ready. Finish Episode 1 at the cyan finale marker."
+		end
+
+		return "All Star Core fragments are ready. Complete Episode 1 at the cyan finale marker."
+	elseif guidanceType == "Episode1Complete" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "Episode 1 is complete. Star Core Segment 01 has been restored."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Episode 1 is complete. Star Core Segment 01 has been restored."
+		end
+
+		return "Episode 1 is complete. Star Core Segment 01 has been restored."
 	end
 
 	return "Explore nearby discoveries or return to the Command Center."
@@ -271,6 +303,57 @@ local QUEST_006_OBJECTIVE_HINTS = {
 	},
 }
 
+local QUEST_007_OBJECTIVE_HINTS = {
+	obj_ep01_main_007_001 = {
+		Atom = "Travel to Astronaut Training.",
+		Neutron = "Travel to Astronaut Training so we can verify mission readiness.",
+		Proton = "Travel to Astronaut Training.",
+	},
+	obj_ep01_main_007_002 = {
+		Atom = "Complete the movement training station.",
+		Neutron = "Complete the movement training station to test control in space-like conditions.",
+		Proton = "Complete the movement training station.",
+	},
+	obj_ep01_main_007_003 = {
+		Atom = "Complete the oxygen safety check.",
+		Neutron = "Complete the oxygen safety check before Moon clearance.",
+		Proton = "Complete the oxygen safety check.",
+	},
+	obj_ep01_main_007_004 = {
+		Atom = "Receive Moon mission clearance.",
+		Neutron = "Receive Moon mission clearance after safety checks are complete.",
+		Proton = "Receive Moon mission clearance.",
+	},
+}
+
+local QUEST_008_OBJECTIVE_HINTS = {
+	obj_ep01_main_008_001 = {
+		Atom = "Travel to the Moon Walk zone.",
+		Neutron = "Travel to the Moon Walk zone to follow the final signal.",
+		Proton = "Travel to the Moon Walk zone.",
+	},
+	obj_ep01_main_008_002 = {
+		Atom = "Follow the Moon signal trail.",
+		Neutron = "Follow the Moon signal trail and watch how the fragment signature changes.",
+		Proton = "Follow the Moon signal trail.",
+	},
+	obj_ep01_main_008_003 = {
+		Atom = "Recover the Moon Fragment.",
+		Neutron = "Recover the Moon Fragment before the final restoration.",
+		Proton = "Recover the Moon Fragment.",
+	},
+	obj_ep01_main_008_004 = {
+		Atom = "Verify the Episode 1 fragment set.",
+		Neutron = "Verify all five Episode 1 fragments before restoring the segment.",
+		Proton = "Verify all Episode 1 fragments.",
+	},
+	obj_ep01_main_008_005 = {
+		Atom = "Restore Star Core Segment 01.",
+		Neutron = "Restore Star Core Segment 01 using the complete fragment set.",
+		Proton = "Restore Star Core Segment 01.",
+	},
+}
+
 local function getCharacterToneKey(characterId)
 	if characterId == CharacterConfig.Ids.Atom then
 		return "Atom"
@@ -306,6 +389,16 @@ local function buildQuestObjectiveHint(characterId, questId, objectiveId, object
 		end
 	elseif questId == "quest_ep01_main_006" then
 		local objectiveHints = QUEST_006_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	elseif questId == "quest_ep01_main_007" then
+		local objectiveHints = QUEST_007_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	elseif questId == "quest_ep01_main_008" then
+		local objectiveHints = QUEST_008_OBJECTIVE_HINTS[objectiveId]
 		if objectiveHints then
 			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
 		end
@@ -411,6 +504,8 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 				elseif activeQuestId == "quest_ep01_main_004" then "CompleteQuest004"
 				elseif activeQuestId == "quest_ep01_main_005" then "CompleteQuest005"
 				elseif activeQuestId == "quest_ep01_main_006" then "CompleteQuest006"
+				elseif activeQuestId == "quest_ep01_main_007" then "CompleteQuest007"
+				elseif activeQuestId == "quest_ep01_main_008" then "CompleteQuest008"
 				else "CompleteQuest"
 			),
 		})
@@ -497,6 +592,29 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			NextObjectiveId = nil,
 			NextObjectiveText = nil,
 			HintText = buildCharacterHint(guideCharacterId, "Quest007Available"),
+		})
+	end
+
+	local canStartQuest008 = questService.CanStartQuest(player, "quest_ep01_main_008")
+	if canStartQuest008 then
+		return guidanceReady(player, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest008Available"),
+		})
+	end
+
+	if questSnapshot.Data.CompletedQuestIds and questSnapshot.Data.CompletedQuestIds.quest_ep01_main_008 == true then
+		return guidanceReady(player, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Episode1Complete"),
 		})
 	end
 

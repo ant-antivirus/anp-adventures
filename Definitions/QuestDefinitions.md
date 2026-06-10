@@ -21,6 +21,7 @@ ObjectiveDefinition
   RequiredAmount: number
   ObjectiveText: string
   RequiresObjectiveIds: optional array<ObjectiveId>
+  RewardBundleIds: optional array<RewardBundleId>
 ```
 
 ## Episode 1 Quest Records
@@ -41,5 +42,6 @@ ObjectiveDefinition
 - Optional objectives must be listed in `ObjectiveIds[]` and marked optional in the full quest definition implementation.
 - `RequiresObjectiveIds[]` is optional and only locks the objective that declares it; quests are not globally sequential by default.
 - `RequiresObjectiveIds[]` entries must refer to objectives in the same quest, must not duplicate, and must not require the objective itself.
+- Objective-level `RewardBundleIds[]` are allowed only for server-side objective rewards that still route through `RewardService`.
 - Teamwork reward bundles are optional and must not be listed as required completion rewards.
 - Required companion assists listed here must resolve to companion support definitions before a quest is considered valid.

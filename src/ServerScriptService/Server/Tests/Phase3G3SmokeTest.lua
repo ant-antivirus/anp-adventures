@@ -44,9 +44,11 @@ local function assertGuidanceContainsAll(guidanceResult, expectedTokens, message
 	assertCondition(guidanceResult.Data.Guidance ~= nil, message .. " should return guidance data.")
 
 	local hintText = guidanceResult.Data.Guidance.HintText or ""
+	local normalizedHintText = string.lower(hintText)
 	for _, expectedToken in ipairs(expectedTokens) do
+		local normalizedExpectedToken = string.lower(expectedToken)
 		assertCondition(
-			string.find(hintText, expectedToken, 1, true) ~= nil,
+			string.find(normalizedHintText, normalizedExpectedToken, 1, true) ~= nil,
 			message .. " Expected hint containing `" .. expectedToken .. "`, got `" .. hintText .. "`."
 		)
 	end

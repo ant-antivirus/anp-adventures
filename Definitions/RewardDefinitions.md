@@ -30,7 +30,13 @@ RewardBundle
 | `reward_ep01_main_005` | `175` | `item_ep01_fragment_theos:1` | None | `zone_ep01_rocket_mission` | None | `journal_ep01_fragment_theos` | `lore_ep01_theos_calibration_console`, `lore_ep01_theos_fragment` | Once per player per quest completion. |
 | `reward_ep01_main_006` | `175` | `item_ep01_fragment_rocket:1` | None | `zone_ep01_astronaut_training` | None | `journal_ep01_fragment_rocket` | None | Once per player per quest completion. |
 | `reward_ep01_main_007` | `150` | None | `badge_ep01_astronaut` | `zone_ep01_moon_walk` | None | `journal_ep01_astronaut_readiness` | None | Once per player per quest completion. |
-| `reward_ep01_main_008` | `250` | `item_ep01_fragment_moon:1`, `item_star_core_segment_01:1` | `badge_ep01_explorer`, `badge_ep01_space_pioneer` | None | None | `journal_ep01_fragment_moon`, `journal_ep01_star_core_segment_01_restored`, `journal_ep01_episode_complete` | None | Once per player per quest completion and fragment assembly validation. |
+| `reward_ep01_main_008` | `250` | `item_star_core_segment_01:1` | `badge_ep01_explorer`, `badge_ep01_space_pioneer` | None | None | `journal_ep01_star_core_segment_01_restored`, `journal_ep01_episode_complete` | None | Once per player per quest completion and fragment assembly validation. |
+
+## Objective Reward Bundles
+
+| RewardBundleId | ExplorerScore | Items[] | Badges[] | UnlockZones[] | UnlockEpisodes[] | JournalUnlocks[] | LoreUnlocks[] | DuplicatePolicy |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `reward_ep01_objective_008_moon_fragment` | `0` | `item_ep01_fragment_moon:1` | None | None | None | `journal_ep01_fragment_moon` | None | Once per player per quest objective. |
 
 ## Optional Reward Bundles
 
@@ -69,4 +75,6 @@ RewardBundle
 
 - Reward definitions may reference future episode IDs only after those episodes have definition records.
 - Fragments must not be consumed by any reward or assembly operation.
+- The Moon Fragment is granted by `reward_ep01_objective_008_moon_fragment` before the final Episode 1 assembly reward.
+- `reward_ep01_main_008` must only grant `item_star_core_segment_01` after all five Episode 1 fragments already exist.
 - Teamwork rewards must never unlock required progression.

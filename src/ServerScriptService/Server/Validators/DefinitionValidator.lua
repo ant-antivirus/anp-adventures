@@ -11,6 +11,7 @@ local REQUIRED_EP01_FRAGMENTS = {
 local EP01_ID = "ep01_lost_star_core"
 local EP01_RESTORED_SEGMENT_ID = "item_star_core_segment_01"
 local EP01_FINAL_REWARD_ID = "reward_ep01_main_008"
+local EP01_MOON_FRAGMENT_REWARD_ID = "reward_ep01_objective_008_moon_fragment"
 local RESERVED_SOCIAL_HUB_ZONE_ID = "zone_social_hub_anp_town"
 local VALID_CONTENT_STATUS = {
 	Prototype = true,
@@ -219,6 +220,8 @@ local function validateQuestReferences(result, catalog, companionConfig)
 		end
 
 		for objectiveId, objectiveDefinition in pairs(quest.ObjectiveDefinitions or {}) do
+			validateIdList(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` RewardBundleIds", objectiveDefinition.RewardBundleIds, catalog.Rewards, "reward")
+
 			local requiresObjectiveIds = objectiveDefinition.RequiresObjectiveIds
 			if requiresObjectiveIds ~= nil and type(requiresObjectiveIds) ~= "table" then
 				addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` RequiresObjectiveIds must be a list.")
@@ -408,12 +411,11 @@ local function validateEpisodeOneAssembly(result, catalog)
 	end
 
 	local grantsSegment = false
-	local grantsMoonFragment = false
 	for _, itemGrant in ipairs(finalReward.Items or {}) do
 		if itemGrant.ItemId == EP01_RESTORED_SEGMENT_ID then
 			grantsSegment = true
 		elseif itemGrant.ItemId == "item_ep01_fragment_moon" then
-			grantsMoonFragment = true
+			addError(result, "Episode 1 Moon Fragment must be granted before final reward `" .. EP01_FINAL_REWARD_ID .. "`.")
 		elseif string.match(itemGrant.ItemId, "^item_star_core_segment_0[2-5]$") then
 			addError(result, "Episode 1 final reward must not grant future Star Core segment `" .. itemGrant.ItemId .. "`.")
 		end
@@ -423,8 +425,23 @@ local function validateEpisodeOneAssembly(result, catalog)
 		addError(result, "Episode 1 final reward must grant `" .. EP01_RESTORED_SEGMENT_ID .. "`.")
 	end
 
+	local moonFragmentReward = (catalog.Rewards or {})[EP01_MOON_FRAGMENT_REWARD_ID]
+	if not moonFragmentReward then
+		addError(result, "Episode 1 Moon Fragment objective reward `" .. EP01_MOON_FRAGMENT_REWARD_ID .. "` is missing.")
+		return
+	end
+
+	local grantsMoonFragment = false
+	for _, itemGrant in ipairs(moonFragmentReward.Items or {}) do
+		if itemGrant.ItemId == "item_ep01_fragment_moon" then
+			grantsMoonFragment = true
+		elseif itemGrant.ItemId == EP01_RESTORED_SEGMENT_ID then
+			addError(result, "Episode 1 Moon Fragment objective reward must not grant `" .. EP01_RESTORED_SEGMENT_ID .. "`.")
+		end
+	end
+
 	if not grantsMoonFragment then
-		addError(result, "Episode 1 final reward must grant `item_ep01_fragment_moon`.")
+		addError(result, "Episode 1 Moon Fragment objective reward must grant `item_ep01_fragment_moon`.")
 	end
 end
 

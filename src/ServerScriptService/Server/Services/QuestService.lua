@@ -69,6 +69,13 @@ local function buildQuestCompletionSourceContext(questId, sourceContext)
 	}
 end
 
+local function buildObjectiveRewardSourceContext(questId, objectiveId)
+	return {
+		SourceType = "QuestObjective",
+		SourceId = questId .. "_" .. objectiveId,
+	}
+end
+
 local function getObjectiveRequiredAmount(questDefinition, objectiveId)
 	local objectiveDefinition = questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[objectiveId]
 	if objectiveDefinition and type(objectiveDefinition.RequiredAmount) == "number" and objectiveDefinition.RequiredAmount > 0 then
@@ -369,6 +376,11 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 		return result(false, "QuestNotActive", "Cannot progress inactive quest `" .. questId .. "`.")
 	end
 
+	local objectiveStateBefore = stateResult.Data.ObjectiveStates and stateResult.Data.ObjectiveStates[objectiveId]
+	if not objectiveStateBefore then
+		return result(false, "UnknownQuestObjectiveId", "Quest `" .. questId .. "` does not contain objective state `" .. tostring(objectiveId) .. "`.")
+	end
+
 	local dependenciesReady, missingObjectiveId = objectiveDependenciesComplete(questDefinition, stateResult.Data, objectiveId)
 	if not dependenciesReady then
 		return result(false, "ObjectiveDependencyMissing", "Objective `" .. objectiveId .. "` requires `" .. tostring(missingObjectiveId) .. "` first.", {
@@ -376,6 +388,20 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 			ObjectiveId = objectiveId,
 			MissingObjectiveId = missingObjectiveId,
 		})
+	end
+
+	local objectiveDefinition = getObjectiveDefinition(questDefinition, objectiveId)
+	local objectiveRewardBundleIds = objectiveDefinition and objectiveDefinition.RewardBundleIds or {}
+	local willCompleteObjective = objectiveStateBefore.Completed ~= true and objectiveStateBefore.Current + amount >= objectiveStateBefore.Required
+	local objectiveRewardSourceContext = buildObjectiveRewardSourceContext(questId, objectiveId)
+
+	if willCompleteObjective then
+		for _, rewardBundleId in ipairs(objectiveRewardBundleIds) do
+			local preflightResult = rewardService.CanGrantRewardBundle(player, rewardBundleId, objectiveRewardSourceContext)
+			if not preflightResult.Success then
+				return preflightResult
+			end
+		end
 	end
 
 	local now = os.time()
@@ -398,10 +424,29 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 		return updatedStateResult
 	end
 
+	local grantedObjectiveRewardBundleIds = {}
+	if willCompleteObjective then
+		for _, rewardBundleId in ipairs(objectiveRewardBundleIds) do
+			-- TODO: Include objective reward grants in the future DataStore transaction or rollback ledger.
+			local rewardResult = rewardService.GrantRewardBundle(player, rewardBundleId, objectiveRewardSourceContext)
+			if not rewardResult.Success then
+				return result(false, "ObjectiveRewardFailed", "Objective completed but reward grant failed.", {
+					QuestId = questId,
+					ObjectiveId = objectiveId,
+					RewardBundleId = rewardBundleId,
+					FailureCode = rewardResult.Code,
+				})
+			end
+
+			table.insert(grantedObjectiveRewardBundleIds, rewardBundleId)
+		end
+	end
+
 	return result(true, "ObjectiveProgressApplied", nil, {
 		QuestId = questId,
 		ObjectiveId = objectiveId,
 		ObjectiveState = updatedStateResult.Data.ObjectiveStates[objectiveId],
+		GrantedObjectiveRewardBundleIds = grantedObjectiveRewardBundleIds,
 	})
 end
 
@@ -558,15 +603,6 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		return rewardAppliedResult
 	end
 
-	incrementSessionStat(player, "QuestsCompleted")
-	trackAnalytics(player, "QuestCompleted", {
-		QuestId = questId,
-		EpisodeId = questDefinition.EpisodeId,
-		ZoneId = questDefinition.ZoneId,
-		RewardBundleIds = grantedRewardBundleIds,
-	})
-	refreshInteractionVisibility(player)
-
 	local nextQuestId = nil
 	local episodeDefinition = EpisodeDefinitions[questDefinition.EpisodeId]
 	if episodeDefinition then
@@ -578,10 +614,28 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		end
 	end
 
+	local episodeCompletionResult = nil
+	if nextQuestId == nil then
+		episodeCompletionResult = episodeService.CompleteEpisode(player, questDefinition.EpisodeId, rewardSourceContext)
+		if not episodeCompletionResult.Success then
+			return episodeCompletionResult
+		end
+	end
+
+	incrementSessionStat(player, "QuestsCompleted")
+	trackAnalytics(player, "QuestCompleted", {
+		QuestId = questId,
+		EpisodeId = questDefinition.EpisodeId,
+		ZoneId = questDefinition.ZoneId,
+		RewardBundleIds = grantedRewardBundleIds,
+	})
+	refreshInteractionVisibility(player)
+
 	return result(true, "QuestCompleted", nil, {
 		QuestId = questId,
 		GrantedRewardBundleIds = grantedRewardBundleIds,
 		NextQuestId = nextQuestId,
+		EpisodeCompletionResult = episodeCompletionResult,
 	})
 end
 

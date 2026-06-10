@@ -804,7 +804,13 @@ Completion unlocks:
 | `reward_ep01_main_005` | `quest_ep01_main_005` | `175` | `item_ep01_fragment_theos` | THEOS Fragment reward. Optional THEOS objectives use separate reward bundles. |
 | `reward_ep01_main_006` | `quest_ep01_main_006` | `175` | `item_ep01_fragment_rocket` | Rocket Fragment reward. |
 | `reward_ep01_main_007` | `quest_ep01_main_007` | `150` | `badge_ep01_astronaut` | Badge milestone reward. |
-| `reward_ep01_main_008` | `quest_ep01_main_008` | `250` | `item_ep01_fragment_moon`, `item_star_core_segment_01`, `badge_ep01_explorer`, `badge_ep01_space_pioneer` | Moon Fragment and Episode 1 segment completion reward. |
+| `reward_ep01_main_008` | `quest_ep01_main_008` | `250` | `item_star_core_segment_01`, `badge_ep01_explorer`, `badge_ep01_space_pioneer` | Episode 1 segment completion reward after all five fragments are present. |
+
+Objective reward bundles:
+
+| Reward Bundle ID | Source Objective | Explorer Score | Persistent Rewards | Notes |
+| --- | --- | --- | --- | --- |
+| `reward_ep01_objective_008_moon_fragment` | `obj_ep01_main_008_003` | `0` | `item_ep01_fragment_moon` | Moon Fragment is recovered before final Segment 01 restoration validation. |
 
 Optional THEOS educational reward bundles:
 

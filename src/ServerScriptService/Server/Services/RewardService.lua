@@ -15,6 +15,7 @@ local inventoryService = nil
 local SOURCE_SPECIFIC_DUPLICATE_POLICIES = {
 	OncePerPlayerPerDiscovery = true,
 	OncePerPlayerPerOptionalObjective = true,
+	OncePerPlayerPerQuestObjective = true,
 	OncePerPlayerPerHiddenDiscovery = true,
 	OncePerPlayerPerEligibleQuestTeamworkContribution = true,
 }

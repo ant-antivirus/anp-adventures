@@ -262,6 +262,7 @@ return {
 		QuestId = "quest_ep01_main_007",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_astronaut_training",
+		Title = "Complete Astronaut Readiness",
 		ObjectiveIds = {
 			"obj_ep01_main_007_001",
 			"obj_ep01_main_007_002",
@@ -269,10 +270,18 @@ return {
 			"obj_ep01_main_007_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_007_001 = { RequiredAmount = 1 },
-			obj_ep01_main_007_002 = { RequiredAmount = 1 },
-			obj_ep01_main_007_003 = { RequiredAmount = 1 },
-			obj_ep01_main_007_004 = { RequiredAmount = 1 },
+			obj_ep01_main_007_001 = { RequiredAmount = 1, ObjectiveText = "Travel to Astronaut Training." },
+			obj_ep01_main_007_002 = { RequiredAmount = 1, ObjectiveText = "Complete the movement training station." },
+			obj_ep01_main_007_003 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Complete the oxygen safety check.",
+				RequiresObjectiveIds = { "obj_ep01_main_007_002" },
+			},
+			obj_ep01_main_007_004 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Receive Moon mission clearance.",
+				RequiresObjectiveIds = { "obj_ep01_main_007_003" },
+			},
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_007_001",
@@ -295,6 +304,7 @@ return {
 		QuestId = "quest_ep01_main_008",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_moon_walk",
+		Title = "Restore Star Core Segment 01",
 		ObjectiveIds = {
 			"obj_ep01_main_008_001",
 			"obj_ep01_main_008_002",
@@ -303,11 +313,24 @@ return {
 			"obj_ep01_main_008_005",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_008_001 = { RequiredAmount = 1 },
-			obj_ep01_main_008_002 = { RequiredAmount = 1 },
-			obj_ep01_main_008_003 = { RequiredAmount = 1 },
-			obj_ep01_main_008_004 = { RequiredAmount = 1 },
-			obj_ep01_main_008_005 = { RequiredAmount = 1 },
+			obj_ep01_main_008_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the Moon Walk zone." },
+			obj_ep01_main_008_002 = { RequiredAmount = 1, ObjectiveText = "Follow the Moon signal trail." },
+			obj_ep01_main_008_003 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Recover the Moon Fragment.",
+				RequiresObjectiveIds = { "obj_ep01_main_008_002" },
+				RewardBundleIds = { "reward_ep01_objective_008_moon_fragment" },
+			},
+			obj_ep01_main_008_004 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Verify all Episode 1 fragments.",
+				RequiresObjectiveIds = { "obj_ep01_main_008_003" },
+			},
+			obj_ep01_main_008_005 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Restore Star Core Segment 01.",
+				RequiresObjectiveIds = { "obj_ep01_main_008_004" },
+			},
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_008_001",
