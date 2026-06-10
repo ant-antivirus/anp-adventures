@@ -157,6 +157,7 @@ return {
 		QuestId = "quest_ep01_main_005",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_theos_satellite_center",
+		Title = "Calibrate the THEOS Link",
 		ObjectiveIds = {
 			"obj_ep01_main_005_001",
 			"obj_ep01_main_005_002",
@@ -167,10 +168,18 @@ return {
 			"obj_ep01_main_005_optional_003",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_005_001 = { RequiredAmount = 1 },
-			obj_ep01_main_005_002 = { RequiredAmount = 1 },
-			obj_ep01_main_005_003 = { RequiredAmount = 1 },
-			obj_ep01_main_005_004 = { RequiredAmount = 1 },
+			obj_ep01_main_005_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the THEOS Satellite Center." },
+			obj_ep01_main_005_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the satellite archive." },
+			obj_ep01_main_005_003 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Restore the signal relay.",
+				RequiresObjectiveIds = { "obj_ep01_main_005_002" },
+			},
+			obj_ep01_main_005_004 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Recover the THEOS Fragment.",
+				RequiresObjectiveIds = { "obj_ep01_main_005_003" },
+			},
 			obj_ep01_main_005_optional_001 = { RequiredAmount = 1 },
 			obj_ep01_main_005_optional_002 = { RequiredAmount = 1 },
 			obj_ep01_main_005_optional_003 = { RequiredAmount = 1 },
@@ -210,6 +219,7 @@ return {
 		QuestId = "quest_ep01_main_006",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_rocket_mission",
+		Title = "Prepare the Rocket Mission",
 		ObjectiveIds = {
 			"obj_ep01_main_006_001",
 			"obj_ep01_main_006_002",
@@ -217,10 +227,18 @@ return {
 			"obj_ep01_main_006_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_006_001 = { RequiredAmount = 1 },
-			obj_ep01_main_006_002 = { RequiredAmount = 1 },
-			obj_ep01_main_006_003 = { RequiredAmount = 1 },
-			obj_ep01_main_006_004 = { RequiredAmount = 1 },
+			obj_ep01_main_006_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the Rocket Mission zone." },
+			obj_ep01_main_006_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the rocket control panel." },
+			obj_ep01_main_006_003 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Run launch diagnostics.",
+				RequiresObjectiveIds = { "obj_ep01_main_006_002" },
+			},
+			obj_ep01_main_006_004 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Recover the Rocket Fragment.",
+				RequiresObjectiveIds = { "obj_ep01_main_006_003" },
+			},
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_006_001",

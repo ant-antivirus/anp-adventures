@@ -266,7 +266,7 @@ function Phase3G2SmokeTest.Run(services)
 	)
 
 	local postQuest004Guidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContainsAll(postQuest004Guidance, { "Earth Fragment", "satellite path" }, "Guidance after Quest 004 should point to future satellite content.")
+	assertGuidanceContainsAll(postQuest004Guidance, { "Quest 005", "available" }, "Guidance after Quest 004 should point to Quest 005.")
 
 	assertResultSuccess(
 		AnalyticsService.Track(player, "QuestCompleted", {

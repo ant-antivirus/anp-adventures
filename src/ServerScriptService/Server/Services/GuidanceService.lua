@@ -113,12 +113,44 @@ local function buildCharacterHint(characterId, guidanceType, objectiveText)
 		return "The Earth Fragment is ready. Look for the cyan Quest Complete marker."
 	elseif guidanceType == "Quest005Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The Earth Fragment is secure. The next expedition step will open from the satellite path."
+			return "Quest 005 is available. The satellite path leads to THEOS data."
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The Earth Fragment is secure. Prepare for the satellite path ahead."
+			return "Quest 005 is available. Follow the satellite path to the THEOS Satellite Center."
 		end
 
-		return "The Earth Fragment is secure. The next expedition step will open from the satellite path."
+		return "Quest 005 is available. Follow the satellite path to the THEOS Satellite Center."
+	elseif guidanceType == "CompleteQuest005" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The THEOS Fragment signal is stable. Finish at the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The THEOS Fragment is secure. Use the cyan Quest Complete marker to finish this mission."
+		end
+
+		return "The THEOS Fragment is secure. Look for the cyan Quest Complete marker."
+	elseif guidanceType == "Quest006Available" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "Quest 006 is available. The satellite signal points toward the Rocket Mission."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Quest 006 is available. Follow the rocket path to the Rocket Mission zone."
+		end
+
+		return "Quest 006 is available. Follow the rocket path to the Rocket Mission zone."
+	elseif guidanceType == "CompleteQuest006" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The Rocket Fragment data is ready. Finish at the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The Rocket Fragment is ready. Finish strong at the cyan Quest Complete marker."
+		end
+
+		return "The Rocket Fragment is ready. Look for the cyan Quest Complete marker."
+	elseif guidanceType == "Quest007Available" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The Rocket Fragment is secure. Astronaut training should prepare us for the next step."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The Rocket Fragment is secure. Prepare for astronaut training."
+		end
+
+		return "The Rocket Fragment is secure. Prepare for astronaut training."
 	end
 
 	return "Explore nearby discoveries or return to the Command Center."
@@ -193,6 +225,52 @@ local QUEST_004_OBJECTIVE_HINTS = {
 	},
 }
 
+local QUEST_005_OBJECTIVE_HINTS = {
+	obj_ep01_main_005_001 = {
+		Atom = "Travel to the THEOS Satellite Center.",
+		Neutron = "Move to the THEOS Satellite Center so we can inspect the satellite data.",
+		Proton = "Travel to the THEOS Satellite Center.",
+	},
+	obj_ep01_main_005_002 = {
+		Atom = "Inspect the satellite archive for the missing signal.",
+		Neutron = "Inspect the satellite archive for the missing signal pattern.",
+		Proton = "Inspect the satellite archive for the missing signal.",
+	},
+	obj_ep01_main_005_003 = {
+		Atom = "Restore the signal relay.",
+		Neutron = "Restore the signal relay so the THEOS Fragment can stabilize.",
+		Proton = "Restore the signal relay.",
+	},
+	obj_ep01_main_005_004 = {
+		Atom = "Recover the THEOS Fragment.",
+		Neutron = "Recover the THEOS Fragment once the relay is stable.",
+		Proton = "Recover the THEOS Fragment.",
+	},
+}
+
+local QUEST_006_OBJECTIVE_HINTS = {
+	obj_ep01_main_006_001 = {
+		Atom = "Travel to the Rocket Mission zone.",
+		Neutron = "Travel to the Rocket Mission zone to inspect the launch path.",
+		Proton = "Travel to the Rocket Mission zone.",
+	},
+	obj_ep01_main_006_002 = {
+		Atom = "Inspect the rocket control panel.",
+		Neutron = "Inspect the rocket control panel for launch system data.",
+		Proton = "Inspect the rocket control panel.",
+	},
+	obj_ep01_main_006_003 = {
+		Atom = "Run the launch diagnostics.",
+		Neutron = "Run the launch diagnostics to verify the rocket path.",
+		Proton = "Run the launch diagnostics.",
+	},
+	obj_ep01_main_006_004 = {
+		Atom = "Recover the Rocket Fragment.",
+		Neutron = "Recover the Rocket Fragment after diagnostics are complete.",
+		Proton = "Recover the Rocket Fragment.",
+	},
+}
+
 local function getCharacterToneKey(characterId)
 	if characterId == CharacterConfig.Ids.Atom then
 		return "Atom"
@@ -218,6 +296,16 @@ local function buildQuestObjectiveHint(characterId, questId, objectiveId, object
 		end
 	elseif questId == "quest_ep01_main_004" then
 		local objectiveHints = QUEST_004_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	elseif questId == "quest_ep01_main_005" then
+		local objectiveHints = QUEST_005_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	elseif questId == "quest_ep01_main_006" then
+		local objectiveHints = QUEST_006_OBJECTIVE_HINTS[objectiveId]
 		if objectiveHints then
 			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
 		end
@@ -321,6 +409,8 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 				if activeQuestId == "quest_ep01_main_002" then "CompleteQuest002"
 				elseif activeQuestId == "quest_ep01_main_003" then "CompleteQuest003"
 				elseif activeQuestId == "quest_ep01_main_004" then "CompleteQuest004"
+				elseif activeQuestId == "quest_ep01_main_005" then "CompleteQuest005"
+				elseif activeQuestId == "quest_ep01_main_006" then "CompleteQuest006"
 				else "CompleteQuest"
 			),
 		})
@@ -383,6 +473,30 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			NextObjectiveId = nil,
 			NextObjectiveText = nil,
 			HintText = buildCharacterHint(guideCharacterId, "Quest005Available"),
+		})
+	end
+
+	local canStartQuest006 = questService.CanStartQuest(player, "quest_ep01_main_006")
+	if canStartQuest006 then
+		return guidanceReady(player, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest006Available"),
+		})
+	end
+
+	local canStartQuest007 = questService.CanStartQuest(player, "quest_ep01_main_007")
+	if canStartQuest007 then
+		return guidanceReady(player, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest007Available"),
 		})
 	end
 
