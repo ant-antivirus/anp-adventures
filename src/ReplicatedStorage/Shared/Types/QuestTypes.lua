@@ -28,6 +28,8 @@ export type QuestDefinition = {
 	ObjectiveDefinitions: {
 		[string]: {
 			RequiredAmount: number,
+			ObjectiveText: string?,
+			RequiresObjectiveIds: { string }?,
 		},
 	}?,
 	RequiredObjectiveIds: { string },

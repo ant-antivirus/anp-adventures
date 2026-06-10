@@ -22,6 +22,7 @@ local function result(success, code, message, data)
 	return {
 		Success = success,
 		Code = code,
+		Reason = if success then nil else code,
 		Message = message,
 		Data = data,
 	}
@@ -75,6 +76,24 @@ local function getObjectiveRequiredAmount(questDefinition, objectiveId)
 	end
 
 	return 1
+end
+
+local function getObjectiveDefinition(questDefinition, objectiveId)
+	return questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[objectiveId]
+end
+
+local function objectiveDependenciesComplete(questDefinition, questState, objectiveId)
+	local objectiveDefinition = getObjectiveDefinition(questDefinition, objectiveId)
+	local requiresObjectiveIds = objectiveDefinition and objectiveDefinition.RequiresObjectiveIds
+
+	for _, requiredObjectiveId in ipairs(requiresObjectiveIds or {}) do
+		local requiredObjectiveState = questState.ObjectiveStates and questState.ObjectiveStates[requiredObjectiveId]
+		if not requiredObjectiveState or requiredObjectiveState.Completed ~= true then
+			return false, requiredObjectiveId
+		end
+	end
+
+	return true, nil
 end
 
 local function buildObjectiveStates(questDefinition)
@@ -348,6 +367,15 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 
 	if stateResult.Data.Status ~= QuestStatus.Active then
 		return result(false, "QuestNotActive", "Cannot progress inactive quest `" .. questId .. "`.")
+	end
+
+	local dependenciesReady, missingObjectiveId = objectiveDependenciesComplete(questDefinition, stateResult.Data, objectiveId)
+	if not dependenciesReady then
+		return result(false, "ObjectiveDependencyMissing", "Objective `" .. objectiveId .. "` requires `" .. tostring(missingObjectiveId) .. "` first.", {
+			QuestId = questId,
+			ObjectiveId = objectiveId,
+			MissingObjectiveId = missingObjectiveId,
+		})
 	end
 
 	local now = os.time()

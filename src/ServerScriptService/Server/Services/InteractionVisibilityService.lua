@@ -124,6 +124,11 @@ local function getQuestObjectiveState(player, definition)
 		return interactionState(false, false, "ZoneLocked")
 	end
 
+	local questDefinition = QuestDefinitions[definition.QuestId]
+	if not questDefinition then
+		return interactionState(false, false, "UnknownQuestId")
+	end
+
 	local questStateResult = questService.GetQuestState(player, definition.QuestId)
 	if not questStateResult.Success then
 		return interactionState(false, false, questStateResult.Code)
@@ -140,6 +145,14 @@ local function getQuestObjectiveState(player, definition)
 
 	if objectiveState.Completed == true then
 		return interactionState(false, false, "ObjectiveComplete")
+	end
+
+	local objectiveDefinition = questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[definition.ObjectiveId]
+	for _, requiredObjectiveId in ipairs((objectiveDefinition and objectiveDefinition.RequiresObjectiveIds) or {}) do
+		local requiredObjectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[requiredObjectiveId]
+		if not requiredObjectiveState or requiredObjectiveState.Completed ~= true then
+			return interactionState(false, false, "ObjectiveDependencyMissing")
+		end
 	end
 
 	return interactionState(true, true, "QuestObjectiveAvailable")

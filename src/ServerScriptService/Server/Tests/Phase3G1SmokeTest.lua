@@ -40,6 +40,19 @@ local function assertGuidanceContains(guidanceResult, expectedText, message)
 	)
 end
 
+local function assertGuidanceContainsAll(guidanceResult, expectedTexts, message)
+	assertResultSuccess(guidanceResult, message)
+	assertCondition(guidanceResult.Data.Guidance ~= nil, message .. " should return guidance data.")
+
+	local hintText = tostring(guidanceResult.Data.Guidance.HintText)
+	for _, expectedText in ipairs(expectedTexts) do
+		assertCondition(
+			string.find(hintText, expectedText, 1, true) ~= nil,
+			message .. " Expected hint containing `" .. expectedText .. "`, got `" .. hintText .. "`."
+		)
+	end
+end
+
 local function completeQuest001(PromptBindingService, player)
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_start_ep01_main_001", {}), "Quest 001 should start.")
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_ep01_main_001_001", {}), "Quest 001 objective 001 should progress.")
@@ -175,7 +188,11 @@ function Phase3G1SmokeTest.Run(services)
 	)
 
 	local postQuest002Guidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContains(postQuest002Guidance, "Quest 002 is complete", "Guidance after Quest 002 should point to future content.")
+	assertGuidanceContainsAll(
+		postQuest002Guidance,
+		{ "Quest 003", "available" },
+		"Guidance after Quest 002 should point to Quest 003."
+	)
 
 	assertResultSuccess(PlayerDataService.ReleasePlayer(player), "Phase 3G-1 player data should release.")
 

@@ -77,6 +77,14 @@ Proton Companion must assist the player.
 
 ---
 
+## Objective Dependency Rules
+
+Quest objectives are flexible by default.
+
+Use `RequiresObjectiveIds[]` only when an objective logically depends on another objective in the same quest. Dependency locking should guide progression without turning every quest into a strict global sequence.
+
+---
+
 ## Discovery System
 
 Players receive rewards for:

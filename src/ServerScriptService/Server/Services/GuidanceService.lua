@@ -81,12 +81,44 @@ local function buildCharacterHint(characterId, guidanceType, objectiveText)
 		return "Quest 002 is available. Look for the green Quest Start marker in the Universe Explorer area."
 	elseif guidanceType == "Quest003Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The broken signal is mapped. Future route analysis can continue when the next quest marker is ready."
+			return "Quest 003 is available. The mapped signal can guide us deeper into Universe Explorer."
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Great mapping work. The next expedition step will open from the Universe Explorer path."
+			return "Quest 003 is available. Follow the next green Quest Start marker in Universe Explorer."
 		end
 
-		return "Quest 002 is complete. Continue exploring Universe Explorer until the next quest marker is available."
+		return "Quest 003 is available. Follow the next green Quest Start marker in Universe Explorer."
+	elseif guidanceType == "CompleteQuest003" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The Universe Fragment is stable. Finish the quest at the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The Universe Fragment is secure. Use the cyan Quest Complete marker to finish this step."
+		end
+
+		return "The Universe Fragment is secure. Look for the cyan Quest Complete marker."
+	elseif guidanceType == "Quest004Available" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "Quest 004 is available. The next evidence points toward the Terrain Sandbox."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "Quest 004 is available. Head toward the Terrain Sandbox path."
+		end
+
+		return "Quest 004 is available. Look for the green Quest Start marker near the Terrain Sandbox."
+	elseif guidanceType == "CompleteQuest004" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The Earth Fragment data is complete. Finish at the cyan Quest Complete marker."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The Earth Fragment is ready. Finish strong at the cyan Quest Complete marker."
+		end
+
+		return "The Earth Fragment is ready. Look for the cyan Quest Complete marker."
+	elseif guidanceType == "Quest005Available" then
+		if characterId == CharacterConfig.Ids.Neutron then
+			return "The Earth Fragment is secure. The next expedition step will open from the satellite path."
+		elseif characterId == CharacterConfig.Ids.Atom then
+			return "The Earth Fragment is secure. Prepare for the satellite path ahead."
+		end
+
+		return "The Earth Fragment is secure. The next expedition step will open from the satellite path."
 	end
 
 	return "Explore nearby discoveries or return to the Command Center."
@@ -115,6 +147,52 @@ local QUEST_002_OBJECTIVE_HINTS = {
 	},
 }
 
+local QUEST_003_OBJECTIVE_HINTS = {
+	obj_ep01_main_003_001 = {
+		Atom = "Follow the star signal trail deeper into Universe Explorer.",
+		Neutron = "The mapped signal is extending. Follow the star signal trail.",
+		Proton = "Follow the star signal trail deeper into Universe Explorer.",
+	},
+	obj_ep01_main_003_002 = {
+		Atom = "Inspect the unstable signal echo and stay steady.",
+		Neutron = "Inspect the unstable signal echo so we can understand the distortion.",
+		Proton = "Inspect the unstable signal echo.",
+	},
+	obj_ep01_main_003_003 = {
+		Atom = "Stabilize the Universe Fragment before it fades.",
+		Neutron = "Stabilize the Universe Fragment before its signal collapses.",
+		Proton = "Stabilize the Universe Fragment before it fades.",
+	},
+	obj_ep01_main_003_004 = {
+		Atom = "Recover the Universe Fragment.",
+		Neutron = "Recover the Universe Fragment for the Star Core record.",
+		Proton = "Recover the Universe Fragment.",
+	},
+}
+
+local QUEST_004_OBJECTIVE_HINTS = {
+	obj_ep01_main_004_001 = {
+		Atom = "Travel to the Terrain Sandbox.",
+		Neutron = "Move to the Terrain Sandbox so we can compare the terrain memory.",
+		Proton = "Travel to the Terrain Sandbox.",
+	},
+	obj_ep01_main_004_002 = {
+		Atom = "Find the Earth memory marker.",
+		Neutron = "Find the Earth memory marker. It should reveal the terrain pattern.",
+		Proton = "Find the Earth memory marker.",
+	},
+	obj_ep01_main_004_003 = {
+		Atom = "Rebuild the terrain memory path.",
+		Neutron = "Rebuild the terrain memory path so the Earth Fragment can stabilize.",
+		Proton = "Rebuild the terrain memory path.",
+	},
+	obj_ep01_main_004_004 = {
+		Atom = "Recover the Earth Fragment.",
+		Neutron = "Recover the Earth Fragment once the terrain memory is stable.",
+		Proton = "Recover the Earth Fragment.",
+	},
+}
+
 local function getCharacterToneKey(characterId)
 	if characterId == CharacterConfig.Ids.Atom then
 		return "Atom"
@@ -130,6 +208,16 @@ end
 local function buildQuestObjectiveHint(characterId, questId, objectiveId, objectiveText)
 	if questId == "quest_ep01_main_002" then
 		local objectiveHints = QUEST_002_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	elseif questId == "quest_ep01_main_003" then
+		local objectiveHints = QUEST_003_OBJECTIVE_HINTS[objectiveId]
+		if objectiveHints then
+			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
+		end
+	elseif questId == "quest_ep01_main_004" then
+		local objectiveHints = QUEST_004_OBJECTIVE_HINTS[objectiveId]
 		if objectiveHints then
 			return objectiveHints[getCharacterToneKey(characterId)] or objectiveHints.Proton
 		end
@@ -230,7 +318,10 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			NextObjectiveText = nil,
 			HintText = buildCharacterHint(
 				guideCharacterId,
-				if activeQuestId == "quest_ep01_main_002" then "CompleteQuest002" else "CompleteQuest"
+				if activeQuestId == "quest_ep01_main_002" then "CompleteQuest002"
+				elseif activeQuestId == "quest_ep01_main_003" then "CompleteQuest003"
+				elseif activeQuestId == "quest_ep01_main_004" then "CompleteQuest004"
+				else "CompleteQuest"
 			),
 		})
 	end
@@ -268,6 +359,30 @@ function GuidanceService.GetPlayerGuidance(player, characterId)
 			NextObjectiveId = nil,
 			NextObjectiveText = nil,
 			HintText = buildCharacterHint(guideCharacterId, "Quest003Available"),
+		})
+	end
+
+	local canStartQuest004 = questService.CanStartQuest(player, "quest_ep01_main_004")
+	if canStartQuest004 then
+		return guidanceReady(player, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest004Available"),
+		})
+	end
+
+	local canStartQuest005 = questService.CanStartQuest(player, "quest_ep01_main_005")
+	if canStartQuest005 then
+		return guidanceReady(player, {
+			CharacterId = guideCharacterId,
+			ActiveQuestId = nil,
+			ActiveQuestTitle = nil,
+			NextObjectiveId = nil,
+			NextObjectiveText = nil,
+			HintText = buildCharacterHint(guideCharacterId, "Quest005Available"),
 		})
 	end
 

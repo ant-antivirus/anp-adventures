@@ -218,6 +218,33 @@ local function validateQuestReferences(result, catalog, companionConfig)
 			end
 		end
 
+		for objectiveId, objectiveDefinition in pairs(quest.ObjectiveDefinitions or {}) do
+			local requiresObjectiveIds = objectiveDefinition.RequiresObjectiveIds
+			if requiresObjectiveIds ~= nil and type(requiresObjectiveIds) ~= "table" then
+				addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` RequiresObjectiveIds must be a list.")
+			elseif type(requiresObjectiveIds) == "table" then
+				local dependencySeen = {}
+				for _, requiredObjectiveId in ipairs(requiresObjectiveIds) do
+					if type(requiredObjectiveId) ~= "string" or requiredObjectiveId == "" then
+						addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` has an invalid RequiresObjectiveIds entry.")
+					elseif requiredObjectiveId == objectiveId then
+						addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` cannot require itself.")
+					elseif dependencySeen[requiredObjectiveId] then
+						addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` has duplicate dependency `" .. requiredObjectiveId .. "`.")
+					elseif not objectiveSeen[requiredObjectiveId] then
+						addError(result, "Quest `" .. questId .. "` objective `" .. objectiveId .. "` requires unknown objective `" .. requiredObjectiveId .. "`.")
+					else
+						local requiredObjectiveDefinition = quest.ObjectiveDefinitions and quest.ObjectiveDefinitions[requiredObjectiveId]
+						if contains((requiredObjectiveDefinition and requiredObjectiveDefinition.RequiresObjectiveIds) or {}, objectiveId) then
+							addError(result, "Quest `" .. questId .. "` objectives `" .. objectiveId .. "` and `" .. requiredObjectiveId .. "` have a direct circular dependency.")
+						end
+					end
+
+					dependencySeen[requiredObjectiveId] = true
+				end
+			end
+		end
+
 		for _, requiredObjectiveId in ipairs(quest.RequiredObjectiveIds or {}) do
 			if not objectiveSeen[requiredObjectiveId] then
 				addError(result, "Quest `" .. questId .. "` required objective `" .. requiredObjectiveId .. "` is not listed in ObjectiveIds.")

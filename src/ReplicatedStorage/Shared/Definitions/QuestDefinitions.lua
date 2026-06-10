@@ -71,6 +71,7 @@ return {
 		QuestId = "quest_ep01_main_003",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_universe_explorer",
+		Title = "Recover the Universe Fragment",
 		ObjectiveIds = {
 			"obj_ep01_main_003_001",
 			"obj_ep01_main_003_002",
@@ -78,10 +79,18 @@ return {
 			"obj_ep01_main_003_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_003_001 = { RequiredAmount = 1 },
-			obj_ep01_main_003_002 = { RequiredAmount = 1 },
-			obj_ep01_main_003_003 = { RequiredAmount = 1 },
-			obj_ep01_main_003_004 = { RequiredAmount = 1 },
+			obj_ep01_main_003_001 = { RequiredAmount = 1, ObjectiveText = "Follow the star signal trail." },
+			obj_ep01_main_003_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the unstable signal echo." },
+			obj_ep01_main_003_003 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Stabilize the Universe Fragment.",
+				RequiresObjectiveIds = { "obj_ep01_main_003_002" },
+			},
+			obj_ep01_main_003_004 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Recover the Universe Fragment.",
+				RequiresObjectiveIds = { "obj_ep01_main_003_003" },
+			},
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_003_001",
@@ -105,6 +114,7 @@ return {
 		QuestId = "quest_ep01_main_004",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_terrain_sandbox",
+		Title = "Stabilize the Terrain Flow",
 		ObjectiveIds = {
 			"obj_ep01_main_004_001",
 			"obj_ep01_main_004_002",
@@ -112,10 +122,18 @@ return {
 			"obj_ep01_main_004_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_004_001 = { RequiredAmount = 1 },
-			obj_ep01_main_004_002 = { RequiredAmount = 1 },
-			obj_ep01_main_004_003 = { RequiredAmount = 1 },
-			obj_ep01_main_004_004 = { RequiredAmount = 1 },
+			obj_ep01_main_004_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the Terrain Sandbox." },
+			obj_ep01_main_004_002 = { RequiredAmount = 1, ObjectiveText = "Find the Earth memory marker." },
+			obj_ep01_main_004_003 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Rebuild the terrain memory path.",
+				RequiresObjectiveIds = { "obj_ep01_main_004_002" },
+			},
+			obj_ep01_main_004_004 = {
+				RequiredAmount = 1,
+				ObjectiveText = "Recover the Earth Fragment.",
+				RequiresObjectiveIds = { "obj_ep01_main_004_003" },
+			},
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_004_001",
