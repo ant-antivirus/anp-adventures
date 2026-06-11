@@ -44,6 +44,12 @@ Phase 4C adds a small display-only quest tracker panel. The server sends `QuestT
 
 The client does not calculate quest progress, grant rewards, or mutate player state.
 
+## Skeleton Test Track
+
+The current Studio skeleton world uses a compact developer test-track layout for faster Episode 1 playtesting. Quest markers are arranged in short rows from start to objectives to completion.
+
+This is not final world art. IDs and progression logic remain unchanged.
+
 ## Logging
 
 `LogConfig` controls developer log noise.

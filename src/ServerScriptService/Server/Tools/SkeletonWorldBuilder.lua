@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local ZoneDefinitions = require(Shared.Definitions.ZoneDefinitions)
 local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
+local QuestDefinitions = require(Shared.Definitions.QuestDefinitions)
 local CharacterConfig = require(Shared.Config.CharacterConfig)
 
 local SkeletonWorldBuilder = {}
@@ -505,6 +506,35 @@ local NPC_MARKERS = {
 	},
 }
 
+local TRACK_ORIGIN = Vector3.new(0, 0, 0)
+local TRACK_STEP_SPACING = 16
+local TRACK_ROW_SPACING = 28
+local TRACK_SIDE_OFFSET = 12
+local TRACK_INTERACTION_Y = 7
+local TRACK_DISCOVERY_Y = 8
+local TRACK_ZONE_Y = 2
+local TRACK_SPAWN_Y = 6
+local TRACK_NPC_Y = 7
+
+local ZONE_ROW_HINTS = {
+	zone_ep01_command_center = 1,
+	zone_ep01_universe_explorer = 2.5,
+	zone_ep01_terrain_sandbox = 4,
+	zone_ep01_theos_satellite_center = 5,
+	zone_ep01_rocket_mission = 6,
+	zone_ep01_astronaut_training = 7,
+	zone_ep01_moon_walk = 8,
+}
+
+local DISCOVERY_TRACK_POSITIONS = {
+	disc_ep01_command_expedition_terminal = { QuestId = "quest_ep01_main_001", StepIndex = 1, Side = 1 },
+	disc_ep01_command_star_core_display = { QuestId = "quest_ep01_main_001", StepIndex = 4 },
+	disc_ep01_universe_first_signal_marker = { QuestId = "quest_ep01_main_002", StepIndex = 2, Side = 1 },
+	disc_ep01_universe_analysis_station = { QuestId = "quest_ep01_main_002", StepIndex = 4, Side = 1 },
+	disc_ep01_theos_satellite_history = { QuestId = "quest_ep01_main_005", StepIndex = 2, Side = 1 },
+	disc_ep01_moon_star_core_segment_restoration_point = { QuestId = "quest_ep01_main_008", StepIndex = 5, Side = 1 },
+}
+
 local function result(success, code, message, data)
 	return {
 		Success = success,
@@ -533,6 +563,91 @@ local function findChildByAttribute(folder, attributeName, value)
 	end
 
 	return nil
+end
+
+local function getQuestIndex(questId)
+	local questNumber = tonumber(string.match(questId or "", "main_(%d+)"))
+	if questNumber then
+		return questNumber
+	end
+
+	return 1
+end
+
+local function getQuestRowZ(questId)
+	return TRACK_ORIGIN.Z + (getQuestIndex(questId) - 1) * TRACK_ROW_SPACING
+end
+
+local function getTrackPosition(questId, stepIndex, y, sideOffset)
+	return Vector3.new(
+		TRACK_ORIGIN.X + stepIndex * TRACK_STEP_SPACING,
+		y,
+		getQuestRowZ(questId) + (sideOffset or 0)
+	)
+end
+
+local function getObjectiveStepIndex(questId, objectiveId)
+	local questDefinition = QuestDefinitions[questId]
+	for index, requiredObjectiveId in ipairs((questDefinition and questDefinition.RequiredObjectiveIds) or {}) do
+		if requiredObjectiveId == objectiveId then
+			return index
+		end
+	end
+
+	for index, objectiveDefinitionId in ipairs((questDefinition and questDefinition.ObjectiveIds) or {}) do
+		if objectiveDefinitionId == objectiveId then
+			return index
+		end
+	end
+
+	return 1
+end
+
+local function getQuestCompleteStepIndex(questId)
+	local questDefinition = QuestDefinitions[questId]
+	return #((questDefinition and questDefinition.RequiredObjectiveIds) or {}) + 1
+end
+
+local function getInteractionTrackPosition(interaction, fallbackIndex)
+	if interaction.Type == "QuestStart" then
+		return getTrackPosition(interaction.QuestId, 0, TRACK_INTERACTION_Y)
+	elseif interaction.Type == "QuestComplete" then
+		return getTrackPosition(interaction.QuestId, getQuestCompleteStepIndex(interaction.QuestId), TRACK_INTERACTION_Y)
+	elseif interaction.Type == "QuestObjective" then
+		return getTrackPosition(interaction.QuestId, getObjectiveStepIndex(interaction.QuestId, interaction.ObjectiveId), TRACK_INTERACTION_Y)
+	elseif interaction.Type == "ZoneTravel" then
+		return getTrackPosition(interaction.QuestId or "quest_ep01_main_002", 1, TRACK_INTERACTION_Y, -TRACK_SIDE_OFFSET)
+	end
+
+	return Vector3.new(TRACK_ORIGIN.X + (fallbackIndex - 1) * TRACK_STEP_SPACING, TRACK_INTERACTION_Y, TRACK_ORIGIN.Z - TRACK_ROW_SPACING)
+end
+
+local function getDiscoveryTrackPosition(discovery, fallbackIndex)
+	local trackPosition = DISCOVERY_TRACK_POSITIONS[discovery.DiscoveryId]
+	if trackPosition then
+		return getTrackPosition(
+			trackPosition.QuestId,
+			trackPosition.StepIndex,
+			TRACK_DISCOVERY_Y,
+			(trackPosition.Side or 0) * TRACK_SIDE_OFFSET
+		)
+	end
+
+	return Vector3.new(TRACK_ORIGIN.X + (fallbackIndex - 1) * TRACK_STEP_SPACING, TRACK_DISCOVERY_Y, TRACK_ORIGIN.Z + 9 * TRACK_ROW_SPACING)
+end
+
+local function getZoneTrackPosition(zoneId)
+	local rowHint = ZONE_ROW_HINTS[zoneId] or 1
+	return Vector3.new(TRACK_ORIGIN.X - 18, TRACK_ZONE_Y, TRACK_ORIGIN.Z + (rowHint - 1) * TRACK_ROW_SPACING)
+end
+
+local function getSpawnTrackPosition(zoneId, spawnIndex)
+	local zonePosition = getZoneTrackPosition(zoneId)
+	return Vector3.new(zonePosition.X, TRACK_SPAWN_Y, zonePosition.Z + 8 + ((spawnIndex - 1) * 5))
+end
+
+local function getNPCTrackPosition(index)
+	return Vector3.new(TRACK_ORIGIN.X - 22, TRACK_NPC_Y, TRACK_ORIGIN.Z - 14 + ((index - 1) * 8))
 end
 
 local function createPart(folder, name, position, size, color, transparency)
@@ -721,8 +836,8 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			"ZoneId",
 			zoneId,
 			"Zone_" .. zoneId,
-			Vector3.new((index - 1) * 80, 2, 0),
-			Vector3.new(48, 4, 48),
+			getZoneTrackPosition(zoneId),
+			Vector3.new(20, 4, 20),
 			Color3.fromRGB(70, 110, 160),
 			0.65,
 			{
@@ -736,7 +851,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 				"SpawnPointId",
 				spawnPointId,
 				"Spawn_" .. spawnPointId,
-				Vector3.new((index - 1) * 80, 6, spawnIndex * 8),
+				getSpawnTrackPosition(zoneId, spawnIndex),
 				Vector3.new(6, 1, 6),
 				PLACEHOLDER_COLORS.SpawnPoint,
 				0.55,
@@ -760,7 +875,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			"DiscoveryId",
 			discovery.DiscoveryId,
 			"Discovery_" .. discovery.DiscoveryId,
-			Vector3.new((index - 1) * 20, 8, 70),
+			getDiscoveryTrackPosition(discovery, index),
 			Vector3.new(5, 5, 5),
 			PLACEHOLDER_COLORS.Discovery,
 			0.35,
@@ -781,7 +896,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			"InteractionId",
 			interaction.InteractionId,
 			partName,
-			Vector3.new((index - 1) * 18, 7, -70),
+			getInteractionTrackPosition(interaction, index),
 			Vector3.new(8, 6, 8),
 			PLACEHOLDER_COLORS[interaction.Type] or PLACEHOLDER_COLORS.QuestObjective,
 			0.35,
@@ -801,7 +916,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			"CharacterId",
 			marker.CharacterId,
 			"NPCMarker_" .. marker.CharacterId,
-			Vector3.new((index - 1) * 8, 7, -18),
+			getNPCTrackPosition(index),
 			Vector3.new(4, 6, 4),
 			PLACEHOLDER_COLORS.NPCMarker,
 			0.45,

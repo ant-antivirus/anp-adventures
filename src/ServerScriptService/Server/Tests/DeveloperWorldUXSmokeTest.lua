@@ -60,6 +60,13 @@ local function assertPromptMatchesDefinition(PromptBindingService, interactionId
 	assertPromptText(PromptBindingService, interactionId, interactionDefinition.PromptActionText)
 end
 
+local function assertLeftToRight(previousObject, nextObject, message)
+	assertCondition(previousObject and previousObject:IsA("BasePart"), message .. " Previous object should be a BasePart.")
+	assertCondition(nextObject and nextObject:IsA("BasePart"), message .. " Next object should be a BasePart.")
+	assertCondition(nextObject.Position.X > previousObject.Position.X, message .. " Next object should be farther along the test track.")
+	assertCondition(math.abs(nextObject.Position.Z - previousObject.Position.Z) <= 2, message .. " Objects should stay on the same compact quest row.")
+end
+
 function DeveloperWorldUXSmokeTest.Run(services)
 	local PlayerDataService = services.PlayerDataService
 	local QuestService = services.QuestService
@@ -92,11 +99,13 @@ function DeveloperWorldUXSmokeTest.Run(services)
 	assertResultSuccess(questObjective, "Quest objective interaction point should exist.")
 	assertColor(questObjective.Data, EXPECTED_COLORS.QuestObjective, "QuestObjective placeholder")
 	assertDeveloperLabel(questObjective.Data, "[QUEST OBJECTIVE]", "Expedition Terminal", "interaction_ep01_main_001_001")
+	assertLeftToRight(questStart.Data, questObjective.Data, "Q1 start to Q1 Obj1 layout")
 
 	local discovery = WorldRegistryService.GetDiscoveryPoint("disc_ep01_command_star_core_display")
 	assertResultSuccess(discovery, "Discovery point should exist.")
 	assertColor(discovery.Data, EXPECTED_COLORS.Discovery, "Discovery placeholder")
 	assertDeveloperLabel(discovery.Data, "[DISCOVERY]", "Star Core Display", "disc_ep01_command_star_core_display")
+	assertLeftToRight(questObjective.Data, discovery.Data, "Q1 Obj1 to Q1 Star Core Display layout")
 
 	local travel = WorldRegistryService.GetInteractionPoint("interaction_travel_ep01_universe_explorer")
 	assertResultSuccess(travel, "Zone travel interaction point should exist.")
@@ -111,6 +120,12 @@ function DeveloperWorldUXSmokeTest.Run(services)
 	assertResultSuccess(npc, "Proton NPC marker should exist.")
 	assertColor(npc.Data, EXPECTED_COLORS.NPCMarker, "NPCMarker placeholder")
 	assertDeveloperLabel(npc.Data, "[NPC GUIDE]", "Proton", "interaction_npc_proton_guide")
+
+	local quest008Objective5 = WorldRegistryService.GetInteractionPoint("interaction_ep01_main_008_005")
+	assertResultSuccess(quest008Objective5, "Quest 008 objective 005 interaction point should exist.")
+	local quest008Complete = WorldRegistryService.GetInteractionPoint("interaction_complete_ep01_main_008")
+	assertResultSuccess(quest008Complete, "Quest 008 complete interaction point should exist.")
+	assertLeftToRight(quest008Objective5.Data, quest008Complete.Data, "Q8 Obj5 to Q8 Complete layout")
 
 	assertPromptMatchesDefinition(PromptBindingService, "interaction_start_ep01_main_001")
 	assertPromptMatchesDefinition(PromptBindingService, "interaction_complete_ep01_main_001")
