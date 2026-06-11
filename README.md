@@ -1,47 +1,53 @@
 # ANP Adventures
 
-ANP Adventures is a Roblox co-op adventure game universe inspired by real-world educational destinations in Thailand.
+## Project Overview
 
-ANP stands for:
+ANP Adventures is a family-friendly Roblox adventure prototype where players explore, discover, and learn through story-driven quests.
 
-- Atom
-- Neutron
-- Proton
+Current focus: Episode 1 server-side playable prototype.
 
-## Current Episode
+## Current Status
 
-Episode 1:
-The Lost Star Core
+- Episode 1: Lost Star Core
+- Quest 001-008 implemented
+- Episode 1 finale restores `item_star_core_segment_01`
+- Early discovery anti-stuck fix implemented
+- Phase 3H playtest polish implemented
+- Studio verification pending
 
-Location:
-Space Inspirium
+## How To Run
 
-## Core Gameplay
+1. Open the Rojo project.
+2. Sync with Roblox Studio.
+3. Run the experience in Studio.
+4. Watch Server Output for smoke test results.
 
-- Explore
-- Discover
-- Solve Puzzles
-- Collect Fragments
-- Learn Through Adventure
+## Expected Studio Smoke Test Lines
 
-## Supported Modes
+```text
+[ANP DiscoveryBridgeRegressionSmokeTest] Discovery bridge regression smoke test passed.
+[ANP Phase3G4SmokeTest] Phase 3G-4 smoke test passed.
+[ANP Phase3HPlaytestPolishSmokeTest] Phase 3H playtest polish smoke test passed.
+[ANP SmokeTestSummary]
+All Studio smoke tests passed.
+```
 
-- Solo Play
-- Multiplayer Co-op
+## Logging
 
-## Design Rule
+`LogConfig` controls developer log noise.
 
-Every quest must be completable by a solo player.
+Normal mode keeps bootstrap summary, smoke test pass/fail lines, warnings/errors, and prompt failures visible. It suppresses analytics spam, prompt success spam, and guidance spam.
 
-Multiplayer should provide bonuses,
-but never be required for progression.
+Use Verbose mode for deeper debugging when detailed analytics, prompt success, and guidance logs are needed.
 
-## Main Characters
+## Current Non-Goals
 
-Atom
-Neutron
-Proton
-
-## Development Status
-
-Pre-production
+- No UI
+- No DataStore persistence
+- No RemoteEvents / RemoteFunctions
+- No Marketplace / monetization
+- No trading
+- No party system
+- No pet system
+- No cosmetic system
+- No CompanionService implementation
