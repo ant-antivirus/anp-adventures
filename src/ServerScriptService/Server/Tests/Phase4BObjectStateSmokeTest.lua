@@ -70,6 +70,15 @@ local function completeQuest002(PromptBindingService, player)
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_complete_ep01_main_002"), "Quest 002 should complete.")
 end
 
+local function completeQuest004(PromptBindingService, player)
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_start_ep01_main_004"), "Quest 004 should start.")
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_004_001"), "Quest 004 objective 001 should complete.")
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_004_002"), "Quest 004 objective 002 should complete.")
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_004_003"), "Quest 004 objective 003 should complete.")
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_004_004"), "Quest 004 objective 004 should complete.")
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_complete_ep01_main_004"), "Quest 004 should complete.")
+end
+
 function Phase4BObjectStateSmokeTest.Run(services)
 	local PlayerDataService = services.PlayerDataService
 	local PlayerFeedbackService = services.PlayerFeedbackService
@@ -135,11 +144,37 @@ function Phase4BObjectStateSmokeTest.Run(services)
 	local lockedDependencyResult = directInteract(InteractionService, player, "interaction_ep01_main_003_003")
 	assertResultFailure(lockedDependencyResult, "ObjectiveDependencyMissing", "Locked fragment should still return dependency hint if processed directly.")
 
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_003_001"), "Quest 003 objective 001 should complete.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_003_002"), "Quest 003 objective 002 should complete.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_003_003"), "Quest 003 objective 003 should complete.")
+	local stabilizedFragmentState = InteractionVisibilityService.GetInteractionState(player, "interaction_ep01_main_003_003")
+	assertResultSuccess(stabilizedFragmentState, "Stabilized fragment visibility state should read.")
+	assertCondition(stabilizedFragmentState.Data.Visible == false and stabilizedFragmentState.Data.Enabled == false, "Completed Quest 003 fragment stabilization prompt should hide.")
+	local stabilizedFragmentDuplicate = directInteract(InteractionService, player, "interaction_ep01_main_003_003")
+	assertResultFailure(stabilizedFragmentDuplicate, "ObjectiveAlreadyCompleted", "Direct duplicate stabilization interaction should remain safe.")
+
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_003_004"), "Universe Fragment collectible should complete once.")
-	local collectibleDuplicateResult = trigger(PromptBindingService, player, "interaction_ep01_main_003_004")
+	local collectibleState = InteractionVisibilityService.GetInteractionState(player, "interaction_ep01_main_003_004")
+	assertResultSuccess(collectibleState, "Collected fragment visibility state should read.")
+	assertCondition(collectibleState.Data.Visible == false and collectibleState.Data.Enabled == false, "Completed Quest 003 collectible prompt should hide.")
+	local collectibleDuplicateResult = directInteract(InteractionService, player, "interaction_ep01_main_003_004")
 	assertResultFailure(collectibleDuplicateResult, "ObjectiveAlreadyCompleted", "Collectible duplicate should return already-collected feedback.")
+
+	assertResultSuccess(trigger(PromptBindingService, player, "interaction_complete_ep01_main_003"), "Quest 003 should complete.")
+	local completedQuestStabilizedFragmentState = InteractionVisibilityService.GetInteractionState(player, "interaction_ep01_main_003_003")
+	assertResultSuccess(completedQuestStabilizedFragmentState, "Completed Quest 003 stabilized fragment visibility state should read.")
+	assertCondition(completedQuestStabilizedFragmentState.Data.Visible == false and completedQuestStabilizedFragmentState.Data.Enabled == false, "Quest 003 stabilized fragment prompt should stay hidden after Quest 003 completion.")
+	local completedQuestCollectibleState = InteractionVisibilityService.GetInteractionState(player, "interaction_ep01_main_003_004")
+	assertResultSuccess(completedQuestCollectibleState, "Completed Quest 003 collectible visibility state should read.")
+	assertCondition(completedQuestCollectibleState.Data.Visible == false and completedQuestCollectibleState.Data.Enabled == false, "Quest 003 collectible prompt should stay hidden after Quest 003 completion.")
+
+	completeQuest004(PromptBindingService, player)
+	local postQuest004StabilizedFragmentState = InteractionVisibilityService.GetInteractionState(player, "interaction_ep01_main_003_003")
+	assertResultSuccess(postQuest004StabilizedFragmentState, "Post Quest 004 stabilized fragment visibility state should read.")
+	assertCondition(postQuest004StabilizedFragmentState.Data.Visible == false and postQuest004StabilizedFragmentState.Data.Enabled == false, "Quest 003 stabilized fragment prompt should stay hidden after Quest 004 completion.")
+	local postQuest004CollectibleState = InteractionVisibilityService.GetInteractionState(player, "interaction_ep01_main_003_004")
+	assertResultSuccess(postQuest004CollectibleState, "Post Quest 004 collectible visibility state should read.")
+	assertCondition(postQuest004CollectibleState.Data.Visible == false and postQuest004CollectibleState.Data.Enabled == false, "Quest 003 collectible prompt should stay hidden after Quest 004 completion.")
 
 	assertResultSuccess(PlayerDataService.ReleasePlayer(player), "Phase 4B player data should release.")
 

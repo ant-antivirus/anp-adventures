@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local InteractionDefinitions = require(Shared.Definitions.InteractionDefinitions)
 local QuestDefinitions = require(Shared.Definitions.QuestDefinitions)
+local Logger = require(script.Parent.Parent.Utils.Logger)
 
 local InteractionVisibilityService = {}
 
@@ -12,6 +13,11 @@ local discoveryService = nil
 local zoneService = nil
 local promptBindingService = nil
 local lastRefreshPlayer = nil
+
+local FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS = {
+	interaction_ep01_main_003_003 = true,
+	interaction_ep01_main_003_004 = true,
+}
 
 local function result(success, code, message, data)
 	return {
@@ -35,11 +41,71 @@ local function unavailableState(definition, reason)
 		return interactionState(false, false, reason)
 	end
 
-	if definition.ObjectBehaviorType == "LockedObject" and definition.VisibleBeforeAvailable == true and definition.InspectableBeforeAvailable == true then
+	if definition.VisibleBeforeAvailable == true and definition.InspectableBeforeAvailable == true then
 		return interactionState(true, true, reason)
 	end
 
 	return interactionState(false, false, reason)
+end
+
+local function shouldHideAfterObjectiveComplete(definition)
+	if definition.HidePromptAfterObjectiveComplete ~= nil then
+		return definition.HidePromptAfterObjectiveComplete == true
+	end
+
+	return definition.ObjectBehaviorType == "CollectibleItem"
+end
+
+local function shouldLogObjectState(definition)
+	return definition
+		and (
+			FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS[definition.InteractionId] == true
+			or shouldHideAfterObjectiveComplete(definition)
+		)
+end
+
+local function getPlayerName(player)
+	return player and player.Name or "UnknownPlayer"
+end
+
+local function logQuestObjectiveState(player, definition, questState, objectiveCompleted, state)
+	if not shouldLogObjectState(definition) then
+		return
+	end
+
+	local active = questState and questState.Status == questService.QuestStatus.Active
+	local questCompleted = questState and questState.Status == questService.QuestStatus.Completed
+
+	Logger.ObjectStateDebug(
+		tostring(definition.InteractionId)
+			.. " player="
+			.. getPlayerName(player)
+			.. " behavior="
+			.. tostring(definition.ObjectBehaviorType)
+			.. " hideAfterComplete="
+			.. tostring(shouldHideAfterObjectiveComplete(definition))
+			.. " questId="
+			.. tostring(definition.QuestId)
+			.. " objectiveId="
+			.. tostring(definition.ObjectiveId)
+			.. " active="
+			.. tostring(active)
+			.. " questCompleted="
+			.. tostring(questCompleted)
+			.. " objectiveCompleted="
+			.. tostring(objectiveCompleted)
+			.. " visible="
+			.. tostring(state.Visible)
+			.. " enabled="
+			.. tostring(state.Enabled)
+			.. " reason="
+			.. tostring(state.Reason)
+	)
+end
+
+local function finalizeQuestObjectiveState(player, definition, questState, objectiveCompleted, state)
+	logQuestObjectiveState(player, definition, questState, objectiveCompleted, state)
+	return state
 end
 
 local function getDefinition(interactionId)
@@ -133,41 +199,71 @@ end
 
 local function getQuestObjectiveState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return unavailableState(definition, "ZoneLocked")
+		return finalizeQuestObjectiveState(player, definition, nil, false, unavailableState(definition, "ZoneLocked"))
 	end
 
 	local questDefinition = QuestDefinitions[definition.QuestId]
 	if not questDefinition then
-		return interactionState(false, false, "UnknownQuestId")
+		return finalizeQuestObjectiveState(player, definition, nil, false, interactionState(false, false, "UnknownQuestId"))
 	end
 
 	local questStateResult = questService.GetQuestState(player, definition.QuestId)
 	if not questStateResult.Success then
-		return interactionState(false, false, questStateResult.Code)
+		return finalizeQuestObjectiveState(player, definition, nil, false, interactionState(false, false, questStateResult.Code))
+	end
+
+	local objectiveCompleted = false
+	local objectiveCompletedResult, objectiveCompletedCode = questService.IsObjectiveCompleted(player, definition.QuestId, definition.ObjectiveId)
+	if objectiveCompletedResult == true then
+		objectiveCompleted = true
+	end
+
+	if objectiveCompleted and shouldHideAfterObjectiveComplete(definition) then
+		return finalizeQuestObjectiveState(
+			player,
+			definition,
+			questStateResult.Data,
+			objectiveCompleted,
+			interactionState(false, false, "ObjectiveCompletedHidePrompt")
+		)
 	end
 
 	if questStateResult.Data.Status ~= questService.QuestStatus.Active then
-		return unavailableState(definition, "QuestNotActive")
+		return finalizeQuestObjectiveState(player, definition, questStateResult.Data, objectiveCompleted, unavailableState(definition, "QuestNotActive"))
 	end
 
 	local objectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[definition.ObjectiveId]
 	if not objectiveState then
-		return interactionState(false, false, "UnknownQuestObjectiveId")
+		return finalizeQuestObjectiveState(player, definition, questStateResult.Data, objectiveCompleted, interactionState(false, false, "UnknownQuestObjectiveId"))
 	end
 
 	if objectiveState.Completed == true then
-		return unavailableState(definition, "ObjectiveComplete")
+		if shouldHideAfterObjectiveComplete(definition) then
+			return finalizeQuestObjectiveState(player, definition, questStateResult.Data, true, interactionState(false, false, "ObjectiveCompletedHidePrompt"))
+		end
+
+		return finalizeQuestObjectiveState(player, definition, questStateResult.Data, true, unavailableState(definition, "ObjectiveComplete"))
 	end
 
 	local objectiveDefinition = questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[definition.ObjectiveId]
 	for _, requiredObjectiveId in ipairs((objectiveDefinition and objectiveDefinition.RequiresObjectiveIds) or {}) do
 		local requiredObjectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[requiredObjectiveId]
 		if not requiredObjectiveState or requiredObjectiveState.Completed ~= true then
-			return unavailableState(definition, "ObjectiveDependencyMissing")
+			return finalizeQuestObjectiveState(
+				player,
+				definition,
+				questStateResult.Data,
+				objectiveCompleted,
+				unavailableState(definition, "ObjectiveDependencyMissing")
+			)
 		end
 	end
 
-	return interactionState(true, true, "QuestObjectiveAvailable")
+	if objectiveCompletedCode == "UnknownQuestObjectiveId" then
+		return finalizeQuestObjectiveState(player, definition, questStateResult.Data, objectiveCompleted, interactionState(false, false, objectiveCompletedCode))
+	end
+
+	return finalizeQuestObjectiveState(player, definition, questStateResult.Data, objectiveCompleted, interactionState(true, true, "QuestObjectiveAvailable"))
 end
 
 local function findQuestIdForObjective(objectiveId)
@@ -354,7 +450,12 @@ function InteractionVisibilityService.RefreshPlayer(player)
 	for interactionId in pairs(InteractionDefinitions) do
 		local stateResult = InteractionVisibilityService.GetInteractionState(player, interactionId)
 		if stateResult.Success then
-			promptBindingService.SetPromptEnabled(interactionId, stateResult.Data.Visible == true and stateResult.Data.Enabled == true)
+			promptBindingService.SetPromptEnabled(
+				interactionId,
+				stateResult.Data.Visible == true and stateResult.Data.Enabled == true,
+				player,
+				stateResult.Data.Reason
+			)
 			refreshed[interactionId] = stateResult.Data
 		end
 	end
@@ -379,7 +480,12 @@ function InteractionVisibilityService.RefreshInteraction(interactionId)
 		return stateResult
 	end
 
-	promptBindingService.SetPromptEnabled(interactionId, stateResult.Data.Visible == true and stateResult.Data.Enabled == true)
+	promptBindingService.SetPromptEnabled(
+		interactionId,
+		stateResult.Data.Visible == true and stateResult.Data.Enabled == true,
+		lastRefreshPlayer,
+		stateResult.Data.Reason
+	)
 	return result(true, "InteractionVisibilityRefreshed", nil, stateResult.Data)
 end
 

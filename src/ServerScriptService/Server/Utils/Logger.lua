@@ -87,6 +87,12 @@ function Logger.Guidance(message)
 	end
 end
 
+function Logger.ObjectStateDebug(message)
+	if shouldLog("EnableObjectStateDebugLogs") then
+		print("[ANP ObjectStateDebug] " .. tostring(message))
+	end
+end
+
 function Logger.Bootstrap(message)
 	if isSilent() then
 		return

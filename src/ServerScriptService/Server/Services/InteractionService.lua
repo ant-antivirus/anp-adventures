@@ -43,6 +43,35 @@ local FALLBACK_HINTS = {
 	InteractionDisabled = "This interaction is not available right now.",
 }
 
+local FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS = {
+	interaction_ep01_main_003_003 = true,
+	interaction_ep01_main_003_004 = true,
+}
+
+local function shouldHideAfterObjectiveComplete(definition)
+	if not definition then
+		return false
+	end
+
+	if definition.HidePromptAfterObjectiveComplete ~= nil then
+		return definition.HidePromptAfterObjectiveComplete == true
+	end
+
+	return definition.ObjectBehaviorType == "CollectibleItem"
+end
+
+local function shouldLogObjectState(definition)
+	return definition
+		and (
+			FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS[definition.InteractionId] == true
+			or shouldHideAfterObjectiveComplete(definition)
+		)
+end
+
+local function getPlayerName(player)
+	return player and player.Name or "UnknownPlayer"
+end
+
 local function result(success, code, failureReason, data)
 	local response = {
 		Success = success,
@@ -486,16 +515,23 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 			ServiceResult = completeResult,
 		})
 	elseif definition.Type == "QuestObjective" then
-		local questStateResult = questService.GetQuestState(player, definition.QuestId)
-		if questStateResult.Success then
-			local objectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[definition.ObjectiveId]
-			if objectiveState and objectiveState.Completed == true then
-				return result(false, "ObjectiveAlreadyCompleted", "ObjectiveAlreadyCompleted", {
-					HintText = getHintText(definition, "ObjectiveAlreadyCompleted"),
-					QuestId = definition.QuestId,
-					ObjectiveId = definition.ObjectiveId,
-				})
+		local objectiveCompleted = questService.IsObjectiveCompleted(player, definition.QuestId, definition.ObjectiveId)
+		if objectiveCompleted == true then
+			if shouldLogObjectState(definition) then
+				Logger.ObjectStateDebug(
+					"ProcessedHiddenCompletedObject "
+						.. tostring(interactionId)
+						.. " player="
+						.. getPlayerName(player)
+						.. " code=ObjectiveAlreadyCompleted"
+				)
 			end
+
+			return result(false, "ObjectiveAlreadyCompleted", "ObjectiveAlreadyCompleted", {
+				HintText = getHintText(definition, "ObjectiveAlreadyCompleted"),
+				QuestId = definition.QuestId,
+				ObjectiveId = definition.ObjectiveId,
+			})
 		end
 
 		local progressResult = questService.ApplyObjectiveProgress(

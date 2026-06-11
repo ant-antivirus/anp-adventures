@@ -15,6 +15,11 @@ local playerFeedbackService = nil
 local boundPromptsByInteractionId = {}
 local boundConnectionsByInteractionId = {}
 
+local FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS = {
+	interaction_ep01_main_003_003 = true,
+	interaction_ep01_main_003_004 = true,
+}
+
 local function result(success, code, message, data)
 	return {
 		Success = success,
@@ -52,6 +57,30 @@ local function getDefaultActionText(interactionType)
 	end
 
 	return "Interact"
+end
+
+local function shouldHideAfterObjectiveComplete(definition)
+	if not definition then
+		return false
+	end
+
+	if definition.HidePromptAfterObjectiveComplete ~= nil then
+		return definition.HidePromptAfterObjectiveComplete == true
+	end
+
+	return definition.ObjectBehaviorType == "CollectibleItem"
+end
+
+local function shouldLogObjectState(definition)
+	return definition
+		and (
+			FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS[definition.InteractionId] == true
+			or shouldHideAfterObjectiveComplete(definition)
+		)
+end
+
+local function getPlayerName(player)
+	return player and player.Name or "UnknownPlayer"
 end
 
 local function getDefaultObjectText(definition)
@@ -262,13 +291,27 @@ function PromptBindingService.GetPromptForInteraction(interactionId)
 	return result(prompt ~= nil, prompt and "PromptRead" or "PromptMissing", nil, prompt)
 end
 
-function PromptBindingService.SetPromptEnabled(interactionId, enabled)
+function PromptBindingService.SetPromptEnabled(interactionId, enabled, player, reason)
 	local prompt = boundPromptsByInteractionId[interactionId]
 	if not prompt then
 		return result(false, "PromptMissing", "Interaction prompt is not bound.")
 	end
 
 	prompt.Enabled = enabled == true
+	local definition = InteractionDefinitions[interactionId]
+	if shouldLogObjectState(definition) then
+		Logger.ObjectStateDebug(
+			"ApplyPromptVisibility interaction="
+				.. tostring(interactionId)
+				.. " player="
+				.. getPlayerName(player)
+				.. " enabled="
+				.. tostring(prompt.Enabled)
+				.. " reason="
+				.. tostring(reason)
+		)
+	end
+
 	return result(true, "PromptEnabledStateUpdated", nil, {
 		InteractionId = interactionId,
 		Enabled = prompt.Enabled,

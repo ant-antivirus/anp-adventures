@@ -358,6 +358,34 @@ function QuestService.GetQuestState(player, questId)
 	return result(true, "QuestStateRead", nil, questState)
 end
 
+function QuestService.IsObjectiveCompleted(player, questId, objectiveId)
+	local questDefinition, errorResult = getQuestDefinition(questId)
+	if errorResult then
+		return false, errorResult.Code
+	end
+
+	if not listContains(questDefinition.ObjectiveIds, objectiveId) then
+		return false, "UnknownQuestObjectiveId"
+	end
+
+	local snapshotResult = playerDataService.GetSnapshot(player, "Quests")
+	if not snapshotResult.Success then
+		return false, snapshotResult.Code
+	end
+
+	local questState = snapshotResult.Data.QuestStates[questId]
+	local objectiveState = questState and questState.ObjectiveStates and questState.ObjectiveStates[objectiveId]
+	if objectiveState and objectiveState.Completed == true then
+		return true, "ObjectiveCompleted"
+	end
+
+	if snapshotResult.Data.CompletedQuestIds[questId] == true and listContains(questDefinition.RequiredObjectiveIds, objectiveId) then
+		return true, "CompletedQuestRequiredObjective"
+	end
+
+	return false, "ObjectiveIncomplete"
+end
+
 function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amount, sourceContext, metadata)
 	local questDefinition, errorResult = getQuestDefinition(questId)
 	if errorResult then
