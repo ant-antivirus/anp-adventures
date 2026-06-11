@@ -145,21 +145,8 @@ local function updateQuestPanel(payload)
 		objectiveLabel.Text = tostring(payload.CurrentObjectiveText or "Look for your next step.")
 		progressLabel.Text = "Progress: " .. tostring(payload.ProgressText or payload.State or "No active quest")
 		hintLabel.Text = "Hint: " .. tostring(payload.HintText or "Talk to Proton for guidance.")
-	elseif payload.Type == "QuestStarted" then
-		questTitleLabel.Text = payload.QuestId or "Quest Started"
-		objectiveLabel.Text = payload.Message or "Follow the next objective."
-	elseif payload.Type == "ObjectiveUpdated" then
-		questTitleLabel.Text = payload.QuestId or questTitleLabel.Text
-		objectiveLabel.Text = payload.ObjectiveId or "Objective updated."
-	elseif payload.Type == "QuestCompleted" then
-		questTitleLabel.Text = payload.QuestId or "Quest Complete"
-		objectiveLabel.Text = payload.Message or "Quest complete."
 	elseif payload.Type == "Hint" or payload.Type == "Blocked" then
 		hintLabel.Text = payload.Message or ""
-	elseif payload.Type == "EpisodeCompleted" then
-		questTitleLabel.Text = payload.EpisodeId or "Episode Complete"
-		objectiveLabel.Text = payload.Message or "Episode complete."
-		progressLabel.Text = "Progress: Episode complete"
 	end
 end
 

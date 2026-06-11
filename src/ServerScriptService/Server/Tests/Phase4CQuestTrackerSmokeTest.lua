@@ -109,13 +109,28 @@ local function completeQuest007(PromptBindingService, player)
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_complete_ep01_main_007"), "Quest 007 should complete.")
 end
 
-local function completeQuest008(PromptBindingService, player)
+local function assertQuest008TrackerCount(QuestTrackerService, player, expectedCompletedCount, message)
+	local tracker = assertTrackerState(QuestTrackerService, player, "ActiveQuest", message)
+	assertCondition(tracker.QuestId == "quest_ep01_main_008", message .. " should track Quest 008.")
+	assertCondition(tracker.TotalObjectiveCount == 5, message .. " should keep Quest 008 total at 5.")
+	assertCondition(tracker.CompletedObjectiveCount == expectedCompletedCount, message .. " expected completed count " .. tostring(expectedCompletedCount) .. ", got " .. tostring(tracker.CompletedObjectiveCount) .. ".")
+	assertCondition(string.find(tracker.ProgressText or "", "/ 5", 1, true) ~= nil, message .. " should display `/ 5` in ProgressText.")
+	return tracker
+end
+
+local function completeQuest008(PromptBindingService, QuestTrackerService, player)
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_start_ep01_main_008"), "Quest 008 should start.")
+	assertQuest008TrackerCount(QuestTrackerService, player, 0, "Quest 008 tracker should start at 0 / 5.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_008_001"), "Quest 008 objective 001 should complete.")
+	assertQuest008TrackerCount(QuestTrackerService, player, 1, "Quest 008 tracker should stay at total 5 after objective 001.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_008_002"), "Quest 008 objective 002 should complete.")
+	assertQuest008TrackerCount(QuestTrackerService, player, 2, "Quest 008 tracker should stay at total 5 after objective 002.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_008_003"), "Quest 008 objective 003 should complete.")
+	assertQuest008TrackerCount(QuestTrackerService, player, 3, "Quest 008 tracker should stay at total 5 after objective 003.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_008_004"), "Quest 008 objective 004 should complete.")
+	assertQuest008TrackerCount(QuestTrackerService, player, 4, "Quest 008 tracker should stay at total 5 after objective 004.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_ep01_main_008_005"), "Quest 008 objective 005 should complete.")
+	assertQuest008TrackerCount(QuestTrackerService, player, 5, "Quest 008 tracker should end at 5 / 5 before turn-in.")
 	assertResultSuccess(trigger(PromptBindingService, player, "interaction_complete_ep01_main_008"), "Quest 008 should complete.")
 end
 
@@ -196,7 +211,7 @@ function Phase4CQuestTrackerSmokeTest.Run(services)
 	completeQuest005(PromptBindingService, player)
 	completeQuest006(PromptBindingService, player)
 	completeQuest007(PromptBindingService, player)
-	completeQuest008(PromptBindingService, player)
+	completeQuest008(PromptBindingService, QuestTrackerService, player)
 	local episodeCompleteTracker = assertTrackerState(QuestTrackerService, player, "EpisodeCompleted", "Episode completed tracker should read.")
 	assertCondition(string.find(episodeCompleteTracker.HintText or "", "Star Core Segment 01", 1, true) ~= nil, "Episode complete tracker should mention Star Core Segment 01.")
 
