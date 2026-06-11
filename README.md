@@ -4,7 +4,7 @@
 
 ANP Adventures is a family-friendly Roblox adventure prototype where players explore, discover, and learn through story-driven quests.
 
-Current focus: Episode 1 playable prototype with minimal player feedback UI.
+Current focus: Episode 1 playable prototype with minimal player feedback and quest tracker UI.
 
 ## Current Status
 
@@ -15,7 +15,8 @@ Current focus: Episode 1 playable prototype with minimal player feedback UI.
 - Phase 3H playtest polish implemented
 - Phase 4A minimal player feedback UI implemented
 - Phase 4B object state polish implemented
-- Studio verification pending for Phase 4B
+- Phase 4C quest tracker UI implemented
+- Studio verification pending for Phase 4C
 
 ## How To Run
 
@@ -32,9 +33,16 @@ Current focus: Episode 1 playable prototype with minimal player feedback UI.
 [ANP Phase3HPlaytestPolishSmokeTest] Phase 3H playtest polish smoke test passed.
 [ANP Phase4AFeedbackSmokeTest] Phase 4A feedback smoke test passed.
 [ANP Phase4BObjectStateSmokeTest] Phase 4B object state smoke test passed.
+[ANP Phase4CQuestTrackerSmokeTest] Phase 4C quest tracker smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
+
+## Quest Tracker
+
+Phase 4C adds a small display-only quest tracker panel. The server sends `QuestTracker` payloads through the existing `PlayerFeedbackEvent`; the client only displays the current quest, current objective, progress text, and hint text.
+
+The client does not calculate quest progress, grant rewards, or mutate player state.
 
 ## Logging
 

@@ -59,7 +59,7 @@ local questFrame = Instance.new("Frame")
 questFrame.Name = "QuestPanel"
 questFrame.AnchorPoint = Vector2.new(1, 0)
 questFrame.Position = UDim2.new(1, -18, 0, 18)
-questFrame.Size = UDim2.fromOffset(300, 126)
+questFrame.Size = UDim2.fromOffset(320, 150)
 questFrame.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
 questFrame.BackgroundTransparency = 0.12
 questFrame.BorderSizePixel = 0
@@ -95,11 +95,24 @@ objectiveLabel.TextYAlignment = Enum.TextYAlignment.Top
 objectiveLabel.Text = "Start an expedition to see your next step."
 objectiveLabel.Parent = questFrame
 
+local progressLabel = Instance.new("TextLabel")
+progressLabel.Name = "Progress"
+progressLabel.BackgroundTransparency = 1
+progressLabel.Position = UDim2.fromOffset(14, 74)
+progressLabel.Size = UDim2.new(1, -28, 0, 20)
+progressLabel.Font = Enum.Font.GothamMedium
+progressLabel.TextColor3 = Color3.fromRGB(210, 220, 230)
+progressLabel.TextSize = 12
+progressLabel.TextXAlignment = Enum.TextXAlignment.Left
+progressLabel.TextYAlignment = Enum.TextYAlignment.Center
+progressLabel.Text = "Progress: No active quest"
+progressLabel.Parent = questFrame
+
 local hintLabel = Instance.new("TextLabel")
 hintLabel.Name = "LastHint"
 hintLabel.BackgroundTransparency = 1
-hintLabel.Position = UDim2.fromOffset(14, 76)
-hintLabel.Size = UDim2.new(1, -28, 0, 40)
+hintLabel.Position = UDim2.fromOffset(14, 98)
+hintLabel.Size = UDim2.new(1, -28, 0, 42)
 hintLabel.Font = Enum.Font.Gotham
 hintLabel.TextColor3 = Color3.fromRGB(190, 205, 220)
 hintLabel.TextSize = 12
@@ -127,7 +140,12 @@ local function showNotification(payload)
 end
 
 local function updateQuestPanel(payload)
-	if payload.Type == "QuestStarted" then
+	if payload.Type == "QuestTracker" then
+		questTitleLabel.Text = tostring(payload.QuestTitle or payload.QuestId or "ANP Adventures")
+		objectiveLabel.Text = tostring(payload.CurrentObjectiveText or "Look for your next step.")
+		progressLabel.Text = "Progress: " .. tostring(payload.ProgressText or payload.State or "No active quest")
+		hintLabel.Text = "Hint: " .. tostring(payload.HintText or "Talk to Proton for guidance.")
+	elseif payload.Type == "QuestStarted" then
 		questTitleLabel.Text = payload.QuestId or "Quest Started"
 		objectiveLabel.Text = payload.Message or "Follow the next objective."
 	elseif payload.Type == "ObjectiveUpdated" then
@@ -141,6 +159,7 @@ local function updateQuestPanel(payload)
 	elseif payload.Type == "EpisodeCompleted" then
 		questTitleLabel.Text = payload.EpisodeId or "Episode Complete"
 		objectiveLabel.Text = payload.Message or "Episode complete."
+		progressLabel.Text = "Progress: Episode complete"
 	end
 end
 
@@ -150,5 +169,7 @@ feedbackEvent.OnClientEvent:Connect(function(payload)
 	end
 
 	updateQuestPanel(payload)
-	showNotification(payload)
+	if payload.Type ~= "QuestTracker" then
+		showNotification(payload)
+	end
 end)

@@ -102,6 +102,8 @@ Discovery recording and quest objective progress are independent. If a discovery
 
 Phase 3H adds developer log noise control, structured blocked hints, Episode 1 anti-stuck smoke coverage, and clearer placeholder prompt text. Blocked server-side interactions should preserve their existing result codes and include `HintText` when a player action is unavailable because of quest prerequisites, objective dependencies, incomplete turn-in requirements, or duplicate discoveries.
 
+Phase 4C adds a display-only quest tracker. The tracker should show the active quest, next objective, objective progress, and a short server-authored hint. It is guidance only; the server remains authoritative for all quest, reward, discovery, inventory, and episode state.
+
 ---
 
 ## Badge System

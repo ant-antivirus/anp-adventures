@@ -23,6 +23,7 @@ local InteractionVisibilityService = require(script.Parent.Services.InteractionV
 local GuidanceService = require(script.Parent.Services.GuidanceService)
 local AnalyticsService = require(script.Parent.Services.AnalyticsService)
 local PlayerFeedbackService = require(script.Parent.Services.PlayerFeedbackService)
+local QuestTrackerService = require(script.Parent.Services.QuestTrackerService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
@@ -47,6 +48,7 @@ local Phase3G4SmokeTest = require(script.Parent.Tests.Phase3G4SmokeTest)
 local Phase3HPlaytestPolishSmokeTest = require(script.Parent.Tests.Phase3HPlaytestPolishSmokeTest)
 local Phase4AFeedbackSmokeTest = require(script.Parent.Tests.Phase4AFeedbackSmokeTest)
 local Phase4BObjectStateSmokeTest = require(script.Parent.Tests.Phase4BObjectStateSmokeTest)
+local Phase4CQuestTrackerSmokeTest = require(script.Parent.Tests.Phase4CQuestTrackerSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -148,6 +150,13 @@ QuestService.Init({
 	PlayerFeedbackService = PlayerFeedbackService,
 })
 
+QuestTrackerService.Init({
+	PlayerDataService = PlayerDataService,
+	QuestService = QuestService,
+	EpisodeService = EpisodeService,
+	PlayerFeedbackService = PlayerFeedbackService,
+})
+
 GuidanceService.Init({
 	PlayerDataService = PlayerDataService,
 	QuestService = QuestService,
@@ -189,9 +198,12 @@ InteractionVisibilityService.Initialize({
 
 PromptBindingService.SetInteractionVisibilityService(InteractionVisibilityService)
 InteractionService.SetInteractionVisibilityService(InteractionVisibilityService)
+InteractionService.SetQuestTrackerService(QuestTrackerService)
 QuestService.SetInteractionVisibilityService(InteractionVisibilityService)
+QuestService.SetQuestTrackerService(QuestTrackerService)
 DiscoveryService.SetInteractionVisibilityService(InteractionVisibilityService)
 ZoneService.SetInteractionVisibilityService(InteractionVisibilityService)
+ZoneService.SetQuestTrackerService(QuestTrackerService)
 
 if worldRegistryResult.Success then
 	local promptBindingResult = PromptBindingService.BindAllPrompts()
@@ -206,7 +218,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, and Phase 4B services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, and Phase 4C services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -443,6 +455,17 @@ if RunService:IsStudio() then
 	})
 	table.insert(passedSmokeTests, "Phase4BObjectStateSmokeTest")
 
+	Phase4CQuestTrackerSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		PromptBindingService = PromptBindingService,
+		InteractionVisibilityService = InteractionVisibilityService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase4CQuestTrackerSmokeTest")
+
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")
 	for _, smokeTestName in ipairs(passedSmokeTests) do
@@ -462,6 +485,11 @@ local function onPlayerAdded(player)
 	local visibilityResult = InteractionVisibilityService.RefreshPlayer(player)
 	if not visibilityResult.Success then
 		warn("[ANP] Player interaction visibility refresh failed for " .. player.Name .. ": " .. visibilityResult.Code)
+	end
+
+	local trackerResult = QuestTrackerService.SendTrackerUpdate(player)
+	if not trackerResult.Success then
+		warn("[ANP] Quest tracker update failed for " .. player.Name .. ": " .. trackerResult.Code)
 	end
 
 	print("[ANP] Player data initialized for " .. player.Name)

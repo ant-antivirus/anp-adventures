@@ -29,6 +29,12 @@ Phase 4B adds lightweight object behavior metadata for interactions: `Station`, 
 
 Station objects stay in the world and can report already-used hints. Collectibles must not grant duplicate progress or rewards after collection. Discoveries remain readable but do not reward twice. Important locked objects may stay inspectable and explain why they are not usable yet through server-authored feedback.
 
+## Phase 4C Quest Tracker
+
+Phase 4C adds a minimal display-only quest tracker UI. `QuestTrackerService` builds server-owned tracker state and sends `QuestTracker` payloads through the existing `PlayerFeedbackEvent`.
+
+The client renders quest title, current objective, progress text, and hint text only. It must not calculate quest progress, mutate quest state, claim rewards, or infer inventory state.
+
 ## Recommended Folder Structure
 
 ```text

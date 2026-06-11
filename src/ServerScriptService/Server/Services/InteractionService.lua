@@ -25,6 +25,7 @@ local zoneService = nil
 local guidanceService = nil
 local interactionVisibilityService = nil
 local playerFeedbackService = nil
+local questTrackerService = nil
 local refreshInteractionVisibility = nil
 local cooldownsByPlayerInteraction = {}
 local cooldownDurationSeconds = 1
@@ -381,6 +382,7 @@ function InteractionService.Init(dependencies)
 	guidanceService = dependencies.GuidanceService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
 	playerFeedbackService = dependencies.PlayerFeedbackService
+	questTrackerService = dependencies.QuestTrackerService
 
 	assert(playerDataService, "InteractionService requires PlayerDataService.")
 	assert(worldRegistryService, "InteractionService requires WorldRegistryService.")
@@ -392,6 +394,16 @@ end
 
 function InteractionService.SetInteractionVisibilityService(service)
 	interactionVisibilityService = service
+end
+
+function InteractionService.SetQuestTrackerService(service)
+	questTrackerService = service
+end
+
+local function sendQuestTrackerUpdate(player)
+	if questTrackerService then
+		questTrackerService.SendTrackerUpdate(player)
+	end
 end
 
 refreshInteractionVisibility = function(player, interactionResult)
@@ -480,6 +492,7 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 				CharacterId = definition.CharacterId,
 			})
 		end
+		sendQuestTrackerUpdate(player)
 
 		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionGuidanceProvided", {
 			Guidance = guidanceResult.Data,

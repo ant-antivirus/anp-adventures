@@ -141,6 +141,18 @@ function PlayerFeedbackService.SendEpisodeCompleted(player, episodeId, message)
 	}))
 end
 
+function PlayerFeedbackService.SendQuestTracker(player, trackerPayload)
+	local payload = {}
+	for key, value in pairs(trackerPayload or {}) do
+		payload[key] = value
+	end
+
+	payload.Type = "QuestTracker"
+	payload.Duration = nil
+
+	return sendPayload(player, payload)
+end
+
 function PlayerFeedbackService.GetSentFeedbackForTests(player)
 	local playerKey = getPlayerKey(player)
 	return sentFeedbackByPlayerKey[playerKey] or {}

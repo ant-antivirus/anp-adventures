@@ -18,6 +18,7 @@ local episodeService = nil
 local interactionVisibilityService = nil
 local analyticsService = nil
 local playerFeedbackService = nil
+local questTrackerService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -224,6 +225,7 @@ function QuestService.Init(dependencies)
 	interactionVisibilityService = dependencies.InteractionVisibilityService
 	analyticsService = dependencies.AnalyticsService
 	playerFeedbackService = dependencies.PlayerFeedbackService
+	questTrackerService = dependencies.QuestTrackerService
 
 	assert(playerDataService, "QuestService requires PlayerDataService.")
 	assert(rewardService, "QuestService requires RewardService.")
@@ -251,9 +253,19 @@ function QuestService.SetInteractionVisibilityService(service)
 	interactionVisibilityService = service
 end
 
+function QuestService.SetQuestTrackerService(service)
+	questTrackerService = service
+end
+
 local function refreshInteractionVisibility(player)
 	if interactionVisibilityService then
 		interactionVisibilityService.RefreshPlayer(player)
+	end
+end
+
+local function sendQuestTrackerUpdate(player)
+	if questTrackerService then
+		questTrackerService.SendTrackerUpdate(player)
 	end
 end
 
@@ -326,6 +338,7 @@ function QuestService.StartQuest(player, questId, sourceContext)
 		playerFeedbackService.SendQuestStarted(player, questId, "Quest started. Follow the next objective.")
 	end
 	refreshInteractionVisibility(player)
+	sendQuestTrackerUpdate(player)
 
 	return result(true, "QuestStarted", nil, {
 		QuestId = questId,
@@ -477,6 +490,9 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 
 	if willCompleteObjective and playerFeedbackService then
 		playerFeedbackService.SendObjectiveUpdated(player, questId, objectiveId, "Objective complete. Check the next step.")
+	end
+	if willCompleteObjective then
+		sendQuestTrackerUpdate(player)
 	end
 
 	return result(true, "ObjectiveProgressApplied", nil, {
@@ -676,6 +692,7 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		playerFeedbackService.SendQuestCompleted(player, questId, "Quest complete.")
 	end
 	refreshInteractionVisibility(player)
+	sendQuestTrackerUpdate(player)
 
 	return result(true, "QuestCompleted", nil, {
 		QuestId = questId,
@@ -717,6 +734,7 @@ function QuestService.AbandonQuest(player, questId, reason)
 	end
 
 	refreshInteractionVisibility(player)
+	sendQuestTrackerUpdate(player)
 
 	return result(true, "QuestAbandoned", nil, {
 		QuestId = questId,

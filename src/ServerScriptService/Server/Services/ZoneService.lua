@@ -8,6 +8,7 @@ local ZoneService = {}
 local playerDataService = nil
 local interactionVisibilityService = nil
 local analyticsService = nil
+local questTrackerService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -41,6 +42,7 @@ function ZoneService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
 	analyticsService = dependencies.AnalyticsService
+	questTrackerService = dependencies.QuestTrackerService
 
 	assert(playerDataService, "ZoneService requires PlayerDataService.")
 end
@@ -66,9 +68,19 @@ function ZoneService.SetInteractionVisibilityService(service)
 	interactionVisibilityService = service
 end
 
+function ZoneService.SetQuestTrackerService(service)
+	questTrackerService = service
+end
+
 local function refreshInteractionVisibility(player)
 	if interactionVisibilityService then
 		interactionVisibilityService.RefreshPlayer(player)
+	end
+end
+
+local function sendQuestTrackerUpdate(player)
+	if questTrackerService then
+		questTrackerService.SendTrackerUpdate(player)
 	end
 end
 
@@ -189,6 +201,7 @@ function ZoneService.TravelToZone(player, zoneId, spawnPointId, travelMode, sour
 		SpawnPointId = targetSpawnPointId,
 		TravelMode = travelMode or "Spawn",
 	})
+	sendQuestTrackerUpdate(player)
 
 	return result(true, "ZoneTravelRecorded", nil, {
 		ZoneId = zoneId,
