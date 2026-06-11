@@ -30,6 +30,18 @@ local function interactionState(visible, enabled, reason)
 	}
 end
 
+local function unavailableState(definition, reason)
+	if reason == "ObjectiveDependencyMissing" then
+		return interactionState(false, false, reason)
+	end
+
+	if definition.ObjectBehaviorType == "LockedObject" and definition.VisibleBeforeAvailable == true and definition.InspectableBeforeAvailable == true then
+		return interactionState(true, true, reason)
+	end
+
+	return interactionState(false, false, reason)
+end
+
 local function getDefinition(interactionId)
 	local definition = InteractionDefinitions[interactionId]
 	if not definition then
@@ -113,7 +125,7 @@ end
 local function getQuestStartState(player, definition)
 	local canStart, blockCode = questService.CanStartQuest(player, definition.QuestId)
 	if not canStart then
-		return interactionState(false, false, blockCode)
+		return unavailableState(definition, blockCode)
 	end
 
 	return interactionState(true, true, "QuestStartAvailable")
@@ -121,7 +133,7 @@ end
 
 local function getQuestObjectiveState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return interactionState(false, false, "ZoneLocked")
+		return unavailableState(definition, "ZoneLocked")
 	end
 
 	local questDefinition = QuestDefinitions[definition.QuestId]
@@ -135,7 +147,7 @@ local function getQuestObjectiveState(player, definition)
 	end
 
 	if questStateResult.Data.Status ~= questService.QuestStatus.Active then
-		return interactionState(false, false, "QuestNotActive")
+		return unavailableState(definition, "QuestNotActive")
 	end
 
 	local objectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[definition.ObjectiveId]
@@ -144,14 +156,14 @@ local function getQuestObjectiveState(player, definition)
 	end
 
 	if objectiveState.Completed == true then
-		return interactionState(false, false, "ObjectiveComplete")
+		return unavailableState(definition, "ObjectiveComplete")
 	end
 
 	local objectiveDefinition = questDefinition.ObjectiveDefinitions and questDefinition.ObjectiveDefinitions[definition.ObjectiveId]
 	for _, requiredObjectiveId in ipairs((objectiveDefinition and objectiveDefinition.RequiresObjectiveIds) or {}) do
 		local requiredObjectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[requiredObjectiveId]
 		if not requiredObjectiveState or requiredObjectiveState.Completed ~= true then
-			return interactionState(false, false, "ObjectiveDependencyMissing")
+			return unavailableState(definition, "ObjectiveDependencyMissing")
 		end
 	end
 
@@ -200,7 +212,7 @@ end
 
 local function getQuestCompleteState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return interactionState(false, false, "ZoneLocked")
+		return unavailableState(definition, "ZoneLocked")
 	end
 
 	local questDefinition = QuestDefinitions[definition.QuestId]
@@ -214,15 +226,15 @@ local function getQuestCompleteState(player, definition)
 	end
 
 	if questStateResult.Data.Status == questService.QuestStatus.Completed then
-		return interactionState(false, false, "QuestAlreadyCompleted")
+		return unavailableState(definition, "QuestAlreadyCompleted")
 	end
 
 	if questStateResult.Data.Status ~= questService.QuestStatus.Active then
-		return interactionState(false, false, "QuestNotActive")
+		return unavailableState(definition, "QuestNotActive")
 	end
 
 	if not requiredQuestObjectivesComplete(questDefinition, questStateResult.Data) then
-		return interactionState(false, false, "QuestObjectivesIncomplete")
+		return unavailableState(definition, "QuestObjectivesIncomplete")
 	end
 
 	return interactionState(true, true, "QuestCompleteAvailable")
@@ -230,7 +242,7 @@ end
 
 local function getDiscoveryState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return interactionState(false, false, "ZoneLocked")
+		return unavailableState(definition, "ZoneLocked")
 	end
 
 	local discoveryStateResult = discoveryService.GetDiscoveryState(player, definition.DiscoveryId)
@@ -251,7 +263,7 @@ end
 
 local function getZoneTravelState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return interactionState(false, false, "ZoneLocked")
+		return unavailableState(definition, "ZoneLocked")
 	end
 
 	return interactionState(true, true, "ZoneTravelAvailable")
@@ -259,7 +271,7 @@ end
 
 local function getNPCGuideState(player, definition)
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
-		return interactionState(false, false, "ZoneLocked")
+		return unavailableState(definition, "ZoneLocked")
 	end
 
 	return interactionState(true, true, "NPCGuideAvailable")
@@ -304,7 +316,7 @@ function InteractionVisibilityService.GetInteractionState(player, interactionId)
 
 	local commonReady, commonReason = checkCommonRequirements(player, definition)
 	if not commonReady then
-		return result(true, "InteractionStateRead", nil, interactionState(false, false, commonReason))
+		return result(true, "InteractionStateRead", nil, unavailableState(definition, commonReason))
 	end
 
 	local policy = definition.VisibilityPolicy or definition.Type

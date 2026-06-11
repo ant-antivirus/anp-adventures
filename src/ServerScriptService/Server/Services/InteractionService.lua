@@ -24,6 +24,7 @@ local discoveryService = nil
 local zoneService = nil
 local guidanceService = nil
 local interactionVisibilityService = nil
+local playerFeedbackService = nil
 local refreshInteractionVisibility = nil
 local cooldownsByPlayerInteraction = {}
 local cooldownDurationSeconds = 1
@@ -35,6 +36,7 @@ local FALLBACK_HINTS = {
 	QuestLocked = "This quest is not ready yet. Finish the previous expedition step first.",
 	RequiredObjectiveIncomplete = "This quest is not ready to complete yet. Finish the remaining objective first.",
 	DiscoveryAlreadyRecorded = "You already discovered this.",
+	ObjectiveAlreadyCompleted = "You already checked this.",
 	QuestAlreadyCompleted = "This quest is already complete.",
 	QuestAlreadyActive = "This quest is already active.",
 	ZoneLocked = "This area is not available yet.",
@@ -89,7 +91,14 @@ local function getHintText(definition, code)
 		return definition.QuestPrerequisiteMissingHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
 	elseif code == "RequiredObjectiveIncomplete" then
 		return definition.RequiredObjectiveIncompleteHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
-	elseif code == "DiscoveryAlreadyRecorded" or code == "QuestAlreadyCompleted" then
+	elseif code == "DiscoveryAlreadyRecorded" then
+		return definition.AlreadyDiscoveredHintText or definition.AlreadyCompletedHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "ObjectiveAlreadyCompleted" then
+		if definition.ObjectBehaviorType == "CollectibleItem" then
+			return definition.AlreadyCollectedHintText or definition.AlreadyUsedHintText or definition.UnavailableHintText or "You already collected this."
+		end
+		return definition.AlreadyUsedHintText or definition.AlreadyCompletedHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
+	elseif code == "QuestAlreadyCompleted" then
 		return definition.AlreadyCompletedHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
 	elseif code == "QuestAlreadyActive" then
 		return definition.AlreadyActiveHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
@@ -342,6 +351,7 @@ function InteractionService.Init(dependencies)
 	zoneService = dependencies.ZoneService
 	guidanceService = dependencies.GuidanceService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
+	playerFeedbackService = dependencies.PlayerFeedbackService
 
 	assert(playerDataService, "InteractionService requires PlayerDataService.")
 	assert(worldRegistryService, "InteractionService requires WorldRegistryService.")
@@ -435,6 +445,12 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 
 		local speakerName = guidanceService.GetCharacterName(definition.CharacterId)
 		Logger.Guidance(speakerName .. " -> " .. guidanceResult.Data.HintText)
+		if playerFeedbackService then
+			playerFeedbackService.SendHint(player, guidanceResult.Data.HintText, {
+				Title = speakerName,
+				CharacterId = definition.CharacterId,
+			})
+		end
 
 		return finishSuccessfulInteraction(player, definition, sourceContext, safeMetadata, "InteractionGuidanceProvided", {
 			Guidance = guidanceResult.Data,
@@ -470,6 +486,18 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 			ServiceResult = completeResult,
 		})
 	elseif definition.Type == "QuestObjective" then
+		local questStateResult = questService.GetQuestState(player, definition.QuestId)
+		if questStateResult.Success then
+			local objectiveState = questStateResult.Data.ObjectiveStates and questStateResult.Data.ObjectiveStates[definition.ObjectiveId]
+			if objectiveState and objectiveState.Completed == true then
+				return result(false, "ObjectiveAlreadyCompleted", "ObjectiveAlreadyCompleted", {
+					HintText = getHintText(definition, "ObjectiveAlreadyCompleted"),
+					QuestId = definition.QuestId,
+					ObjectiveId = definition.ObjectiveId,
+				})
+			end
+		end
+
 		local progressResult = questService.ApplyObjectiveProgress(
 			player,
 			definition.QuestId,

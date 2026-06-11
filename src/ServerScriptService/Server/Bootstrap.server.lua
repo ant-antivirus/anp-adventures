@@ -22,6 +22,7 @@ local PromptBindingService = require(script.Parent.Services.PromptBindingService
 local InteractionVisibilityService = require(script.Parent.Services.InteractionVisibilityService)
 local GuidanceService = require(script.Parent.Services.GuidanceService)
 local AnalyticsService = require(script.Parent.Services.AnalyticsService)
+local PlayerFeedbackService = require(script.Parent.Services.PlayerFeedbackService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
@@ -44,6 +45,8 @@ local Phase3G2SmokeTest = require(script.Parent.Tests.Phase3G2SmokeTest)
 local Phase3G3SmokeTest = require(script.Parent.Tests.Phase3G3SmokeTest)
 local Phase3G4SmokeTest = require(script.Parent.Tests.Phase3G4SmokeTest)
 local Phase3HPlaytestPolishSmokeTest = require(script.Parent.Tests.Phase3HPlaytestPolishSmokeTest)
+local Phase4AFeedbackSmokeTest = require(script.Parent.Tests.Phase4AFeedbackSmokeTest)
+local Phase4BObjectStateSmokeTest = require(script.Parent.Tests.Phase4BObjectStateSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -104,6 +107,8 @@ if RunService:IsStudio() then
 	PlayerDataService.ResetForTests()
 end
 
+PlayerFeedbackService.Init()
+
 ProgressionService.Init({
 	PlayerDataService = PlayerDataService,
 })
@@ -116,6 +121,7 @@ RewardService.Init({
 	PlayerDataService = PlayerDataService,
 	ProgressionService = ProgressionService,
 	InventoryService = InventoryService,
+	PlayerFeedbackService = PlayerFeedbackService,
 })
 
 EpisodeService.Init({
@@ -139,6 +145,7 @@ QuestService.Init({
 	RewardService = RewardService,
 	EpisodeService = EpisodeService,
 	AnalyticsService = AnalyticsService,
+	PlayerFeedbackService = PlayerFeedbackService,
 })
 
 GuidanceService.Init({
@@ -163,11 +170,13 @@ InteractionService.Init({
 	DiscoveryService = DiscoveryService,
 	ZoneService = ZoneService,
 	GuidanceService = GuidanceService,
+	PlayerFeedbackService = PlayerFeedbackService,
 })
 
 PromptBindingService.Init({
 	WorldRegistryService = WorldRegistryService,
 	InteractionService = InteractionService,
+	PlayerFeedbackService = PlayerFeedbackService,
 })
 
 InteractionVisibilityService.Initialize({
@@ -197,7 +206,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, and Phase 3H services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, and Phase 4B services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -411,6 +420,28 @@ if RunService:IsStudio() then
 		WorldRegistryService = WorldRegistryService,
 	})
 	table.insert(passedSmokeTests, "Phase3HPlaytestPolishSmokeTest")
+
+	Phase4AFeedbackSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		InventoryService = InventoryService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		PromptBindingService = PromptBindingService,
+		InteractionService = InteractionService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase4AFeedbackSmokeTest")
+
+	Phase4BObjectStateSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		InteractionService = InteractionService,
+		InteractionVisibilityService = InteractionVisibilityService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase4BObjectStateSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

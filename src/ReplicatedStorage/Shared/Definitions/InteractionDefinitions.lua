@@ -219,6 +219,8 @@ return {
 		PromptObjectText = "Expedition Terminal",
 		QuestId = "quest_ep01_main_001",
 		ObjectiveId = "obj_ep01_main_001_001",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already checked this station. Follow the next clue.",
 	},
 	interaction_ep01_main_001_002 = {
 		InteractionId = "interaction_ep01_main_001_002",
@@ -231,6 +233,8 @@ return {
 		PromptObjectText = "Mission Briefing",
 		QuestId = "quest_ep01_main_001",
 		ObjectiveId = "obj_ep01_main_001_002",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already reviewed the mission briefing. Follow the next step.",
 	},
 	interaction_ep01_main_001_003 = {
 		InteractionId = "interaction_ep01_main_001_003",
@@ -243,6 +247,8 @@ return {
 		PromptObjectText = "Launch Console",
 		QuestId = "quest_ep01_main_001",
 		ObjectiveId = "obj_ep01_main_001_003",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already checked the launch console. Follow the next clue.",
 	},
 	interaction_ep01_main_002_002 = {
 		InteractionId = "interaction_ep01_main_002_002",
@@ -291,6 +297,8 @@ return {
 		PromptObjectText = "Neutron Analysis Station",
 		QuestId = "quest_ep01_main_002",
 		ObjectiveId = "obj_ep01_main_002_004",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already checked this analysis station. Follow the next clue.",
 	},
 	interaction_ep01_main_003_001 = {
 		InteractionId = "interaction_ep01_main_003_001",
@@ -327,6 +335,12 @@ return {
 		PromptObjectText = "Universe Fragment",
 		QuestId = "quest_ep01_main_003",
 		ObjectiveId = "obj_ep01_main_003_003",
+		ObjectBehaviorType = "LockedObject",
+		VisibleBeforeAvailable = true,
+		InspectableBeforeAvailable = true,
+		UnavailableObjectName = "Universe Fragment",
+		UnavailableHintText = "This fragment is unstable. Finish the previous step before using it.",
+		DependencyMissingHintText = "This fragment is unstable. Inspect the signal echo first.",
 	},
 	interaction_ep01_main_003_004 = {
 		InteractionId = "interaction_ep01_main_003_004",
@@ -339,6 +353,9 @@ return {
 		PromptObjectText = "Universe Fragment",
 		QuestId = "quest_ep01_main_003",
 		ObjectiveId = "obj_ep01_main_003_004",
+		ObjectBehaviorType = "CollectibleItem",
+		AlreadyCollectedHintText = "You already collected the Universe Fragment.",
+		CollectedStateText = "[Collected] Universe Fragment",
 	},
 	interaction_ep01_main_004_001 = {
 		InteractionId = "interaction_ep01_main_004_001",
@@ -387,6 +404,9 @@ return {
 		PromptObjectText = "Earth Fragment",
 		QuestId = "quest_ep01_main_004",
 		ObjectiveId = "obj_ep01_main_004_004",
+		ObjectBehaviorType = "CollectibleItem",
+		AlreadyCollectedHintText = "You already collected the Earth Fragment.",
+		CollectedStateText = "[Collected] Earth Fragment",
 	},
 	interaction_ep01_main_005_001 = {
 		InteractionId = "interaction_ep01_main_005_001",
@@ -411,6 +431,8 @@ return {
 		PromptObjectText = "Satellite Archive",
 		QuestId = "quest_ep01_main_005",
 		ObjectiveId = "obj_ep01_main_005_002",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already checked the satellite archive. Follow the next signal clue.",
 	},
 	interaction_ep01_main_005_003 = {
 		InteractionId = "interaction_ep01_main_005_003",
@@ -435,6 +457,9 @@ return {
 		PromptObjectText = "THEOS Fragment",
 		QuestId = "quest_ep01_main_005",
 		ObjectiveId = "obj_ep01_main_005_004",
+		ObjectBehaviorType = "CollectibleItem",
+		AlreadyCollectedHintText = "You already collected the THEOS Fragment.",
+		CollectedStateText = "[Collected] THEOS Fragment",
 	},
 	interaction_ep01_main_006_001 = {
 		InteractionId = "interaction_ep01_main_006_001",
@@ -459,6 +484,8 @@ return {
 		PromptObjectText = "Rocket Control Panel",
 		QuestId = "quest_ep01_main_006",
 		ObjectiveId = "obj_ep01_main_006_002",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already checked the rocket control panel. Follow the next diagnostic step.",
 	},
 	interaction_ep01_main_006_003 = {
 		InteractionId = "interaction_ep01_main_006_003",
@@ -483,6 +510,9 @@ return {
 		PromptObjectText = "Rocket Fragment",
 		QuestId = "quest_ep01_main_006",
 		ObjectiveId = "obj_ep01_main_006_004",
+		ObjectBehaviorType = "CollectibleItem",
+		AlreadyCollectedHintText = "You already collected the Rocket Fragment.",
+		CollectedStateText = "[Collected] Rocket Fragment",
 	},
 	interaction_ep01_main_007_001 = {
 		InteractionId = "interaction_ep01_main_007_001",
@@ -507,6 +537,8 @@ return {
 		PromptObjectText = "Movement Training Station",
 		QuestId = "quest_ep01_main_007",
 		ObjectiveId = "obj_ep01_main_007_002",
+		ObjectBehaviorType = "Station",
+		AlreadyUsedHintText = "You already completed this training station. Follow the next training step.",
 	},
 	interaction_ep01_main_007_003 = {
 		InteractionId = "interaction_ep01_main_007_003",
@@ -567,6 +599,9 @@ return {
 		PromptObjectText = "Moon Fragment",
 		QuestId = "quest_ep01_main_008",
 		ObjectiveId = "obj_ep01_main_008_003",
+		ObjectBehaviorType = "CollectibleItem",
+		AlreadyCollectedHintText = "You already collected the Moon Fragment.",
+		CollectedStateText = "[Collected] Moon Fragment",
 	},
 	interaction_ep01_main_008_004 = {
 		InteractionId = "interaction_ep01_main_008_004",
@@ -601,9 +636,14 @@ return {
 		EnabledInWorld = true,
 		PromptActionText = "Inspect",
 		PromptObjectText = "Star Core Display",
+		ObjectBehaviorType = "DiscoveryObject",
+		VisibleBeforeAvailable = true,
+		InspectableBeforeAvailable = true,
+		UnavailableObjectName = "Star Core Display",
 		UnavailableHintText = "The Star Core is quiet for now. Start the expedition first.",
 		QuestNotActiveHintText = "The Star Core Display has been recorded. Start Quest 001 to continue this investigation.",
 		AlreadyCompletedHintText = "You already inspected the Star Core Display.",
+		AlreadyDiscoveredHintText = "This discovery has already been recorded.",
 		DiscoveryId = "disc_ep01_command_star_core_display",
 		ObjectiveProgressIds = {
 			"obj_ep01_main_001_004",
@@ -618,6 +658,8 @@ return {
 		EnabledInWorld = false,
 		PromptActionText = "Inspect",
 		PromptObjectText = "Expedition Terminal",
+		ObjectBehaviorType = "DiscoveryObject",
+		AlreadyDiscoveredHintText = "This discovery has already been recorded.",
 		DiscoveryId = "disc_ep01_command_expedition_terminal",
 	},
 	interaction_disc_ep01_universe_first_signal_marker = {
@@ -629,7 +671,9 @@ return {
 		EnabledInWorld = false,
 		PromptActionText = "Inspect",
 		PromptObjectText = "First Signal Marker",
+		ObjectBehaviorType = "DiscoveryObject",
 		QuestNotActiveHintText = "The signal marker has been recorded. Start the Universe Signal Mission to analyze it.",
+		AlreadyDiscoveredHintText = "This signal marker discovery has already been recorded.",
 		DiscoveryId = "disc_ep01_universe_first_signal_marker",
 		ObjectiveProgressIds = {
 			"obj_ep01_main_002_002",
@@ -644,7 +688,9 @@ return {
 		EnabledInWorld = false,
 		PromptActionText = "Inspect",
 		PromptObjectText = "Neutron Analysis Station",
+		ObjectBehaviorType = "DiscoveryObject",
 		QuestNotActiveHintText = "The analysis station is ready, but the signal mission has not started yet.",
+		AlreadyDiscoveredHintText = "This analysis station discovery has already been recorded.",
 		DiscoveryId = "disc_ep01_universe_analysis_station",
 		ObjectiveProgressIds = {
 			"obj_ep01_main_002_004",

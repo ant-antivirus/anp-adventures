@@ -11,6 +11,7 @@ local PROMPT_NAME = "ANP_InteractionPrompt"
 local worldRegistryService = nil
 local interactionService = nil
 local interactionVisibilityService = nil
+local playerFeedbackService = nil
 local boundPromptsByInteractionId = {}
 local boundConnectionsByInteractionId = {}
 
@@ -167,6 +168,12 @@ local function handlePromptTriggered(player, interactionId, metadata)
 		end
 	else
 		Logger.PromptFailure("Interaction `" .. interactionId .. "` failed for " .. playerName .. ": " .. tostring(interactionResult.Code))
+		if playerFeedbackService and interactionResult.Data and interactionResult.Data.HintText then
+			playerFeedbackService.SendBlocked(player, interactionResult.Data.HintText, {
+				InteractionId = interactionId,
+				Code = interactionResult.Code,
+			})
+		end
 	end
 
 	return interactionResult
@@ -196,6 +203,7 @@ function PromptBindingService.Init(dependencies)
 	worldRegistryService = dependencies.WorldRegistryService
 	interactionService = dependencies.InteractionService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
+	playerFeedbackService = dependencies.PlayerFeedbackService
 
 	assert(worldRegistryService, "PromptBindingService requires WorldRegistryService.")
 	assert(interactionService, "PromptBindingService requires InteractionService.")

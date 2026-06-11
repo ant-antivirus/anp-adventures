@@ -11,6 +11,7 @@ local RewardService = {}
 local playerDataService = nil
 local progressionService = nil
 local inventoryService = nil
+local playerFeedbackService = nil
 
 local SOURCE_SPECIFIC_DUPLICATE_POLICIES = {
 	OncePerPlayerPerDiscovery = true,
@@ -144,6 +145,7 @@ function RewardService.Init(dependencies)
 	playerDataService = dependencies.PlayerDataService
 	progressionService = dependencies.ProgressionService
 	inventoryService = dependencies.InventoryService
+	playerFeedbackService = dependencies.PlayerFeedbackService
 
 	assert(playerDataService, "RewardService requires PlayerDataService.")
 	assert(progressionService, "RewardService requires ProgressionService.")
@@ -304,6 +306,10 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 	local claimResult = playerDataService.MarkRewardClaim(player, rewardClaimId)
 	if not claimResult.Success then
 		return claimResult
+	end
+
+	if playerFeedbackService then
+		playerFeedbackService.SendRewardReceived(player, rewardBundleId, "Reward received.")
 	end
 
 	return result(true, "RewardGranted", nil, summary)

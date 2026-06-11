@@ -4,7 +4,7 @@
 
 ANP Adventures is a family-friendly Roblox adventure prototype where players explore, discover, and learn through story-driven quests.
 
-Current focus: Episode 1 server-side playable prototype.
+Current focus: Episode 1 playable prototype with minimal player feedback UI.
 
 ## Current Status
 
@@ -13,7 +13,9 @@ Current focus: Episode 1 server-side playable prototype.
 - Episode 1 finale restores `item_star_core_segment_01`
 - Early discovery anti-stuck fix implemented
 - Phase 3H playtest polish implemented
-- Studio verification pending
+- Phase 4A minimal player feedback UI implemented
+- Phase 4B object state polish implemented
+- Studio verification pending for Phase 4B
 
 ## How To Run
 
@@ -28,6 +30,8 @@ Current focus: Episode 1 server-side playable prototype.
 [ANP DiscoveryBridgeRegressionSmokeTest] Discovery bridge regression smoke test passed.
 [ANP Phase3G4SmokeTest] Phase 3G-4 smoke test passed.
 [ANP Phase3HPlaytestPolishSmokeTest] Phase 3H playtest polish smoke test passed.
+[ANP Phase4AFeedbackSmokeTest] Phase 4A feedback smoke test passed.
+[ANP Phase4BObjectStateSmokeTest] Phase 4B object state smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -36,15 +40,14 @@ All Studio smoke tests passed.
 
 `LogConfig` controls developer log noise.
 
-Normal mode keeps bootstrap summary, smoke test pass/fail lines, warnings/errors, and prompt failures visible. It suppresses analytics spam, prompt success spam, and guidance spam.
+Normal mode keeps bootstrap summary, smoke test pass/fail lines, warnings/errors, prompt failures, and guidance visible. It suppresses analytics spam and prompt success spam.
 
-Use Verbose mode for deeper debugging when detailed analytics, prompt success, and guidance logs are needed.
+Use Verbose mode for deeper debugging when detailed analytics and prompt success logs are needed.
 
 ## Current Non-Goals
 
-- No UI
 - No DataStore persistence
-- No RemoteEvents / RemoteFunctions
+- No RemoteFunctions
 - No Marketplace / monetization
 - No trading
 - No party system

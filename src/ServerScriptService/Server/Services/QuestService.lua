@@ -17,6 +17,7 @@ local rewardService = nil
 local episodeService = nil
 local interactionVisibilityService = nil
 local analyticsService = nil
+local playerFeedbackService = nil
 
 local function result(success, code, message, data)
 	return {
@@ -222,6 +223,7 @@ function QuestService.Init(dependencies)
 	episodeService = dependencies.EpisodeService
 	interactionVisibilityService = dependencies.InteractionVisibilityService
 	analyticsService = dependencies.AnalyticsService
+	playerFeedbackService = dependencies.PlayerFeedbackService
 
 	assert(playerDataService, "QuestService requires PlayerDataService.")
 	assert(rewardService, "QuestService requires RewardService.")
@@ -320,6 +322,9 @@ function QuestService.StartQuest(player, questId, sourceContext)
 		EpisodeId = questDefinition.EpisodeId,
 		ZoneId = questDefinition.ZoneId,
 	})
+	if playerFeedbackService then
+		playerFeedbackService.SendQuestStarted(player, questId, "Quest started. Follow the next objective.")
+	end
 	refreshInteractionVisibility(player)
 
 	return result(true, "QuestStarted", nil, {
@@ -440,6 +445,10 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 
 			table.insert(grantedObjectiveRewardBundleIds, rewardBundleId)
 		end
+	end
+
+	if willCompleteObjective and playerFeedbackService then
+		playerFeedbackService.SendObjectiveUpdated(player, questId, objectiveId, "Objective complete. Check the next step.")
 	end
 
 	return result(true, "ObjectiveProgressApplied", nil, {
@@ -623,6 +632,9 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		if not episodeCompletionResult.Success then
 			return episodeCompletionResult
 		end
+		if playerFeedbackService then
+			playerFeedbackService.SendEpisodeCompleted(player, questDefinition.EpisodeId, "Episode 1 complete. Star Core Segment 01 has been restored.")
+		end
 	end
 
 	incrementSessionStat(player, "QuestsCompleted")
@@ -632,6 +644,9 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		ZoneId = questDefinition.ZoneId,
 		RewardBundleIds = grantedRewardBundleIds,
 	})
+	if playerFeedbackService then
+		playerFeedbackService.SendQuestCompleted(player, questId, "Quest complete.")
+	end
 	refreshInteractionVisibility(player)
 
 	return result(true, "QuestCompleted", nil, {

@@ -17,6 +17,18 @@ This document does not define gameplay content, quest stories, puzzles, dialogue
 - Provide Proton Companion support for solo players whenever a mechanic would otherwise benefit from another player.
 - Support episode-based expansion without rewriting core services.
 
+## Phase 4A Feedback UI
+
+Phase 4A adds a minimal player-facing feedback layer. `PlayerFeedbackService` sends display-only payloads through one server-to-client `RemoteEvent` at `ReplicatedStorage/ANP_Remotes/PlayerFeedbackEvent`.
+
+The client UI may show hints, blocked interaction reasons, quest start/completion messages, objective updates, reward messages, and episode completion messages. The client must not mutate quest, reward, discovery, inventory, or episode state.
+
+## Phase 4B Object Behavior
+
+Phase 4B adds lightweight object behavior metadata for interactions: `Station`, `CollectibleItem`, `DiscoveryObject`, `LockedObject`, and `QuestObject`.
+
+Station objects stay in the world and can report already-used hints. Collectibles must not grant duplicate progress or rewards after collection. Discoveries remain readable but do not reward twice. Important locked objects may stay inspectable and explain why they are not usable yet through server-authored feedback.
+
 ## Recommended Folder Structure
 
 ```text
