@@ -408,6 +408,16 @@ function InteractionService.AttemptInteraction(player, interactionId, metadata)
 		return worldObjectError
 	end
 
+	if definition.Type == "QuestStart" then
+		local canStart, blockCode = questService.CanStartQuest(player, definition.QuestId)
+		if not canStart then
+			return result(false, blockCode, blockCode, {
+				HintText = getHintText(definition, blockCode),
+				QuestId = definition.QuestId,
+			})
+		end
+	end
+
 	if not zoneService.IsZoneUnlocked(player, definition.ZoneId) then
 		return result(false, "ZoneLocked", "ZoneLocked", withHint(definition, "ZoneLocked"))
 	end

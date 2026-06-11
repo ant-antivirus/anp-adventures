@@ -1,4 +1,7 @@
 local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local InteractionDefinitions = require(ReplicatedStorage.Shared.Definitions.InteractionDefinitions)
 
 local DeveloperWorldUXSmokeTest = {}
 
@@ -49,6 +52,12 @@ local function assertPromptText(PromptBindingService, interactionId, expectedAct
 	local promptResult = PromptBindingService.GetPromptForInteraction(interactionId)
 	assertResultSuccess(promptResult, "Prompt should exist for `" .. interactionId .. "`.")
 	assertCondition(promptResult.Data.ActionText == expectedActionText, "Prompt `" .. interactionId .. "` ActionText should be `" .. expectedActionText .. "`.")
+end
+
+local function assertPromptMatchesDefinition(PromptBindingService, interactionId)
+	local interactionDefinition = InteractionDefinitions[interactionId]
+	assertCondition(interactionDefinition ~= nil, "Interaction definition should exist for `" .. interactionId .. "`.")
+	assertPromptText(PromptBindingService, interactionId, interactionDefinition.PromptActionText)
 end
 
 function DeveloperWorldUXSmokeTest.Run(services)
@@ -103,11 +112,11 @@ function DeveloperWorldUXSmokeTest.Run(services)
 	assertColor(npc.Data, EXPECTED_COLORS.NPCMarker, "NPCMarker placeholder")
 	assertDeveloperLabel(npc.Data, "[NPC GUIDE]", "Proton", "interaction_npc_proton_guide")
 
-	assertPromptText(PromptBindingService, "interaction_start_ep01_main_001", "Start Quest")
-	assertPromptText(PromptBindingService, "interaction_complete_ep01_main_001", "Complete Quest")
-	assertPromptText(PromptBindingService, "interaction_ep01_main_001_001", "Interact")
-	assertPromptText(PromptBindingService, "interaction_disc_ep01_command_star_core_display", "Inspect")
-	assertPromptText(PromptBindingService, "interaction_travel_ep01_universe_explorer", "Travel")
+	assertPromptMatchesDefinition(PromptBindingService, "interaction_start_ep01_main_001")
+	assertPromptMatchesDefinition(PromptBindingService, "interaction_complete_ep01_main_001")
+	assertPromptMatchesDefinition(PromptBindingService, "interaction_ep01_main_001_001")
+	assertPromptMatchesDefinition(PromptBindingService, "interaction_disc_ep01_command_star_core_display")
+	assertPromptMatchesDefinition(PromptBindingService, "interaction_travel_ep01_universe_explorer")
 
 	local player = makeFakePlayer(937001, "DeveloperWorldUX")
 	assertResultSuccess(PlayerDataService.InitPlayer(player), "Developer UX player data should initialize.")
