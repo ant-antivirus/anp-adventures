@@ -279,22 +279,29 @@ function QuestService.CanStartQuest(player, questId)
 		return false, "QuestLocked"
 	end
 
-	local snapshotResult = playerDataService.GetSnapshot(player, "Quests")
-	if not snapshotResult.Success then
-		return false, snapshotResult.Code
+	local readResult = playerDataService.Read(player, "CanStartQuest", function(playerData)
+		local questData = playerData.Quests
+		local questState = questData.QuestStates[questId]
+		local previousQuestId = findPreviousQuestId(questDefinition)
+		return {
+			Completed = questData.CompletedQuestIds[questId] == true,
+			Active = questState and questState.Status == QuestStatus.Active,
+			PreviousQuestMissing = previousQuestId ~= nil and questData.CompletedQuestIds[previousQuestId] ~= true,
+		}
+	end)
+	if not readResult.Success then
+		return false, readResult.Code
 	end
 
-	if snapshotResult.Data.CompletedQuestIds[questId] then
+	if readResult.Data.Completed then
 		return false, "QuestAlreadyCompleted"
 	end
 
-	local questState = snapshotResult.Data.QuestStates[questId]
-	if questState and questState.Status == QuestStatus.Active then
+	if readResult.Data.Active then
 		return false, "QuestAlreadyActive"
 	end
 
-	local previousQuestId = findPreviousQuestId(questDefinition)
-	if previousQuestId and not snapshotResult.Data.CompletedQuestIds[previousQuestId] then
+	if readResult.Data.PreviousQuestMissing then
 		return false, "QuestPrerequisiteMissing"
 	end
 
@@ -346,29 +353,36 @@ function QuestService.StartQuest(player, questId, sourceContext)
 end
 
 function QuestService.GetQuestState(player, questId)
+	if questId ~= nil then
+		local questDefinition, errorResult = getQuestDefinition(questId)
+		if errorResult then
+			return errorResult
+		end
+
+		local readResult = playerDataService.Read(player, "GetQuestState", function(playerData)
+			return playerData.Quests.QuestStates[questId]
+		end)
+		if not readResult.Success then
+			return readResult
+		end
+
+		local questState = readResult.Data or {
+			QuestId = questId,
+			EpisodeId = questDefinition.EpisodeId,
+			ZoneId = questDefinition.ZoneId,
+			Status = QuestStatus.Inactive,
+			ObjectiveStates = buildObjectiveStates(questDefinition),
+		}
+
+		return result(true, "QuestStateRead", nil, questState)
+	end
+
 	local snapshotResult = playerDataService.GetSnapshot(player, "Quests")
 	if not snapshotResult.Success then
 		return snapshotResult
 	end
 
-	if questId == nil then
-		return result(true, "QuestStateRead", nil, snapshotResult.Data)
-	end
-
-	local questDefinition, errorResult = getQuestDefinition(questId)
-	if errorResult then
-		return errorResult
-	end
-
-	local questState = snapshotResult.Data.QuestStates[questId] or {
-		QuestId = questId,
-		EpisodeId = questDefinition.EpisodeId,
-		ZoneId = questDefinition.ZoneId,
-		Status = QuestStatus.Inactive,
-		ObjectiveStates = buildObjectiveStates(questDefinition),
-	}
-
-	return result(true, "QuestStateRead", nil, questState)
+	return result(true, "QuestStateRead", nil, snapshotResult.Data)
 end
 
 function QuestService.IsObjectiveCompleted(player, questId, objectiveId)

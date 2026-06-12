@@ -102,21 +102,27 @@ function DiscoveryService.GetDiscoveryState(player, discoveryId)
 		return errorResult
 	end
 
-	local snapshotResult = playerDataService.GetSnapshot(player, "Discoveries")
-	if not snapshotResult.Success then
-		return snapshotResult
+	local readResult = playerDataService.Read(player, "GetDiscoveryState", function(playerData)
+		local discoveryData = playerData.Discoveries
+		local discoveryState = discoveryData.DiscoveryStates and discoveryData.DiscoveryStates[discoveryId]
+		return {
+			IsFound = discoveryData.FoundDiscoveryIds[discoveryId] == true,
+			RewardPending = discoveryState and discoveryState.RewardPending == true,
+			RewardFailureCode = discoveryState and discoveryState.RewardFailureCode or nil,
+		}
+	end)
+	if not readResult.Success then
+		return readResult
 	end
 
-	local discoveryData = snapshotResult.Data
-	local discoveryState = discoveryData.DiscoveryStates and discoveryData.DiscoveryStates[discoveryId]
 	return result(true, "DiscoveryStateRead", nil, {
 		DiscoveryId = discoveryId,
 		ZoneId = discoveryDefinition.ZoneId,
-		IsFound = discoveryData.FoundDiscoveryIds[discoveryId] == true,
+		IsFound = readResult.Data.IsFound,
 		RewardBundleId = discoveryDefinition.RewardBundleId,
 		RewardIncludedInQuestBundle = discoveryDefinition.RewardIncludedInQuestBundle == true,
-		RewardPending = discoveryState and discoveryState.RewardPending == true,
-		RewardFailureCode = discoveryState and discoveryState.RewardFailureCode or nil,
+		RewardPending = readResult.Data.RewardPending,
+		RewardFailureCode = readResult.Data.RewardFailureCode,
 	})
 end
 

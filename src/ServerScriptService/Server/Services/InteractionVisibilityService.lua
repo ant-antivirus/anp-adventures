@@ -132,15 +132,21 @@ local function requiredQuestsCompleted(player, definition)
 		return true, nil
 	end
 
-	local questSnapshot = playerDataService.GetSnapshot(player, "Quests")
-	if not questSnapshot.Success then
-		return false, questSnapshot.Code
+	local readResult = playerDataService.Read(player, "RequiredQuestsCompleted", function(playerData)
+		for _, questId in ipairs(definition.RequiredQuestIds or {}) do
+			if playerData.Quests.CompletedQuestIds[questId] ~= true then
+				return false
+			end
+		end
+
+		return true
+	end)
+	if not readResult.Success then
+		return false, readResult.Code
 	end
 
-	for _, questId in ipairs(definition.RequiredQuestIds or {}) do
-		if questSnapshot.Data.CompletedQuestIds[questId] ~= true then
-			return false, "RequiredQuestIncomplete"
-		end
+	if readResult.Data ~= true then
+		return false, "RequiredQuestIncomplete"
 	end
 
 	return true, nil
@@ -151,15 +157,21 @@ local function requiredEpisodesUnlocked(player, definition)
 		return true, nil
 	end
 
-	local episodeSnapshot = playerDataService.GetSnapshot(player, "Episodes")
-	if not episodeSnapshot.Success then
-		return false, episodeSnapshot.Code
+	local readResult = playerDataService.Read(player, "RequiredEpisodesUnlocked", function(playerData)
+		for _, episodeId in ipairs(definition.RequiredEpisodeIds or {}) do
+			if playerData.Episodes.UnlockedEpisodeIds[episodeId] ~= true then
+				return false
+			end
+		end
+
+		return true
+	end)
+	if not readResult.Success then
+		return false, readResult.Code
 	end
 
-	for _, episodeId in ipairs(definition.RequiredEpisodeIds or {}) do
-		if episodeSnapshot.Data.UnlockedEpisodeIds[episodeId] ~= true then
-			return false, "RequiredEpisodeLocked"
-		end
+	if readResult.Data ~= true then
+		return false, "RequiredEpisodeLocked"
 	end
 
 	return true, nil

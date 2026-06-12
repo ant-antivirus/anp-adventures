@@ -201,7 +201,6 @@ function PlayerDataService.Mutate(player, mutationName, sourceContext, mutator)
 
 	return result(true, "MutationApplied", nil, {
 		Changed = mutationResult ~= false,
-		UpdatedSnapshot = TableUtil.DeepCopy(session.Data),
 	})
 end
 

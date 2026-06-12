@@ -90,30 +90,43 @@ function ZoneService.GetZoneState(player, zoneId)
 		return errorResult
 	end
 
-	local snapshotResult = playerDataService.GetSnapshot(player, "Zones")
-	if not snapshotResult.Success then
-		return snapshotResult
+	local readResult = playerDataService.Read(player, "GetZoneState", function(playerData)
+		local zoneData = playerData.Zones
+		return {
+			IsUnlocked = zoneData.UnlockedZoneIds[zoneId] == true,
+			IsFastTravelUnlocked = zoneData.FastTravelUnlockedZoneIds[zoneId] == true,
+			IsLastZone = zoneData.LastZoneId == zoneId,
+			LastSpawnPointId = zoneData.LastSpawnPointId,
+		}
+	end)
+	if not readResult.Success then
+		return readResult
 	end
 
-	local zoneData = snapshotResult.Data
 	return result(true, "ZoneStateRead", nil, {
 		ZoneId = zoneId,
 		EpisodeId = zoneDefinition.EpisodeId,
-		IsUnlocked = zoneData.UnlockedZoneIds[zoneId] == true,
-		IsFastTravelUnlocked = zoneData.FastTravelUnlockedZoneIds[zoneId] == true,
-		IsLastZone = zoneData.LastZoneId == zoneId,
-		LastSpawnPointId = zoneData.LastSpawnPointId,
+		IsUnlocked = readResult.Data.IsUnlocked,
+		IsFastTravelUnlocked = readResult.Data.IsFastTravelUnlocked,
+		IsLastZone = readResult.Data.IsLastZone,
+		LastSpawnPointId = readResult.Data.LastSpawnPointId,
 		TravelEligibility = zoneDefinition.TravelEligibility or {},
 	})
 end
 
 function ZoneService.IsZoneUnlocked(player, zoneId)
-	local stateResult = ZoneService.GetZoneState(player, zoneId)
-	if not stateResult.Success then
-		return false, stateResult.Code
+	if not ZoneDefinitions[zoneId] then
+		return false, "UnknownZoneId"
 	end
 
-	return stateResult.Data.IsUnlocked == true
+	local readResult = playerDataService.Read(player, "IsZoneUnlocked", function(playerData)
+		return playerData.Zones.UnlockedZoneIds[zoneId] == true
+	end)
+	if not readResult.Success then
+		return false, readResult.Code
+	end
+
+	return readResult.Data == true
 end
 
 function ZoneService.UnlockZone(player, zoneId, sourceContext)
