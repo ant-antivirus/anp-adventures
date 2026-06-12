@@ -56,6 +56,12 @@ local typeStyles = {
 		Background = Color3.fromRGB(38, 32, 56),
 		Long = true,
 	},
+	Onboarding = {
+		Title = "Welcome",
+		Accent = Color3.fromRGB(99, 218, 132),
+		Background = Color3.fromRGB(22, 36, 36),
+		Long = true,
+	},
 }
 
 local function createCorner(parent, radius)
@@ -235,9 +241,15 @@ end
 
 local function createNotificationCard(payload)
 	local style = typeStyles[payload.Type] or typeStyles.Hint
+	local lines = if type(payload.Lines) == "table" then payload.Lines else nil
+	local messageText = tostring(payload.Message or "")
+	if lines and #lines > 0 then
+		messageText ..= "\n" .. table.concat(lines, "\n")
+	end
+
 	local card = Instance.new("Frame")
 	card.Name = tostring(payload.Type or "Notification")
-	card.Size = UDim2.fromOffset(360, 86)
+	card.Size = UDim2.fromOffset(360, if lines and #lines > 0 then 146 else 86)
 	card.BackgroundColor3 = style.Background
 	card.BackgroundTransparency = 0.05
 	card.BorderSizePixel = 0
@@ -263,7 +275,10 @@ local function createNotificationCard(payload)
 	local message = createLabel("Message", card, Enum.Font.Gotham, 13, Color3.fromRGB(232, 238, 245))
 	message.Position = UDim2.fromOffset(16, 36)
 	message.Size = UDim2.new(1, -28, 0, 42)
-	message.Text = tostring(payload.Message or "")
+	if lines and #lines > 0 then
+		message.Size = UDim2.new(1, -28, 0, 100)
+	end
+	message.Text = messageText
 
 	return card, style
 end

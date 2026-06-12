@@ -24,6 +24,7 @@ local GuidanceService = require(script.Parent.Services.GuidanceService)
 local AnalyticsService = require(script.Parent.Services.AnalyticsService)
 local PlayerFeedbackService = require(script.Parent.Services.PlayerFeedbackService)
 local QuestTrackerService = require(script.Parent.Services.QuestTrackerService)
+local OnboardingService = require(script.Parent.Services.OnboardingService)
 local SaveSerializationService = require(script.Parent.Services.SaveSerializationService)
 local MockPersistenceService = require(script.Parent.Services.MockPersistenceService)
 local DataStorePersistenceService = require(script.Parent.Services.DataStorePersistenceService)
@@ -61,6 +62,9 @@ local Phase5CControlledPersistencePilotSmokeTest = require(script.Parent.Tests.P
 local Phase5DStudioDataStorePilotSafetySmokeTest = require(script.Parent.Tests.Phase5DStudioDataStorePilotSafetySmokeTest)
 local Phase6APlayerFacingUISmokeTest = require(script.Parent.Tests.Phase6APlayerFacingUISmokeTest)
 local Phase6BVisualWorldPresentationSmokeTest = require(script.Parent.Tests.Phase6BVisualWorldPresentationSmokeTest)
+local Phase6COnboardingFlowSmokeTest = require(script.Parent.Tests.Phase6COnboardingFlowSmokeTest)
+local Phase6DEP1ContentLockSmokeTest = require(script.Parent.Tests.Phase6DEP1ContentLockSmokeTest)
+local Phase6DEP1FinalMvpRegressionSmokeTest = require(script.Parent.Tests.Phase6DEP1FinalMvpRegressionSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -212,6 +216,11 @@ QuestTrackerService.Init({
 	PlayerFeedbackService = PlayerFeedbackService,
 })
 
+OnboardingService.Init({
+	PlayerDataService = PlayerDataService,
+	PlayerFeedbackService = PlayerFeedbackService,
+})
+
 GuidanceService.Init({
 	PlayerDataService = PlayerDataService,
 	QuestService = QuestService,
@@ -273,7 +282,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, and Phase 6B services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, Phase 6B, Phase 6C, and Phase 6D services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -619,6 +628,51 @@ if RunService:IsStudio() then
 	})
 	table.insert(passedSmokeTests, "Phase6BVisualWorldPresentationSmokeTest")
 
+	Phase6COnboardingFlowSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestService = QuestService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+		SaveService = SaveService,
+		OnboardingService = OnboardingService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase6COnboardingFlowSmokeTest")
+
+	Phase6DEP1ContentLockSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		OnboardingService = OnboardingService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+		SaveService = SaveService,
+		MockPersistenceService = MockPersistenceService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+	})
+	table.insert(passedSmokeTests, "Phase6DEP1ContentLockSmokeTest")
+
+	Phase6DEP1FinalMvpRegressionSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		OnboardingService = OnboardingService,
+		PromptBindingService = PromptBindingService,
+		InteractionService = InteractionService,
+		InteractionVisibilityService = InteractionVisibilityService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+		SaveService = SaveService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+	})
+	table.insert(passedSmokeTests, "Phase6DEP1FinalMvpRegressionSmokeTest")
+
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")
 	for _, smokeTestName in ipairs(passedSmokeTests) do
@@ -661,6 +715,11 @@ local function onPlayerAdded(player)
 	local trackerResult = QuestTrackerService.SendTrackerUpdate(player)
 	if not trackerResult.Success then
 		warn("[ANP] Quest tracker update failed for " .. player.Name .. ": " .. trackerResult.Code)
+	end
+
+	local onboardingResult = OnboardingService.SendInitialOnboarding(player)
+	if not onboardingResult.Success then
+		warn("[ANP] Onboarding failed for " .. player.Name .. ": " .. onboardingResult.Code)
 	end
 
 	print("[ANP] Player data initialized for " .. player.Name)

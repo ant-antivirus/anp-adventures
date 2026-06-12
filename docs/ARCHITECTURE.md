@@ -53,6 +53,12 @@ Phase 5B adds `DataStorePersistenceService` behind `SaveService`. Real persisten
 
 Load/save lifecycle hooks, autosave, and shutdown flush are config-gated. If a real DataStore load fails, the session is marked unsafe to save by default so default data cannot overwrite an existing cloud save.
 
+## Phase 6D EP1 Content Lock
+
+Phase 6D locks Episode 1 as the active MVP baseline. Runtime IDs for `ep01_lost_star_core`, Quest 001 through Quest 008, required objective counts, final reward semantics, and active EP1 zones are documented in `docs/EP1_CONTENT_LOCK_MANIFEST.md`.
+
+Future expansion must not rename, reuse, or delete locked EP1 IDs without migration/version planning. EP1 remains the only active episode; no active EP2 gameplay content is part of this baseline. Real DataStore remains disabled by default, server authority remains unchanged, and client UI stays display-only.
+
 ## Recommended Folder Structure
 
 ```text
@@ -345,6 +351,10 @@ Phase 6A improves the display-only player UI. The client renders server payloads
 ## Phase 6B World Presentation
 
 Phase 6B adds decorative MVP presentation to the Studio skeleton world: zone platforms, route strips, marker adornments, and simple landmarks. These parts are developer/playtest visuals only; gameplay IDs, prompt binding, quest progression, save/load behavior, and server authority remain unchanged.
+
+## Phase 6C Onboarding
+
+Phase 6C adds server-owned first-time onboarding guidance through existing display-only feedback payloads. `OnboardingService` decides eligibility from authoritative quest and episode state, then sends welcome, marker legend, episode goal, and first quest hint payloads. The client only renders `Onboarding` payloads and does not control quest, reward, inventory, or save/load state.
 
 ## Journal And Lore Architecture
 

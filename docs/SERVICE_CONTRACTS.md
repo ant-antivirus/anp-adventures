@@ -55,6 +55,25 @@ Phase 6B world presentation is decorative only. `SkeletonWorldBuilder` may creat
 
 Decorative parts should not block prompts or player movement during Studio playtests, and the compact Q1-Q8 route must remain fast to traverse.
 
+## Onboarding Contract
+
+Phase 6C onboarding is server-owned and display-only. `OnboardingService` may send `Onboarding` payloads through `PlayerFeedbackEvent`, but it must not mutate quest, inventory, reward, episode, or save state.
+
+The client may render welcome text, marker legend lines, Episode 1 goal text, and first quest hints. It must not request onboarding state, calculate progression, skip server rules, or save onboarding decisions.
+
+## EP1 Content Lock Contract
+
+Phase 6D locks Episode 1 runtime content for the MVP baseline. Definition modules must keep `ep01_lost_star_core`, Quest 001 through Quest 008, required objective totals, start/objective/complete interaction routes, final reward semantics, and active EP1 zones stable.
+
+Validation rules:
+
+- Quest 008 must keep five required objectives.
+- `reward_ep01_main_008` must grant `item_star_core_segment_01` only for Star Core segment restoration.
+- EP1 must not grant future Star Core segment items.
+- Quest Tracker totals must use `RequiredObjectiveIds`.
+- Save payloads must validate under `SaveSchema` v1 after full EP1 completion.
+- No active EP2 gameplay content should be added to the EP1 MVP baseline.
+
 ### PlayerRef
 
 Used by all player-facing methods.

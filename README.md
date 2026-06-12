@@ -24,6 +24,8 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 5D Studio DataStore pilot safety polish implemented
 - Phase 6A player-facing UI polish implemented
 - Phase 6B EP1 visual world presentation pass implemented
+- Phase 6C first-time onboarding flow implemented
+- Phase 6D EP1 content lock and final MVP hardening implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 
@@ -50,6 +52,9 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase5DStudioDataStorePilotSafetySmokeTest] Phase 5D Studio DataStore pilot safety smoke test passed.
 [ANP Phase6APlayerFacingUISmokeTest] Phase 6A player-facing UI smoke test passed.
 [ANP Phase6BVisualWorldPresentationSmokeTest] Phase 6B visual world presentation smoke test passed.
+[ANP Phase6COnboardingFlowSmokeTest] Phase 6C onboarding flow smoke test passed.
+[ANP Phase6DEP1ContentLockSmokeTest] Phase 6D EP1 content lock smoke test passed.
+[ANP Phase6DEP1FinalMvpRegressionSmokeTest] Phase 6D EP1 final MVP regression smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -61,6 +66,8 @@ Phase 4C adds a small display-only quest tracker panel. The server sends `QuestT
 The client does not calculate quest progress, grant rewards, or mutate player state.
 
 Phase 6A polishes the display-only tracker, notification stack, and Episode Complete banner. UI still does not control gameplay, rewards, save/load, or inventory state.
+
+Phase 6C adds server-owned first-time onboarding payloads for welcome text, Episode 1 goal, marker legend, and first quest guidance. The client only displays these payloads.
 
 ## Skeleton Test Track
 
@@ -77,6 +84,12 @@ Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 play
 Use `docs/EP1_UI_PLAYTEST_CHECKLIST.md` for the Phase 6A UI presentation pass.
 
 Use `docs/EP1_WORLD_PRESENTATION_CHECKLIST.md` for the Phase 6B skeleton-world presentation pass.
+
+Use `docs/EP1_ONBOARDING_PLAYTEST_CHECKLIST.md` for the Phase 6C first-time onboarding pass.
+
+Use `docs/EP1_FINAL_MVP_CHECKLIST.md` for the Phase 6D final MVP hardening pass.
+
+See `docs/EP1_CONTENT_LOCK_MANIFEST.md` for locked Episode 1 runtime IDs and reward contracts. See `docs/EP1_MVP_RELEASE_NOTES_DRAFT.md` for the internal milestone summary.
 
 ## Save Readiness
 
@@ -104,3 +117,4 @@ Use Verbose mode for deeper debugging when detailed analytics and prompt success
 - No pet system
 - No cosmetic system
 - No CompanionService implementation
+- No active EP2 gameplay

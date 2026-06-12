@@ -178,6 +178,8 @@ Star Core Segment items are persistent inventory items:
 
 - `item_star_core_segment_01`
 - `item_star_core_segment_02`
+
+Phase 6D locks EP1 save compatibility around `SaveSchema` v1. A completed Episode 1 save must preserve completed Quest 001 through Quest 008, `ep01_lost_star_core`, reward claim markers, Episode 1 fragments, and `item_star_core_segment_01`. It must not gain future Star Core segment items from EP1 completion.
 - `item_star_core_segment_03`
 - `item_star_core_segment_04`
 - `item_star_core_segment_05`

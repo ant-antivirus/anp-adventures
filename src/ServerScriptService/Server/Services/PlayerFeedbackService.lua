@@ -153,6 +153,18 @@ function PlayerFeedbackService.SendQuestTracker(player, trackerPayload)
 	return sendPayload(player, payload)
 end
 
+function PlayerFeedbackService.SendOnboarding(player, onboardingPayload)
+	local payload = {}
+	for key, value in pairs(onboardingPayload or {}) do
+		payload[key] = value
+	end
+
+	payload.Type = "Onboarding"
+	payload.Duration = payload.Duration or 7
+
+	return sendPayload(player, payload)
+end
+
 function PlayerFeedbackService.GetSentFeedbackForTests(player)
 	local playerKey = getPlayerKey(player)
 	return sentFeedbackByPlayerKey[playerKey] or {}

@@ -120,6 +120,10 @@ Phase 6A polishes the player-facing quest tracker, feedback notifications, and E
 
 Phase 6B improves the Studio skeleton world with MVP decorative zone identity, route strips, marker presentation, and simple landmarks. This remains developer/playtest scaffolding and must not change quest IDs, objective IDs, interaction IDs, rewards, save/load behavior, or progression logic.
 
+Phase 6C adds first-time onboarding guidance for fresh Episode 1 players. Onboarding should explain the adventure premise, Episode 1 goal, marker colors, and first green Quest Start marker without adding gameplay gates or client authority.
+
+Phase 6D locks Episode 1 as the current active MVP content baseline. Quest 001 through Quest 008, required objective counts, Episode 1 final reward semantics, active zone IDs, and save/tracker contracts are documented in `EP1_CONTENT_LOCK_MANIFEST.md`. Future content must not alter locked EP1 IDs without migration planning.
+
 ---
 
 ## Badge System

@@ -233,7 +233,7 @@ function QuestTrackerService.BuildTrackerState(player)
 				payload.QuestTitle = "ANP Adventures"
 				payload.ProgressText = "No active quest"
 				payload.HintText = "Look for a green Quest Start marker."
-				payload.CurrentObjectiveText = "Start an expedition to see your next step."
+				payload.CurrentObjectiveText = "No active quest. Find the green Quest Start marker."
 				payload.ZoneId = questDefinition and questDefinition.ZoneId
 				payload.ZoneName = questDefinition and getZoneName(questDefinition.ZoneId)
 				return result(true, "QuestTrackerStateBuilt", nil, payload)
@@ -254,7 +254,7 @@ function QuestTrackerService.BuildTrackerState(player)
 	payload.QuestTitle = "ANP Adventures"
 	payload.ProgressText = "No active quest"
 	payload.HintText = "Look for a green Quest Start marker."
-	payload.CurrentObjectiveText = "Start an expedition to see your next step."
+	payload.CurrentObjectiveText = "No active quest. Find the green Quest Start marker."
 	return result(true, "QuestTrackerStateBuilt", nil, payload)
 end
 
