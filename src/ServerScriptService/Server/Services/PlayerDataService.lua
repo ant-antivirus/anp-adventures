@@ -205,6 +205,28 @@ function PlayerDataService.Mutate(player, mutationName, sourceContext, mutator)
 	})
 end
 
+function PlayerDataService.Read(player, readName, reader)
+	local session, code = getSession(player)
+	if not session then
+		return result(false, code, "Player data is not loaded.")
+	end
+
+	if type(readName) ~= "string" or readName == "" then
+		return result(false, "InvalidReadName", "ReadName must be a non-empty string.")
+	end
+
+	if type(reader) ~= "function" then
+		return result(false, "InvalidReadRequest", "Read requires a reader function.")
+	end
+
+	local ok, readResult = pcall(reader, session.Data)
+	if not ok then
+		return result(false, "ReadFailed", tostring(readResult))
+	end
+
+	return result(true, "ReadApplied", nil, readResult)
+end
+
 function PlayerDataService.HasRewardClaim(player, rewardClaimId)
 	local session, code = getSession(player)
 	if not session then

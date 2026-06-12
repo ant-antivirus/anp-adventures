@@ -21,6 +21,15 @@ local REQUIRED_FOLDERS = {
 
 local DEVELOPER_LABEL_NAME = "ANP_DeveloperLabel"
 
+local DEV_LABEL_CONFIG = {
+	Enabled = true,
+	ShowLongIds = false,
+	MaxDistance = 55,
+	TextSize = 12,
+	StudsOffsetY = 3.5,
+	UseCompactText = true,
+}
+
 local PLACEHOLDER_COLORS = {
 	QuestStart = Color3.fromRGB(80, 220, 120),
 	QuestComplete = Color3.fromRGB(80, 230, 235),
@@ -678,17 +687,19 @@ local function getOrCreateDeveloperLabel(part)
 	label = Instance.new("BillboardGui")
 	label.Name = DEVELOPER_LABEL_NAME
 	label.AlwaysOnTop = true
-	label.Size = UDim2.new(0, 260, 0, 76)
+	label.Size = UDim2.new(0, 150, 0, 42)
+	label.MaxDistance = DEV_LABEL_CONFIG.MaxDistance
 	label.Parent = part
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "Text"
 	textLabel.BackgroundColor3 = Color3.fromRGB(20, 24, 30)
-	textLabel.BackgroundTransparency = 0.15
+	textLabel.BackgroundTransparency = 0.25
 	textLabel.BorderSizePixel = 0
 	textLabel.Font = Enum.Font.GothamMedium
 	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	textLabel.TextScaled = true
+	textLabel.TextScaled = false
+	textLabel.TextSize = DEV_LABEL_CONFIG.TextSize
 	textLabel.TextWrapped = true
 	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.Parent = label
@@ -696,17 +707,84 @@ local function getOrCreateDeveloperLabel(part)
 	return label
 end
 
-local function setDeveloperLabel(object, category, friendlyName, internalId)
+local function getQuestShortName(questId)
+	local questNumber = tonumber(string.match(questId or "", "main_(%d+)"))
+	if questNumber then
+		return "Q" .. tostring(questNumber)
+	end
+
+	return "Quest"
+end
+
+local function getObjectiveShortName(objectiveId)
+	local objectiveNumber = tonumber(string.match(objectiveId or "", "_(%d+)$"))
+	if objectiveNumber then
+		return "Obj" .. tostring(objectiveNumber)
+	end
+
+	return "Obj"
+end
+
+local function getZoneShortName(zoneId)
+	if zoneId == "zone_ep01_universe_explorer" then
+		return "Universe"
+	elseif zoneId == "zone_ep01_terrain_sandbox" then
+		return "Terrain"
+	elseif zoneId == "zone_ep01_theos_satellite_center" then
+		return "THEOS"
+	elseif zoneId == "zone_ep01_rocket_mission" then
+		return "Rocket"
+	elseif zoneId == "zone_ep01_astronaut_training" then
+		return "Astronaut"
+	elseif zoneId == "zone_ep01_moon_walk" then
+		return "Moon Walk"
+	end
+
+	return "Command"
+end
+
+local function getCompactInteractionLabel(interaction, friendlyName)
+	if interaction.Type == "QuestStart" then
+		return getQuestShortName(interaction.QuestId) .. " Start"
+	elseif interaction.Type == "QuestComplete" then
+		return getQuestShortName(interaction.QuestId) .. " Complete"
+	elseif interaction.Type == "QuestObjective" then
+		return getQuestShortName(interaction.QuestId) .. " " .. getObjectiveShortName(interaction.ObjectiveId)
+	elseif interaction.Type == "ZoneTravel" then
+		return "Travel " .. getZoneShortName(interaction.ZoneId)
+	end
+
+	return friendlyName
+end
+
+local function setDeveloperLabel(object, category, friendlyName, internalId, compactText)
 	if not object:IsA("BasePart") then
 		return
 	end
 
+	if DEV_LABEL_CONFIG.Enabled ~= true then
+		local existingLabel = object:FindFirstChild(DEVELOPER_LABEL_NAME)
+		if existingLabel then
+			existingLabel:Destroy()
+		end
+		return
+	end
+
 	local label = getOrCreateDeveloperLabel(object)
-	label.StudsOffset = Vector3.new(0, object.Size.Y / 2 + 3, 0)
+	label.Size = UDim2.new(0, 150, 0, 42)
+	label.MaxDistance = DEV_LABEL_CONFIG.MaxDistance
+	label.StudsOffset = Vector3.new(0, object.Size.Y / 2 + DEV_LABEL_CONFIG.StudsOffsetY, 0)
 
 	local textLabel = label:FindFirstChild("Text")
 	if textLabel and textLabel:IsA("TextLabel") then
-		textLabel.Text = "[" .. category .. "]\n" .. friendlyName .. "\n" .. internalId
+		textLabel.TextScaled = false
+		textLabel.TextSize = DEV_LABEL_CONFIG.TextSize
+		if DEV_LABEL_CONFIG.UseCompactText and compactText then
+			textLabel.Text = if DEV_LABEL_CONFIG.ShowLongIds then compactText .. "\n" .. internalId else compactText
+		else
+			local longIdText = if DEV_LABEL_CONFIG.ShowLongIds then "\n" .. internalId else ""
+			textLabel.Text = "[" .. category .. "]\n" .. friendlyName .. longIdText
+		end
 	end
 end
 
@@ -864,7 +942,8 @@ function SkeletonWorldBuilder.BuildIfMissing()
 				spawnObject,
 				"SPAWN",
 				spawnPointId,
-				spawnPointId
+				spawnPointId,
+				"Spawn " .. getZoneShortName(zoneId)
 			)
 		end
 	end
@@ -885,7 +964,8 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			discoveryObject,
 			"DISCOVERY",
 			DISCOVERY_FRIENDLY_NAMES[discovery.DiscoveryId] or discovery.DiscoveryId,
-			discovery.DiscoveryId
+			discovery.DiscoveryId,
+			DISCOVERY_FRIENDLY_NAMES[discovery.DiscoveryId] or "Discovery"
 		)
 	end
 
@@ -906,7 +986,8 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			interactionObject,
 			getInteractionLabelCategory(interaction.Type),
 			getInteractionFriendlyName(interaction),
-			interaction.InteractionId
+			interaction.InteractionId,
+			getCompactInteractionLabel(interaction, getInteractionFriendlyName(interaction))
 		)
 	end
 
@@ -926,7 +1007,8 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			markerObject,
 			"NPC GUIDE",
 			CHARACTER_FRIENDLY_NAMES[marker.CharacterId] or marker.CharacterId,
-			marker.InteractionId
+			marker.InteractionId,
+			"NPC " .. (CHARACTER_FRIENDLY_NAMES[marker.CharacterId] or marker.CharacterId)
 		)
 	end
 
@@ -934,5 +1016,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 		WorldRoot = worldRoot,
 	})
 end
+
+SkeletonWorldBuilder.DevLabels = DEV_LABEL_CONFIG
 
 return SkeletonWorldBuilder

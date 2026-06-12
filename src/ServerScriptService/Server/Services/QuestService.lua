@@ -381,22 +381,35 @@ function QuestService.IsObjectiveCompleted(player, questId, objectiveId)
 		return false, "UnknownQuestObjectiveId"
 	end
 
-	local snapshotResult = playerDataService.GetSnapshot(player, "Quests")
-	if not snapshotResult.Success then
-		return false, snapshotResult.Code
+	local readResult = playerDataService.Read(player, "IsObjectiveCompleted", function(playerData)
+		local questData = playerData.Quests
+		local questState = questData.QuestStates[questId]
+		local objectiveState = questState and questState.ObjectiveStates and questState.ObjectiveStates[objectiveId]
+		if objectiveState and objectiveState.Completed == true then
+			return {
+				IsCompleted = true,
+				Code = "ObjectiveCompleted",
+			}
+		end
+
+		if questData.CompletedQuestIds[questId] == true and listContains(questDefinition.RequiredObjectiveIds, objectiveId) then
+			return {
+				IsCompleted = true,
+				Code = "CompletedQuestRequiredObjective",
+			}
+		end
+
+		return {
+			IsCompleted = false,
+			Code = "ObjectiveIncomplete",
+		}
+	end)
+
+	if not readResult.Success then
+		return false, readResult.Code
 	end
 
-	local questState = snapshotResult.Data.QuestStates[questId]
-	local objectiveState = questState and questState.ObjectiveStates and questState.ObjectiveStates[objectiveId]
-	if objectiveState and objectiveState.Completed == true then
-		return true, "ObjectiveCompleted"
-	end
-
-	if snapshotResult.Data.CompletedQuestIds[questId] == true and listContains(questDefinition.RequiredObjectiveIds, objectiveId) then
-		return true, "CompletedQuestRequiredObjective"
-	end
-
-	return false, "ObjectiveIncomplete"
+	return readResult.Data.IsCompleted == true, readResult.Data.Code
 end
 
 function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amount, sourceContext, metadata)

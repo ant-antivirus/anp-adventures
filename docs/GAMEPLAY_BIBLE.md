@@ -106,6 +106,8 @@ Phase 4C adds a display-only quest tracker. The tracker should show the active q
 
 Phase 4D-Dev arranges the skeleton Studio world as a compact quest test track for faster Episode 1 playtesting. This layout is developer scaffolding only, not final world art, and does not change IDs or progression logic.
 
+Phase 4E adds an EP1 MVP QA pass, compact configurable developer labels, a full Episode 1 regression smoke test, and a practical playtest checklist. It does not add new gameplay systems or persistence.
+
 ---
 
 ## Badge System

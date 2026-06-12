@@ -35,6 +35,12 @@ Phase 4C adds a minimal display-only quest tracker UI. `QuestTrackerService` bui
 
 The client renders quest title, current objective, progress text, and hint text only. It must not calculate quest progress, mutate quest state, claim rewards, or infer inventory state.
 
+## Phase 4E MVP QA
+
+Phase 4E adds full Episode 1 MVP regression coverage and compact, configurable developer labels for the skeleton test track. The compact track remains developer scaffolding only; IDs, progression logic, reward logic, and RemoteEvent payload contracts stay unchanged.
+
+The project still has no persistence implementation at this MVP checkpoint. Server authority remains intact for quest, discovery, reward, inventory, tracker, and episode state.
+
 ## Recommended Folder Structure
 
 ```text

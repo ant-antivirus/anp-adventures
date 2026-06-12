@@ -16,7 +16,9 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 - Phase 4A minimal player feedback UI implemented
 - Phase 4B object state polish implemented
 - Phase 4C quest tracker UI implemented
-- Studio verification pending for Phase 4C
+- Phase 4D compact skeleton quest test track implemented
+- Phase 4E EP1 MVP QA pass implemented
+- Studio verification pending for Phase 4E
 
 ## How To Run
 
@@ -34,6 +36,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 [ANP Phase4AFeedbackSmokeTest] Phase 4A feedback smoke test passed.
 [ANP Phase4BObjectStateSmokeTest] Phase 4B object state smoke test passed.
 [ANP Phase4CQuestTrackerSmokeTest] Phase 4C quest tracker smoke test passed.
+[ANP Phase4EFullEP1MvpSmokeTest] Phase 4E full EP1 MVP smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -49,6 +52,12 @@ The client does not calculate quest progress, grant rewards, or mutate player st
 The current Studio skeleton world uses a compact developer test-track layout for faster Episode 1 playtesting. Quest markers are arranged in short rows from start to objectives to completion.
 
 This is not final world art. IDs and progression logic remain unchanged.
+
+Dev labels are compact and configurable so the test track remains readable without covering nearby objects.
+
+## MVP Playtest Checklist
+
+Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 playtest pass.
 
 ## Logging
 
