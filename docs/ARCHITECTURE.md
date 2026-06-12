@@ -342,6 +342,10 @@ Phase 5D adds canary-gated pilot execution. Studio pilot load/save only runs for
 
 Phase 6A improves the display-only player UI. The client renders server payloads for notifications, quest tracker state, and Episode Complete presentation. It does not calculate quest progress, complete objectives, grant rewards, save/load data, or send save payloads.
 
+## Phase 6B World Presentation
+
+Phase 6B adds decorative MVP presentation to the Studio skeleton world: zone platforms, route strips, marker adornments, and simple landmarks. These parts are developer/playtest visuals only; gameplay IDs, prompt binding, quest progression, save/load behavior, and server authority remain unchanged.
+
 ## Journal And Lore Architecture
 
 Journal and lore content are definition-driven systems.

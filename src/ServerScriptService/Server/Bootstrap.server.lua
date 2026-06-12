@@ -60,6 +60,7 @@ local Phase5BDataStoreAdapterSmokeTest = require(script.Parent.Tests.Phase5BData
 local Phase5CControlledPersistencePilotSmokeTest = require(script.Parent.Tests.Phase5CControlledPersistencePilotSmokeTest)
 local Phase5DStudioDataStorePilotSafetySmokeTest = require(script.Parent.Tests.Phase5DStudioDataStorePilotSafetySmokeTest)
 local Phase6APlayerFacingUISmokeTest = require(script.Parent.Tests.Phase6APlayerFacingUISmokeTest)
+local Phase6BVisualWorldPresentationSmokeTest = require(script.Parent.Tests.Phase6BVisualWorldPresentationSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -272,7 +273,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, and Phase 6A services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, and Phase 6B services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -610,6 +611,13 @@ if RunService:IsStudio() then
 		WorldRegistryService = WorldRegistryService,
 	})
 	table.insert(passedSmokeTests, "Phase6APlayerFacingUISmokeTest")
+
+	Phase6BVisualWorldPresentationSmokeTest.Run({
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+		PromptBindingService = PromptBindingService,
+	})
+	table.insert(passedSmokeTests, "Phase6BVisualWorldPresentationSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

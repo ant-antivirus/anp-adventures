@@ -49,6 +49,12 @@ Validation rules:
 - Client UI must not complete objectives, grant rewards, mutate inventory, or save/load data.
 - No RemoteFunction is used for UI state.
 
+## Skeleton World Presentation Contract
+
+Phase 6B world presentation is decorative only. `SkeletonWorldBuilder` may create zone platforms, route strips, marker adornments, and simple landmarks, but it must preserve existing gameplay IDs, prompt binding, quest progression, rewards, save/load behavior, and server authority.
+
+Decorative parts should not block prompts or player movement during Studio playtests, and the compact Q1-Q8 route must remain fast to traverse.
+
 ### PlayerRef
 
 Used by all player-facing methods.

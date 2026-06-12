@@ -118,6 +118,8 @@ Phase 5D adds canary UserId gating and pilot diagnostics so real Studio DataStor
 
 Phase 6A polishes the player-facing quest tracker, feedback notifications, and Episode Complete banner. These UI elements are display-only and must not decide quest progress, rewards, inventory, or save/load state.
 
+Phase 6B improves the Studio skeleton world with MVP decorative zone identity, route strips, marker presentation, and simple landmarks. This remains developer/playtest scaffolding and must not change quest IDs, objective IDs, interaction IDs, rewards, save/load behavior, or progression logic.
+
 ---
 
 ## Badge System

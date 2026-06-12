@@ -17,6 +17,7 @@ local REQUIRED_FOLDERS = {
 	"InteractionPoints",
 	"DiscoveryPoints",
 	"NPCMarkers",
+	"WorldPresentation",
 }
 
 local DEVELOPER_LABEL_NAME = "ANP_DeveloperLabel"
@@ -38,6 +39,65 @@ local PLACEHOLDER_COLORS = {
 	ZoneTravel = Color3.fromRGB(170, 110, 245),
 	NPCMarker = Color3.fromRGB(245, 145, 65),
 	SpawnPoint = Color3.fromRGB(245, 245, 245),
+}
+
+local ZONE_PRESENTATION = {
+	zone_ep01_command_center = {
+		Name = "Command Center",
+		BaseColor = Color3.fromRGB(210, 232, 255),
+		AccentColor = Color3.fromRGB(76, 151, 255),
+		Material = Enum.Material.SmoothPlastic,
+		Width = 108,
+		Depth = 23,
+	},
+	zone_ep01_universe_explorer = {
+		Name = "Universe Explorer",
+		BaseColor = Color3.fromRGB(38, 34, 72),
+		AccentColor = Color3.fromRGB(116, 89, 255),
+		Material = Enum.Material.Neon,
+		Width = 108,
+		Depth = 54,
+	},
+	zone_ep01_terrain_sandbox = {
+		Name = "Terrain Sandbox",
+		BaseColor = Color3.fromRGB(112, 158, 91),
+		AccentColor = Color3.fromRGB(205, 176, 105),
+		Material = Enum.Material.Grass,
+		Width = 108,
+		Depth = 23,
+	},
+	zone_ep01_theos_satellite_center = {
+		Name = "THEOS Satellite Center",
+		BaseColor = Color3.fromRGB(214, 222, 226),
+		AccentColor = Color3.fromRGB(117, 188, 230),
+		Material = Enum.Material.Metal,
+		Width = 108,
+		Depth = 23,
+	},
+	zone_ep01_rocket_mission = {
+		Name = "Rocket Mission",
+		BaseColor = Color3.fromRGB(92, 92, 96),
+		AccentColor = Color3.fromRGB(255, 128, 70),
+		Material = Enum.Material.Concrete,
+		Width = 108,
+		Depth = 23,
+	},
+	zone_ep01_astronaut_training = {
+		Name = "Astronaut Training",
+		BaseColor = Color3.fromRGB(216, 238, 250),
+		AccentColor = Color3.fromRGB(70, 170, 255),
+		Material = Enum.Material.SmoothPlastic,
+		Width = 108,
+		Depth = 23,
+	},
+	zone_ep01_moon_walk = {
+		Name = "Moon Walk",
+		BaseColor = Color3.fromRGB(176, 178, 184),
+		AccentColor = Color3.fromRGB(255, 232, 132),
+		Material = Enum.Material.Slate,
+		Width = 124,
+		Depth = 25,
+	},
 }
 
 local CHARACTER_FRIENDLY_NAMES = {
@@ -672,6 +732,32 @@ local function createPart(folder, name, position, size, color, transparency)
 	return part
 end
 
+local function getOrCreateVisualPart(folder, name, position, size, color, transparency, material, shape)
+	local part = folder:FindFirstChild(name)
+	if not part or not part:IsA("BasePart") then
+		if part then
+			part:Destroy()
+		end
+		part = Instance.new("Part")
+		part.Name = name
+		part.Parent = folder
+	end
+
+	part.Anchored = true
+	part.CanCollide = false
+	part.CanTouch = false
+	part.CanQuery = false
+	part.Size = size
+	part.Position = position
+	part.Color = color
+	part.Transparency = transparency or 0
+	part.Material = material or Enum.Material.SmoothPlastic
+	if shape then
+		part.Shape = shape
+	end
+	return part
+end
+
 local function setAttributes(instance, attributes)
 	for attributeName, value in pairs(attributes) do
 		instance:SetAttribute(attributeName, value)
@@ -815,6 +901,152 @@ local function getOrCreatePartByAttribute(folder, attributeName, value, name, po
 	return object
 end
 
+local function clearPresentationChildren(container)
+	for _, child in ipairs(container:GetChildren()) do
+		child:Destroy()
+	end
+end
+
+local function createZonePresentation(presentationFolder, zoneId)
+	local zonePresentation = ZONE_PRESENTATION[zoneId]
+	if not zonePresentation then
+		return
+	end
+
+	local zoneFolder = getOrCreateFolder(presentationFolder, zoneId)
+	clearPresentationChildren(zoneFolder)
+
+	local zonePosition = getZoneTrackPosition(zoneId)
+	local platformPosition = Vector3.new(TRACK_ORIGIN.X + 36, 0.15, zonePosition.Z)
+	getOrCreateVisualPart(
+		zoneFolder,
+		"PresentationPlatform",
+		platformPosition,
+		Vector3.new(zonePresentation.Width, 0.3, zonePresentation.Depth),
+		zonePresentation.BaseColor,
+		0.12,
+		zonePresentation.Material
+	)
+
+	getOrCreateVisualPart(
+		zoneFolder,
+		"RouteStripe",
+		Vector3.new(platformPosition.X, 0.36, platformPosition.Z),
+		Vector3.new(zonePresentation.Width - 8, 0.18, 2.2),
+		zonePresentation.AccentColor,
+		0.06,
+		Enum.Material.Neon
+	)
+
+	getOrCreateVisualPart(
+		zoneFolder,
+		"ZoneSignPost",
+		Vector3.new(TRACK_ORIGIN.X - 13, 3.2, zonePosition.Z - (zonePresentation.Depth / 2) + 3),
+		Vector3.new(1.2, 5.2, 1.2),
+		zonePresentation.AccentColor,
+		0.05,
+		Enum.Material.SmoothPlastic
+	)
+
+	local sign = getOrCreateVisualPart(
+		zoneFolder,
+		"ZoneSign",
+		Vector3.new(TRACK_ORIGIN.X - 13, 6.2, zonePosition.Z - (zonePresentation.Depth / 2) + 3),
+		Vector3.new(12, 2.4, 0.4),
+		zonePresentation.AccentColor,
+		0.08,
+		Enum.Material.SmoothPlastic
+	)
+	setDeveloperLabel(sign, "ZONE", zonePresentation.Name, zoneId, zonePresentation.Name)
+
+	if zoneId == "zone_ep01_command_center" then
+		getOrCreateVisualPart(zoneFolder, "ConsoleLeft", platformPosition + Vector3.new(-12, 1, -6), Vector3.new(7, 2, 3), Color3.fromRGB(70, 122, 190), 0.08, Enum.Material.Metal)
+		getOrCreateVisualPart(zoneFolder, "ConsoleRight", platformPosition + Vector3.new(12, 1, -6), Vector3.new(7, 2, 3), Color3.fromRGB(235, 245, 255), 0.08, Enum.Material.SmoothPlastic)
+	elseif zoneId == "zone_ep01_universe_explorer" then
+		for index = 1, 5 do
+			getOrCreateVisualPart(zoneFolder, "StarCue_" .. index, platformPosition + Vector3.new(-36 + (index * 14), 2.2, -18 + ((index % 2) * 8)), Vector3.new(1.4, 1.4, 1.4), Color3.fromRGB(210, 220, 255), 0.05, Enum.Material.Neon, Enum.PartType.Ball)
+		end
+	elseif zoneId == "zone_ep01_terrain_sandbox" then
+		getOrCreateVisualPart(zoneFolder, "TerrainMound", platformPosition + Vector3.new(4, 1, 6), Vector3.new(18, 2, 5), Color3.fromRGB(174, 137, 82), 0.1, Enum.Material.Sand)
+	elseif zoneId == "zone_ep01_theos_satellite_center" then
+		getOrCreateVisualPart(zoneFolder, "SatelliteMast", platformPosition + Vector3.new(-4, 4, 6), Vector3.new(1, 7, 1), Color3.fromRGB(235, 240, 242), 0.05, Enum.Material.Metal)
+		getOrCreateVisualPart(zoneFolder, "SatelliteDish", platformPosition + Vector3.new(-4, 8, 6), Vector3.new(7, 1, 7), Color3.fromRGB(145, 193, 220), 0.15, Enum.Material.Metal, Enum.PartType.Ball)
+	elseif zoneId == "zone_ep01_rocket_mission" then
+		getOrCreateVisualPart(zoneFolder, "RocketBody", platformPosition + Vector3.new(4, 5, 6), Vector3.new(3, 10, 3), Color3.fromRGB(240, 240, 240), 0.05, Enum.Material.Metal)
+		getOrCreateVisualPart(zoneFolder, "RocketNose", platformPosition + Vector3.new(4, 11, 6), Vector3.new(2.4, 2.4, 2.4), Color3.fromRGB(255, 128, 70), 0.05, Enum.Material.Neon, Enum.PartType.Ball)
+	elseif zoneId == "zone_ep01_astronaut_training" then
+		for index = 1, 3 do
+			getOrCreateVisualPart(zoneFolder, "TrainingPad_" .. index, platformPosition + Vector3.new(-14 + (index * 10), 0.65, 6), Vector3.new(6, 0.8, 6), Color3.fromRGB(70, 170, 255), 0.18, Enum.Material.SmoothPlastic)
+		end
+	elseif zoneId == "zone_ep01_moon_walk" then
+		getOrCreateVisualPart(zoneFolder, "FinalStarCoreRing", platformPosition + Vector3.new(34, 1.2, 6), Vector3.new(14, 1, 14), Color3.fromRGB(255, 232, 132), 0.2, Enum.Material.Neon)
+		getOrCreateVisualPart(zoneFolder, "MoonCrater", platformPosition + Vector3.new(-18, 0.65, 6), Vector3.new(15, 0.7, 8), Color3.fromRGB(132, 134, 142), 0.22, Enum.Material.Slate)
+	end
+end
+
+local function createQuestPathPresentation(presentationFolder)
+	local pathFolder = getOrCreateFolder(presentationFolder, "QuestPath")
+	clearPresentationChildren(pathFolder)
+
+	for questIndex = 1, 8 do
+		local questId = string.format("quest_ep01_main_%03d", questIndex)
+		local completeStepIndex = getQuestCompleteStepIndex(questId)
+		local rowZ = getQuestRowZ(questId)
+		local signPosition = Vector3.new(TRACK_ORIGIN.X - 4, 2.6, rowZ + 9)
+		local sign = getOrCreateVisualPart(
+			pathFolder,
+			"Q" .. questIndex .. "_RouteSign",
+			signPosition,
+			Vector3.new(7, 2.1, 0.5),
+			if questIndex == 8 then Color3.fromRGB(255, 232, 132) else Color3.fromRGB(95, 160, 255),
+			0.08,
+			Enum.Material.SmoothPlastic
+		)
+		setDeveloperLabel(sign, "ROUTE", "Quest " .. questIndex, questId, if questIndex == 8 then "Q8 Finale" else "Q" .. questIndex)
+
+		for stepIndex = 0, completeStepIndex - 1 do
+			local arrowPosition = getTrackPosition(questId, stepIndex, 0.7, 0) + Vector3.new(TRACK_STEP_SPACING / 2, 0, -5.5)
+			getOrCreateVisualPart(
+				pathFolder,
+				"Q" .. questIndex .. "_Arrow_" .. stepIndex,
+				arrowPosition,
+				Vector3.new(7, 0.35, 1.6),
+				if questIndex == 8 then Color3.fromRGB(255, 232, 132) else Color3.fromRGB(130, 205, 255),
+				0.14,
+				Enum.Material.Neon
+			)
+		end
+	end
+end
+
+local function createMarkerPresentation(markerPart, markerType)
+	if not markerPart or not markerPart:IsA("BasePart") then
+		return
+	end
+
+	local presentation = getOrCreateFolder(markerPart, "Presentation")
+	clearPresentationChildren(presentation)
+
+	if markerType == "QuestStart" then
+		getOrCreateVisualPart(presentation, "Beacon", markerPart.Position + Vector3.new(0, 4.2, 0), Vector3.new(2, 5, 2), PLACEHOLDER_COLORS.QuestStart, 0.14, Enum.Material.Neon)
+		getOrCreateVisualPart(presentation, "BasePad", markerPart.Position + Vector3.new(0, -3.1, 0), Vector3.new(10, 0.4, 10), PLACEHOLDER_COLORS.QuestStart, 0.2, Enum.Material.SmoothPlastic)
+	elseif markerType == "QuestComplete" then
+		getOrCreateVisualPart(presentation, "FinishBeacon", markerPart.Position + Vector3.new(0, 4.5, 0), Vector3.new(3, 6, 3), PLACEHOLDER_COLORS.QuestComplete, 0.08, Enum.Material.Neon)
+		getOrCreateVisualPart(presentation, "FinishPad", markerPart.Position + Vector3.new(0, -3.1, 0), Vector3.new(12, 0.4, 12), PLACEHOLDER_COLORS.QuestComplete, 0.18, Enum.Material.SmoothPlastic)
+	elseif markerType == "QuestObjective" then
+		getOrCreateVisualPart(presentation, "ObjectivePad", markerPart.Position + Vector3.new(0, -3.1, 0), Vector3.new(9, 0.35, 9), PLACEHOLDER_COLORS.QuestObjective, 0.22, Enum.Material.SmoothPlastic)
+		getOrCreateVisualPart(presentation, "ObjectCore", markerPart.Position + Vector3.new(0, 3.6, 0), Vector3.new(2.6, 2.6, 2.6), PLACEHOLDER_COLORS.QuestObjective, 0.1, Enum.Material.Neon, Enum.PartType.Ball)
+	elseif markerType == "Discovery" then
+		getOrCreateVisualPart(presentation, "DiscoverySpark", markerPart.Position + Vector3.new(0, 3.6, 0), Vector3.new(2.2, 2.2, 2.2), PLACEHOLDER_COLORS.Discovery, 0.05, Enum.Material.Neon, Enum.PartType.Ball)
+	elseif markerType == "ZoneTravel" then
+		getOrCreateVisualPart(presentation, "PortalPad", markerPart.Position + Vector3.new(0, -3.1, 0), Vector3.new(10, 0.35, 10), PLACEHOLDER_COLORS.ZoneTravel, 0.18, Enum.Material.Neon)
+		getOrCreateVisualPart(presentation, "PortalFrame", markerPart.Position + Vector3.new(0, 4, 0), Vector3.new(6, 6, 1), PLACEHOLDER_COLORS.ZoneTravel, 0.24, Enum.Material.Neon)
+	elseif markerType == "NPCMarker" then
+		getOrCreateVisualPart(presentation, "GuideStand", markerPart.Position + Vector3.new(0, -3.1, 0), Vector3.new(6, 0.4, 6), PLACEHOLDER_COLORS.NPCMarker, 0.18, Enum.Material.SmoothPlastic)
+		getOrCreateVisualPart(presentation, "GuideHead", markerPart.Position + Vector3.new(0, 4.1, 0), Vector3.new(2, 2, 2), PLACEHOLDER_COLORS.NPCMarker, 0.08, Enum.Material.Neon, Enum.PartType.Ball)
+	end
+end
+
 local function questFriendlyName(questId)
 	local questNumber = string.match(questId or "", "main_(%d+)")
 	if questNumber then
@@ -922,6 +1154,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 				ZoneId = zoneId,
 			}
 		)
+		createZonePresentation(folders.WorldPresentation, zoneId)
 
 		for spawnIndex, spawnPointId in ipairs((ZoneDefinitions[zoneId] and ZoneDefinitions[zoneId].SpawnPoints) or {}) do
 			local spawnObject = getOrCreatePartByAttribute(
@@ -945,8 +1178,11 @@ function SkeletonWorldBuilder.BuildIfMissing()
 				spawnPointId,
 				"Spawn " .. getZoneShortName(zoneId)
 			)
+			createMarkerPresentation(spawnObject, "SpawnPoint")
 		end
 	end
+
+	createQuestPathPresentation(folders.WorldPresentation)
 
 	for index, discovery in ipairs(MINIMUM_DISCOVERY_POINTS) do
 		local discoveryObject = getOrCreatePartByAttribute(
@@ -967,6 +1203,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			discovery.DiscoveryId,
 			DISCOVERY_FRIENDLY_NAMES[discovery.DiscoveryId] or "Discovery"
 		)
+		createMarkerPresentation(discoveryObject, "Discovery")
 	end
 
 	for index, interaction in ipairs(MINIMUM_INTERACTION_POINTS) do
@@ -989,6 +1226,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			interaction.InteractionId,
 			getCompactInteractionLabel(interaction, getInteractionFriendlyName(interaction))
 		)
+		createMarkerPresentation(interactionObject, interaction.Type)
 	end
 
 	for index, marker in ipairs(NPC_MARKERS) do
@@ -1010,6 +1248,7 @@ function SkeletonWorldBuilder.BuildIfMissing()
 			marker.InteractionId,
 			"NPC " .. (CHARACTER_FRIENDLY_NAMES[marker.CharacterId] or marker.CharacterId)
 		)
+		createMarkerPresentation(markerObject, "NPCMarker")
 	end
 
 	return result(true, "SkeletonWorldBuilt", nil, {

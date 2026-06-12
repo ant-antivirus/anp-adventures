@@ -4,7 +4,7 @@
 
 ANP Adventures is a family-friendly Roblox adventure prototype where players explore, discover, and learn through story-driven quests.
 
-Current focus: Episode 1 playable prototype with minimal player feedback and quest tracker UI.
+Current focus: Episode 1 playable prototype with player feedback, quest tracker UI, and MVP skeleton-world presentation.
 
 ## Current Status
 
@@ -23,6 +23,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 - Phase 5C controlled live persistence pilot implemented
 - Phase 5D Studio DataStore pilot safety polish implemented
 - Phase 6A player-facing UI polish implemented
+- Phase 6B EP1 visual world presentation pass implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 
@@ -48,6 +49,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 [ANP Phase5CControlledPersistencePilotSmokeTest] Phase 5C controlled persistence pilot smoke test passed.
 [ANP Phase5DStudioDataStorePilotSafetySmokeTest] Phase 5D Studio DataStore pilot safety smoke test passed.
 [ANP Phase6APlayerFacingUISmokeTest] Phase 6A player-facing UI smoke test passed.
+[ANP Phase6BVisualWorldPresentationSmokeTest] Phase 6B visual world presentation smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -64,7 +66,7 @@ Phase 6A polishes the display-only tracker, notification stack, and Episode Comp
 
 The current Studio skeleton world uses a compact developer test-track layout for faster Episode 1 playtesting. Quest markers are arranged in short rows from start to objectives to completion.
 
-This is not final world art. IDs and progression logic remain unchanged.
+Phase 6B adds simple decorative zone platforms, route strips, marker presentation parts, and lightweight landmarks. This is not final world art. IDs and progression logic remain unchanged.
 
 Dev labels are compact and configurable so the test track remains readable without covering nearby objects.
 
@@ -73,6 +75,8 @@ Dev labels are compact and configurable so the test track remains readable witho
 Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 playtest pass.
 
 Use `docs/EP1_UI_PLAYTEST_CHECKLIST.md` for the Phase 6A UI presentation pass.
+
+Use `docs/EP1_WORLD_PRESENTATION_CHECKLIST.md` for the Phase 6B skeleton-world presentation pass.
 
 ## Save Readiness
 
