@@ -74,7 +74,7 @@ Validation rules:
 ### Responsibilities
 
 - Own in-memory player data sessions.
-- In Phase 5A, support server-side save payload apply/read hooks for mock persistence tests.
+- Support server-side save payload apply/read hooks for persistence services.
 - Create default player data for new players.
 - Validate loaded data.
 - Apply schema migrations.
@@ -178,7 +178,60 @@ Validation rules:
 - Must serialize valid data only.
 - Must apply retry policy for transient DataStore failures.
 
-Phase 5A note: `SaveNow` is a future contract. Current tests use `SaveService.SavePlayerToMock`.
+Phase 5B note: Real save calls are routed through `SaveService` and are disabled by default unless `PersistenceConfig` enables lifecycle persistence.
+
+## SaveService
+
+### Responsibilities
+
+- Build server-owned save payloads.
+- Validate save payloads before persistence or apply.
+- Route saves to mock or DataStore adapters based on `PersistenceConfig`.
+- Keep client code out of save/load decisions.
+- Block saves after real DataStore load failure by default.
+
+### Public Methods
+
+#### `BuildSave`
+
+Inputs:
+
+- `PlayerRef`.
+
+Outputs:
+
+- Validated save payload.
+
+#### `SavePlayer`
+
+Inputs:
+
+- `PlayerRef`.
+
+Outputs:
+
+- Save result from the active adapter.
+
+Validation rules:
+
+- Must build and validate payload before adapter write.
+- Must not save after failed real persistence load unless config explicitly allows it.
+
+#### `LoadPlayer`
+
+Inputs:
+
+- `PlayerRef`.
+
+Outputs:
+
+- Load/apply result from the active adapter.
+
+Validation rules:
+
+- Must validate payload before applying.
+- Missing save keeps default data.
+- Real load failure marks the session unsafe for later save by default.
 
 #### `IsLoaded`
 

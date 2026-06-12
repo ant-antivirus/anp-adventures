@@ -110,6 +110,8 @@ Phase 4E adds an EP1 MVP QA pass, compact configurable developer labels, a full 
 
 Phase 5A adds save-readiness coverage for Episode 1 player progression. It validates that EP1 quest, inventory, discovery, journal, and episode state can round-trip through a server-owned mock save payload without enabling live persistence.
 
+Phase 5B adds a server-side DataStore adapter behind config. Real persistence remains disabled by default during development, and clients never send save payloads or decide save timing.
+
 ---
 
 ## Badge System

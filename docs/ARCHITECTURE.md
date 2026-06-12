@@ -47,6 +47,12 @@ Phase 5A adds a versioned save schema, server-side serialization and validation,
 
 `SaveService` is the server-only facade. Future persistence adapters should sit behind that facade without changing quest, reward, discovery, inventory, or episode authority.
 
+## Phase 5B DataStore Adapter
+
+Phase 5B adds `DataStorePersistenceService` behind `SaveService`. Real persistence is disabled by default through `PersistenceConfig`, and Studio continues to use mock persistence unless explicitly configured.
+
+Load/save lifecycle hooks, autosave, and shutdown flush are config-gated. If a real DataStore load fails, the session is marked unsafe to save by default so default data cannot overwrite an existing cloud save.
+
 ## Recommended Folder Structure
 
 ```text

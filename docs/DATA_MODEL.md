@@ -8,7 +8,7 @@ This document does not define quest content, puzzle design, dialogue, or story d
 
 ## Data Ownership
 
-Persistent player data is owned by `PlayerDataService`. Phase 5A adds save serialization and mock persistence only; real Roblox persistence is planned for a later phase.
+Persistent player data is owned by `PlayerDataService`. Phase 5B adds a Roblox DataStore adapter, but real load/save is disabled by default and controlled through `PersistenceConfig`.
 
 Other services may read or request mutations through service APIs, but they should not write directly to persistence adapters.
 
@@ -410,6 +410,8 @@ This metadata supports balancing, diagnostics, and future tuning while preservin
 ## DataStore Strategy
 
 Phase 5A does not enable real saves. `SaveSerializationService`, `MockPersistenceService`, and `SaveService` exist to validate payload shape and prove round-trip behavior before live persistence is introduced.
+
+Phase 5B adds `DataStorePersistenceService`, but lifecycle load/save hooks remain disabled unless config explicitly enables them. Load failures must not autosave default data over an existing cloud save.
 
 Recommended save key:
 

@@ -57,14 +57,35 @@ Runtime-only state is excluded:
 
 ## Future Phase 5B
 
-Phase 5B can add a real persistence adapter behind `SaveService`.
+Phase 5B adds a real persistence adapter behind `SaveService`, but keeps it disabled by default.
 
-Planned work:
+Implemented adapter readiness:
 
-- Real Roblox save adapter.
-- Load on player join.
-- Save on player leaving.
-- Autosave interval.
-- Retry and backoff policy.
+- `PersistenceConfig` controls real persistence, lifecycle hooks, autosave, and shutdown save.
+- `DataStorePersistenceService` wraps Roblox `DataStoreService` with bounded retry/backoff.
+- `SaveService` selects mock or DataStore adapter from config.
+- Default Studio behavior remains mock-only.
+- Load failure blocks later saves by default so default data does not overwrite an existing cloud save.
+
+Default disabled settings:
+
+- `EnableRealDataStore = false`
+- `EnableLoadOnPlayerAdded = false`
+- `EnableSaveOnPlayerRemoving = false`
+- `EnableBindToCloseSave = false`
+- `EnableAutosave = false`
+
+Optional live testing later:
+
+1. Enable Studio API access in Roblox Studio game settings if needed.
+2. Set `EnableRealDataStore = true`.
+3. Set `EnableLoadOnPlayerAdded = true`.
+4. Set `EnableSaveOnPlayerRemoving = true`.
+5. Test with a controlled account before production data.
+
+Future hardening:
+
 - Migration handling.
+- Save budgeting and telemetry.
 - Rollback and recovery tests.
+- Production rollout checklist.

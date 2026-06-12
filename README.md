@@ -19,7 +19,9 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 - Phase 4D compact skeleton quest test track implemented
 - Phase 4E EP1 MVP QA pass implemented
 - Phase 5A save readiness foundation implemented
-- Studio verification pending for Phase 5A
+- Phase 5B safe DataStore adapter implemented
+- Real DataStore persistence disabled by default
+- Studio verification pending for Phase 5B
 
 ## How To Run
 
@@ -39,6 +41,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 [ANP Phase4CQuestTrackerSmokeTest] Phase 4C quest tracker smoke test passed.
 [ANP Phase4EFullEP1MvpSmokeTest] Phase 4E full EP1 MVP smoke test passed.
 [ANP Phase5ASaveReadinessSmokeTest] Phase 5A save readiness smoke test passed.
+[ANP Phase5BDataStoreAdapterSmokeTest] Phase 5B DataStore adapter smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -64,6 +67,8 @@ Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 play
 ## Save Readiness
 
 Phase 5A adds save schema, serialization, validation, and mock in-memory persistence for tests. It does not use real Roblox persistence and does not autosave live players yet.
+
+Phase 5B adds a server-side DataStore adapter behind config. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
 
 See `docs/SAVE_SYSTEM_PLAN.md`.
 
