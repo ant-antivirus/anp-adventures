@@ -1,5 +1,7 @@
 local SaveService = {}
 
+local Logger = require(script.Parent.Parent.Utils.Logger)
+
 local saveSerializationService = nil
 local mockPersistenceService = nil
 local dataStorePersistenceService = nil
@@ -23,6 +25,10 @@ local function cloneConfig(config)
 	return clonedConfig
 end
 
+local function getTime()
+	return os.time()
+end
+
 local function getUserId(player)
 	if type(player) == "table" then
 		return player.UserId
@@ -32,15 +38,37 @@ local function getUserId(player)
 end
 
 local function getActiveAdapter()
-	if persistenceConfig and persistenceConfig.EnableRealDataStore == true then
+	if persistenceConfig and persistenceConfig.EnableRealDataStore == true and persistenceConfig.PersistenceMode ~= "Mock" then
 		return dataStorePersistenceService, "DataStorePersistenceService"
 	end
 
 	return mockPersistenceService, "MockPersistenceService"
 end
 
+local function logPersistence(message)
+	if persistenceConfig and persistenceConfig.DebugLogs == false then
+		return
+	end
+
+	Logger.Info("Persistence", message)
+end
+
 local function setPersistenceState(userId, patch)
 	local state = persistenceStateByUserId[userId] or {
+		UserId = userId,
+		AdapterName = SaveService.GetActiveAdapterName(),
+		LoadAttempted = false,
+		LoadSucceeded = false,
+		LoadFailed = false,
+		SaveAttempted = false,
+		LastSaveSucceeded = false,
+		LastSaveFailed = false,
+		UsingDefaultData = true,
+		SaveBlockedReason = nil,
+		LastLoadCode = nil,
+		LastSaveCode = nil,
+		LastLoadTime = nil,
+		LastSaveTime = nil,
 		PersistenceLoadAttempted = false,
 		PersistenceLoadSucceeded = false,
 		PersistenceLoadFailed = false,
@@ -57,6 +85,20 @@ end
 
 local function getPersistenceState(userId)
 	return persistenceStateByUserId[userId] or {
+		UserId = userId,
+		AdapterName = SaveService.GetActiveAdapterName(),
+		LoadAttempted = false,
+		LoadSucceeded = false,
+		LoadFailed = false,
+		SaveAttempted = false,
+		LastSaveSucceeded = false,
+		LastSaveFailed = false,
+		UsingDefaultData = true,
+		SaveBlockedReason = nil,
+		LastLoadCode = nil,
+		LastSaveCode = nil,
+		LastLoadTime = nil,
+		LastSaveTime = nil,
 		PersistenceLoadAttempted = false,
 		PersistenceLoadSucceeded = false,
 		PersistenceLoadFailed = false,
@@ -73,6 +115,23 @@ function SaveService.Init(dependencies)
 	assert(saveSerializationService, "SaveService requires SaveSerializationService.")
 	assert(mockPersistenceService, "SaveService requires MockPersistenceService.")
 	assert(dataStorePersistenceService, "SaveService requires DataStorePersistenceService.")
+
+	if dependencies.PersistenceConfig and type(dependencies.PersistenceConfig.Validate) == "function" then
+		local validationResult = dependencies.PersistenceConfig.Validate(persistenceConfig)
+		if not validationResult.Success then
+			Logger.Warn("Persistence", "Invalid persistence config: " .. table.concat(validationResult.Errors, ", "))
+		end
+		for _, warningCode in ipairs(validationResult.Warnings or {}) do
+			Logger.Warn("Persistence", "Persistence config warning: " .. warningCode)
+		end
+	end
+
+	local _, adapterName = getActiveAdapter()
+	logPersistence(
+		"mode=" .. tostring(persistenceConfig.PersistenceMode or "Mock")
+			.. " adapter=" .. adapterName
+			.. " realDataStore=" .. tostring(persistenceConfig.EnableRealDataStore == true)
+	)
 end
 
 function SaveService.BuildSave(player)
@@ -101,13 +160,26 @@ function SaveService.SavePlayer(player)
 	local adapter, adapterName = getActiveAdapter()
 	local userId = getUserId(player)
 	local state = getPersistenceState(userId)
+	setPersistenceState(userId, {
+		AdapterName = adapterName,
+		SaveAttempted = true,
+		LastSaveTime = getTime(),
+	})
 	if adapterName == "DataStorePersistenceService"
-		and state.PersistenceLoadFailed == true
+		and (state.LoadFailed == true or state.PersistenceLoadFailed == true)
 		and not (persistenceConfig and persistenceConfig.AllowSaveAfterLoadFailure == true)
 	then
-		return result(false, "PersistenceLoadFailedSaveBlocked", "Save skipped because persistence load failed for this session.", {
+		local blockedResult = result(false, "SaveBlockedAfterLoadFailure", "Save skipped because persistence load failed for this session.", {
 			UserId = userId,
 		})
+		setPersistenceState(userId, {
+			LastSaveSucceeded = false,
+			LastSaveFailed = true,
+			SaveBlockedReason = blockedResult.Code,
+			LastSaveCode = blockedResult.Code,
+		})
+		logPersistence("Save skipped for " .. tostring(player.Name or userId) .. " reason=LoadFailedOverwriteProtection")
+		return blockedResult
 	end
 
 	local validationResult = saveSerializationService.ValidateSavePayload(payloadResult.Data)
@@ -117,9 +189,21 @@ function SaveService.SavePlayer(player)
 
 	local saveResult = adapter.SaveAsync(userId, payloadResult.Data)
 	if not saveResult.Success then
+		setPersistenceState(userId, {
+			LastSaveSucceeded = false,
+			LastSaveFailed = true,
+			LastSaveCode = saveResult.Code,
+		})
 		return saveResult
 	end
 
+	setPersistenceState(userId, {
+		LastSaveSucceeded = true,
+		LastSaveFailed = false,
+		SaveBlockedReason = nil,
+		LastSaveCode = saveResult.Code,
+	})
+	logPersistence("Save success for " .. tostring(player.Name or userId) .. " code=" .. tostring(saveResult.Code))
 	return result(true, "PlayerSaved", nil, {
 		UserId = userId,
 		AdapterName = adapterName,
@@ -130,6 +214,13 @@ function SaveService.LoadPlayer(player)
 	local adapter, adapterName = getActiveAdapter()
 	local userId = getUserId(player)
 	setPersistenceState(userId, {
+		UserId = userId,
+		AdapterName = adapterName,
+		LoadAttempted = true,
+		LoadSucceeded = false,
+		LoadFailed = false,
+		UsingDefaultData = true,
+		LastLoadTime = getTime(),
 		PersistenceLoadAttempted = true,
 		PersistenceLoadSucceeded = false,
 		PersistenceLoadFailed = false,
@@ -139,17 +230,28 @@ function SaveService.LoadPlayer(player)
 	local loadResult = adapter.LoadAsync(userId)
 	if not loadResult.Success then
 		setPersistenceState(userId, {
+			LoadFailed = true,
+			LoadSucceeded = false,
+			UsingDefaultData = true,
+			SaveBlockedReason = "LoadFailedOverwriteProtection",
+			LastLoadCode = loadResult.Code,
 			PersistenceLoadFailed = true,
 			PersistenceUsingDefaultData = true,
 		})
+		logPersistence("Load failed for " .. tostring(player.Name or userId) .. " code=" .. tostring(loadResult.Code) .. " saveBlocked=true")
 		return loadResult
 	end
 
 	if loadResult.Code == "SaveNotFound" or loadResult.Data == nil then
 		setPersistenceState(userId, {
+			LoadSucceeded = true,
+			LoadFailed = false,
+			UsingDefaultData = true,
+			LastLoadCode = loadResult.Code,
 			PersistenceLoadSucceeded = true,
 			PersistenceUsingDefaultData = true,
 		})
+		logPersistence("Load missing for " .. tostring(player.Name or userId) .. ": using default data")
 		return result(true, "PlayerSaveNotFound", nil, {
 			UserId = userId,
 			AdapterName = adapterName,
@@ -159,6 +261,11 @@ function SaveService.LoadPlayer(player)
 	local validationResult = saveSerializationService.ValidateSavePayload(loadResult.Data)
 	if not validationResult.Success then
 		setPersistenceState(userId, {
+			LoadFailed = true,
+			LoadSucceeded = false,
+			UsingDefaultData = true,
+			SaveBlockedReason = "LoadValidationFailed",
+			LastLoadCode = validationResult.Code,
 			PersistenceLoadFailed = true,
 			PersistenceUsingDefaultData = true,
 		})
@@ -168,6 +275,11 @@ function SaveService.LoadPlayer(player)
 	local applyResult = saveSerializationService.ApplySavePayload(player, loadResult.Data)
 	if not applyResult.Success then
 		setPersistenceState(userId, {
+			LoadFailed = true,
+			LoadSucceeded = false,
+			UsingDefaultData = true,
+			SaveBlockedReason = "LoadApplyFailed",
+			LastLoadCode = applyResult.Code,
 			PersistenceLoadFailed = true,
 			PersistenceUsingDefaultData = true,
 		})
@@ -175,9 +287,15 @@ function SaveService.LoadPlayer(player)
 	end
 
 	setPersistenceState(userId, {
+		LoadSucceeded = true,
+		LoadFailed = false,
+		UsingDefaultData = false,
+		SaveBlockedReason = nil,
+		LastLoadCode = loadResult.Code,
 		PersistenceLoadSucceeded = true,
 		PersistenceUsingDefaultData = false,
 	})
+	logPersistence("Load success for " .. tostring(player.Name or userId) .. " code=" .. tostring(loadResult.Code))
 	return result(true, "PlayerLoaded", nil, {
 		UserId = userId,
 		AdapterName = adapterName,

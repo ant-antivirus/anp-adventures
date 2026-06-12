@@ -112,6 +112,8 @@ Phase 5A adds save-readiness coverage for Episode 1 player progression. It valid
 
 Phase 5B adds a server-side DataStore adapter behind config. Real persistence remains disabled by default during development, and clients never send save payloads or decide save timing.
 
+Phase 5C adds a controlled Studio DataStore pilot profile. The default mode remains mock-only; pilot testing must explicitly enable the Studio pilot mode and should use the separate pilot DataStore name.
+
 ---
 
 ## Badge System

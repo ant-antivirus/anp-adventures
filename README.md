@@ -20,8 +20,9 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 - Phase 4E EP1 MVP QA pass implemented
 - Phase 5A save readiness foundation implemented
 - Phase 5B safe DataStore adapter implemented
+- Phase 5C controlled live persistence pilot implemented
 - Real DataStore persistence disabled by default
-- Studio verification pending for Phase 5B
+- Mock persistence remains the default Studio mode
 
 ## How To Run
 
@@ -42,6 +43,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 [ANP Phase4EFullEP1MvpSmokeTest] Phase 4E full EP1 MVP smoke test passed.
 [ANP Phase5ASaveReadinessSmokeTest] Phase 5A save readiness smoke test passed.
 [ANP Phase5BDataStoreAdapterSmokeTest] Phase 5B DataStore adapter smoke test passed.
+[ANP Phase5CControlledPersistencePilotSmokeTest] Phase 5C controlled persistence pilot smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -68,9 +70,9 @@ Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 play
 
 Phase 5A adds save schema, serialization, validation, and mock in-memory persistence for tests. It does not use real Roblox persistence and does not autosave live players yet.
 
-Phase 5B adds a server-side DataStore adapter behind config. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
+Phase 5B adds a server-side DataStore adapter behind config. Phase 5C adds persistence mode validation, pilot DataStore naming, session diagnostics, and a runbook for controlled Studio API testing. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
 
-See `docs/SAVE_SYSTEM_PLAN.md`.
+See `docs/SAVE_SYSTEM_PLAN.md` and `docs/DATASTORE_PILOT_RUNBOOK.md`.
 
 ## Logging
 
@@ -82,7 +84,7 @@ Use Verbose mode for deeper debugging when detailed analytics and prompt success
 
 ## Current Non-Goals
 
-- No DataStore persistence
+- No production DataStore persistence enabled by default
 - No RemoteFunctions
 - No Marketplace / monetization
 - No trading

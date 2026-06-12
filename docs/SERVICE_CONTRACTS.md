@@ -180,6 +180,8 @@ Validation rules:
 
 Phase 5B note: Real save calls are routed through `SaveService` and are disabled by default unless `PersistenceConfig` enables lifecycle persistence.
 
+Phase 5C note: `PersistenceConfig.Validate` must reject unsafe DataStore mode combinations before live lifecycle hooks are used.
+
 ## SaveService
 
 ### Responsibilities
@@ -189,6 +191,7 @@ Phase 5B note: Real save calls are routed through `SaveService` and are disabled
 - Route saves to mock or DataStore adapters based on `PersistenceConfig`.
 - Keep client code out of save/load decisions.
 - Block saves after real DataStore load failure by default.
+- Track server-only persistence session diagnostics for load/save attempts, result codes, timestamps, default-data use, and blocked-save reasons.
 
 ### Public Methods
 

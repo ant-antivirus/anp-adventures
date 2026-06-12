@@ -23,7 +23,15 @@ local function cloneConfig(sourceConfig)
 	clonedConfig.BaseRetryDelaySeconds = clonedConfig.BaseRetryDelaySeconds or 1
 	clonedConfig.MaxRetryDelaySeconds = clonedConfig.MaxRetryDelaySeconds or 8
 	clonedConfig.KeyPrefix = clonedConfig.KeyPrefix or "player_"
-	clonedConfig.DataStoreName = clonedConfig.DataStoreName or "ANPAdventures_PlayerData_v1"
+	if type(sourceConfig) == "table" and type(sourceConfig.GetDataStoreName) == "function" then
+		clonedConfig.DataStoreName = sourceConfig.GetDataStoreName(clonedConfig)
+	elseif clonedConfig.PersistenceMode == "StudioDataStorePilot" then
+		clonedConfig.DataStoreName = clonedConfig.StudioPilotDataStoreName
+	elseif clonedConfig.PersistenceMode == "ProductionDataStore" then
+		clonedConfig.DataStoreName = clonedConfig.ProductionDataStoreName
+	else
+		clonedConfig.DataStoreName = clonedConfig.DataStoreName or clonedConfig.MockDataStoreName or "Mock"
+	end
 	return clonedConfig
 end
 
@@ -72,6 +80,10 @@ function DataStorePersistenceService.Init(initConfig, dependencies)
 
 	local dataStoreService = game:GetService("DataStoreService")
 	dataStore = dataStoreService:GetDataStore(config.DataStoreName)
+end
+
+function DataStorePersistenceService.GetDataStoreName()
+	return config and config.DataStoreName or nil
 end
 
 function DataStorePersistenceService.GetKey(userId)
@@ -142,7 +154,7 @@ function DataStorePersistenceService.LoadAsync(userId)
 end
 
 function DataStorePersistenceService.ClearAsync(userId)
-	if not config or config.AllowDevClear ~= true then
+	if not config or (config.AllowDevClear ~= true and config.AllowDestructiveClear ~= true) then
 		return result(false, "DataStoreClearDisabled", "DataStore clear is disabled by config.")
 	end
 

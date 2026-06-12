@@ -56,6 +56,7 @@ local Phase4CQuestTrackerSmokeTest = require(script.Parent.Tests.Phase4CQuestTra
 local Phase4EFullEP1MvpSmokeTest = require(script.Parent.Tests.Phase4EFullEP1MvpSmokeTest)
 local Phase5ASaveReadinessSmokeTest = require(script.Parent.Tests.Phase5ASaveReadinessSmokeTest)
 local Phase5BDataStoreAdapterSmokeTest = require(script.Parent.Tests.Phase5BDataStoreAdapterSmokeTest)
+local Phase5CControlledPersistencePilotSmokeTest = require(script.Parent.Tests.Phase5CControlledPersistencePilotSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -122,6 +123,16 @@ PlayerFeedbackService.Init()
 SaveSerializationService.Init({
 	PlayerDataService = PlayerDataService,
 })
+
+local persistenceConfigValidation = PersistenceConfig.Validate(PersistenceConfig)
+if not persistenceConfigValidation.Success then
+	warn("[ANP Persistence] Invalid persistence config: " .. table.concat(persistenceConfigValidation.Errors, ", "))
+else
+	Logger.Info("Persistence", "mode=" .. tostring(PersistenceConfig.PersistenceMode) .. " adapter=" .. (PersistenceConfig.EnableRealDataStore and "DataStorePersistenceService" or "MockPersistenceService") .. " realDataStore=" .. tostring(PersistenceConfig.EnableRealDataStore == true))
+end
+for _, warningCode in ipairs(persistenceConfigValidation.Warnings or {}) do
+	warn("[ANP Persistence] Config warning: " .. warningCode)
+end
 
 if PersistenceConfig.EnableRealDataStore == true then
 	DataStorePersistenceService.Init(PersistenceConfig)
@@ -241,7 +252,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, and Phase 5B services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, and Phase 5C services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -534,6 +545,22 @@ if RunService:IsStudio() then
 	})
 	table.insert(passedSmokeTests, "Phase5BDataStoreAdapterSmokeTest")
 
+	Phase5CControlledPersistencePilotSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		SaveService = SaveService,
+		SaveSerializationService = SaveSerializationService,
+		MockPersistenceService = MockPersistenceService,
+		DataStorePersistenceService = DataStorePersistenceService,
+		PersistenceConfig = PersistenceConfig,
+		PromptBindingService = PromptBindingService,
+		QuestService = QuestService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase5CControlledPersistencePilotSmokeTest")
+
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")
 	for _, smokeTestName in ipairs(passedSmokeTests) do
@@ -553,10 +580,14 @@ local function onPlayerAdded(player)
 	if PersistenceConfig.EnableLoadOnPlayerAdded == true then
 		local loadResult = SaveService.LoadPlayer(player)
 		if not loadResult.Success then
-			warn("[ANP] Player persistence load failed for " .. player.Name .. ": " .. loadResult.Code)
+			warn("[ANP Persistence] Load failed for " .. player.Name .. " code=" .. loadResult.Code .. " saveBlocked=true")
 		elseif loadResult.Code ~= "PlayerSaveNotFound" then
-			print("[ANP] Player persistence loaded for " .. player.Name)
+			Logger.Info("Persistence", "Load success for " .. player.Name .. " code=" .. tostring(loadResult.Code))
+		else
+			Logger.Info("Persistence", "Load missing for " .. player.Name .. ": using default data")
 		end
+	else
+		Logger.Info("Persistence", "Load skipped for " .. player.Name .. ": load disabled")
 	end
 
 	local visibilityResult = InteractionVisibilityService.RefreshPlayer(player)
@@ -576,7 +607,9 @@ local function onPlayerRemoving(player)
 	if PersistenceConfig.EnableSaveOnPlayerRemoving == true then
 		local saveResult = SaveService.SavePlayer(player)
 		if not saveResult.Success then
-			warn("[ANP] Player persistence save failed for " .. player.Name .. ": " .. saveResult.Code)
+			warn("[ANP Persistence] Save failed for " .. player.Name .. " code=" .. saveResult.Code)
+		else
+			Logger.Info("Persistence", "Save success for " .. player.Name .. " code=" .. tostring(saveResult.Code))
 		end
 	end
 

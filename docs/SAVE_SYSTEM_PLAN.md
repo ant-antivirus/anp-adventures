@@ -55,7 +55,7 @@ Runtime-only state is excluded:
 - Studio skeleton objects
 - Temporary cooldowns
 
-## Future Phase 5B
+## Phase 5B: Safe DataStore Adapter
 
 Phase 5B adds a real persistence adapter behind `SaveService`, but keeps it disabled by default.
 
@@ -89,3 +89,28 @@ Future hardening:
 - Save budgeting and telemetry.
 - Rollback and recovery tests.
 - Production rollout checklist.
+
+## Phase 5C: Controlled Live Persistence Pilot
+
+Phase 5C adds a controlled pilot layer for testing real Roblox DataStore persistence in a dev environment without making real persistence the default.
+
+Implemented pilot controls:
+
+- `PersistenceMode` defaults to `Mock`.
+- Supported modes are `Mock`, `StudioDataStorePilot`, and `ProductionDataStore`.
+- `StudioPilotDataStoreName` is separate from `ProductionDataStoreName`.
+- `PersistenceConfig.Validate` rejects unsafe combinations before lifecycle save/load is used.
+- `SaveService` tracks server-only persistence session state for load/save diagnostics.
+- Load failure still blocks later saves by default to avoid overwriting cloud saves with default data.
+
+Default safety remains:
+
+- `EnableRealDataStore = false`
+- `EnableLoadOnPlayerAdded = false`
+- `EnableSaveOnPlayerRemoving = false`
+- `EnableBindToCloseSave = false`
+- `EnableAutosave = false`
+- `AllowProductionDataStore = false`
+- `AllowSaveAfterLoadFailure = false`
+
+Use `docs/DATASTORE_PILOT_RUNBOOK.md` for manual Studio pilot steps. Production DataStore rollout remains a future step after pilot verification, migration planning, and conservative monitoring.

@@ -334,6 +334,8 @@ Runtime-only systems include:
 - Non-persistent interaction cooldowns.
 - Active session caches.
 
+Phase 5C adds a controlled persistence pilot layer. `PersistenceMode` defaults to `Mock`; `StudioDataStorePilot` uses a separate pilot DataStore name and must be explicitly allowed by config. Production DataStore mode is rejected unless `AllowProductionDataStore` is enabled. Normal Studio runs should not make real cloud calls.
+
 ## Journal And Lore Architecture
 
 Journal and lore content are definition-driven systems.

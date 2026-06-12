@@ -29,11 +29,13 @@ local function makeFakePlayer(userId, name)
 end
 
 local function trigger(PromptBindingService, player, interactionId)
-	return PromptBindingService.SimulatePromptTrigger(player, interactionId, {
+	local triggerResult = PromptBindingService.SimulatePromptTrigger(player, interactionId, {
 		SourceType = "Phase5BDataStoreAdapterSmokeTest",
 		InteractionId = interactionId,
 		BypassCooldownForTests = true,
 	})
+	task.wait()
+	return triggerResult
 end
 
 local function cloneConfig(overrides)
@@ -186,7 +188,9 @@ function Phase5BDataStoreAdapterSmokeTest.Run(services)
 
 	local fakeDataStore = makeFakeDataStore()
 	local dataStoreConfig = cloneConfig({
+		PersistenceMode = "StudioDataStorePilot",
 		EnableRealDataStore = true,
+		AllowStudioRealDataStore = true,
 		MaxRetries = 1,
 		BaseRetryDelaySeconds = 0,
 		MaxRetryDelaySeconds = 0,
@@ -212,7 +216,7 @@ function Phase5BDataStoreAdapterSmokeTest.Run(services)
 	local failedLoadPlayer = makeFakePlayer(951504, "Phase5BLoadFailure")
 	assertResultSuccess(PlayerDataService.InitPlayer(failedLoadPlayer), "Load failure player should initialize.")
 	assertResultFailure(SaveService.LoadPlayer(failedLoadPlayer), "DataStoreLoadFailed", "Simulated load failure should be surfaced.")
-	assertResultFailure(SaveService.SavePlayer(failedLoadPlayer), "PersistenceLoadFailedSaveBlocked", "Save after load failure should be blocked by default.")
+	assertResultFailure(SaveService.SavePlayer(failedLoadPlayer), "SaveBlockedAfterLoadFailure", "Save after load failure should be blocked by default.")
 	assertResultSuccess(PlayerDataService.ReleasePlayer(failedLoadPlayer), "Load failure player should release.")
 
 	configureSaveService(services, PersistenceConfig)
