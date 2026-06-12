@@ -108,6 +108,8 @@ Phase 4D-Dev arranges the skeleton Studio world as a compact quest test track fo
 
 Phase 4E adds an EP1 MVP QA pass, compact configurable developer labels, a full Episode 1 regression smoke test, and a practical playtest checklist. It does not add new gameplay systems or persistence.
 
+Phase 5A adds save-readiness coverage for Episode 1 player progression. It validates that EP1 quest, inventory, discovery, journal, and episode state can round-trip through a server-owned mock save payload without enabling live persistence.
+
 ---
 
 ## Badge System

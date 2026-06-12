@@ -41,6 +41,12 @@ Phase 4E adds full Episode 1 MVP regression coverage and compact, configurable d
 
 The project still has no persistence implementation at this MVP checkpoint. Server authority remains intact for quest, discovery, reward, inventory, tracker, and episode state.
 
+## Phase 5A Save Readiness
+
+Phase 5A adds a versioned save schema, server-side serialization and validation, mock in-memory persistence, and save/load round-trip smoke coverage. It does not enable real persistence, autosave, or client-driven save/load.
+
+`SaveService` is the server-only facade. Future persistence adapters should sit behind that facade without changing quest, reward, discovery, inventory, or episode authority.
+
 ## Recommended Folder Structure
 
 ```text

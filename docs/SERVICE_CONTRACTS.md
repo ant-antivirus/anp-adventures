@@ -73,14 +73,15 @@ Validation rules:
 
 ### Responsibilities
 
-- Load player data from Roblox `DataStoreService`.
+- Own in-memory player data sessions.
+- In Phase 5A, support server-side save payload apply/read hooks for mock persistence tests.
 - Create default player data for new players.
 - Validate loaded data.
 - Apply schema migrations.
 - Own the in-memory session copy of player data.
 - Provide controlled read and mutation APIs.
-- Save on autosave interval, player leave, and server shutdown.
-- Prevent unrelated services from writing directly to DataStore.
+- Future phases may save on autosave interval, player leave, and server shutdown.
+- Prevent unrelated services from writing directly to persistence adapters.
 
 ### Public Methods
 
@@ -176,6 +177,8 @@ Validation rules:
 - Must only save loaded player data.
 - Must serialize valid data only.
 - Must apply retry policy for transient DataStore failures.
+
+Phase 5A note: `SaveNow` is a future contract. Current tests use `SaveService.SavePlayerToMock`.
 
 #### `IsLoaded`
 

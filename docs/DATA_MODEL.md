@@ -8,9 +8,9 @@ This document does not define quest content, puzzle design, dialogue, or story d
 
 ## Data Ownership
 
-Persistent player data is owned by `PlayerDataService` and stored with Roblox `DataStoreService`.
+Persistent player data is owned by `PlayerDataService`. Phase 5A adds save serialization and mock persistence only; real Roblox persistence is planned for a later phase.
 
-Other services may read or request mutations through service APIs, but they should not write directly to DataStore.
+Other services may read or request mutations through service APIs, but they should not write directly to persistence adapters.
 
 ## Core Data Rules
 
@@ -408,6 +408,8 @@ Quest and interaction state should record whether progress was:
 This metadata supports balancing, diagnostics, and future tuning while preserving the rule that solo players can progress.
 
 ## DataStore Strategy
+
+Phase 5A does not enable real saves. `SaveSerializationService`, `MockPersistenceService`, and `SaveService` exist to validate payload shape and prove round-trip behavior before live persistence is introduced.
 
 Recommended save key:
 

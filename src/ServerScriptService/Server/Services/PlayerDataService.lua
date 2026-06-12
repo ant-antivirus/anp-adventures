@@ -227,6 +227,36 @@ function PlayerDataService.Read(player, readName, reader)
 	return result(true, "ReadApplied", nil, readResult)
 end
 
+function PlayerDataService.ApplyPlayerData(player, playerData, sourceContext, rewardClaimIds)
+	local session, code = getSession(player)
+	if not session then
+		return result(false, code, "Player data is not loaded.")
+	end
+
+	if type(playerData) ~= "table" then
+		return result(false, "InvalidPlayerData", "Player data must be a table.")
+	end
+
+	session.Data = TableUtil.DeepCopy(playerData)
+	session.RewardClaimIds = TableUtil.DeepCopy(rewardClaimIds or {})
+
+	return result(true, "PlayerDataApplied", nil, {
+		SourceContext = sourceContext,
+		PlayerDataSnapshot = TableUtil.DeepCopy(session.Data),
+	})
+end
+
+function PlayerDataService.GetRewardClaimsSnapshot(player)
+	local session, code = getSession(player)
+	if not session then
+		return result(false, code, "Player data is not loaded.")
+	end
+
+	return result(true, "RewardClaimsSnapshotRead", nil, {
+		RewardClaimIds = TableUtil.DeepCopy(session.RewardClaimIds),
+	})
+end
+
 function PlayerDataService.HasRewardClaim(player, rewardClaimId)
 	local session, code = getSession(player)
 	if not session then

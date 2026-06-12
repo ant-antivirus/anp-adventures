@@ -18,7 +18,8 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 - Phase 4C quest tracker UI implemented
 - Phase 4D compact skeleton quest test track implemented
 - Phase 4E EP1 MVP QA pass implemented
-- Studio verification pending for Phase 4E
+- Phase 5A save readiness foundation implemented
+- Studio verification pending for Phase 5A
 
 ## How To Run
 
@@ -37,6 +38,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 [ANP Phase4BObjectStateSmokeTest] Phase 4B object state smoke test passed.
 [ANP Phase4CQuestTrackerSmokeTest] Phase 4C quest tracker smoke test passed.
 [ANP Phase4EFullEP1MvpSmokeTest] Phase 4E full EP1 MVP smoke test passed.
+[ANP Phase5ASaveReadinessSmokeTest] Phase 5A save readiness smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -58,6 +60,12 @@ Dev labels are compact and configurable so the test track remains readable witho
 ## MVP Playtest Checklist
 
 Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 playtest pass.
+
+## Save Readiness
+
+Phase 5A adds save schema, serialization, validation, and mock in-memory persistence for tests. It does not use real Roblox persistence and does not autosave live players yet.
+
+See `docs/SAVE_SYSTEM_PLAN.md`.
 
 ## Logging
 
