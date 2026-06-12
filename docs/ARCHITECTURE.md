@@ -338,6 +338,10 @@ Phase 5C adds a controlled persistence pilot layer. `PersistenceMode` defaults t
 
 Phase 5D adds canary-gated pilot execution. Studio pilot load/save only runs for configured `PilotCanaryUserIds` by default, and production mode requires explicit confirmation before it is valid.
 
+## Phase 6A Player-Facing UI
+
+Phase 6A improves the display-only player UI. The client renders server payloads for notifications, quest tracker state, and Episode Complete presentation. It does not calculate quest progress, complete objectives, grant rewards, save/load data, or send save payloads.
+
 ## Journal And Lore Architecture
 
 Journal and lore content are definition-driven systems.

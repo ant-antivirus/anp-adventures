@@ -116,6 +116,8 @@ Phase 5C adds a controlled Studio DataStore pilot profile. The default mode rema
 
 Phase 5D adds canary UserId gating and pilot diagnostics so real Studio DataStore tests can be run with a controlled test account while normal Studio runs remain mock-only.
 
+Phase 6A polishes the player-facing quest tracker, feedback notifications, and Episode Complete banner. These UI elements are display-only and must not decide quest progress, rewards, inventory, or save/load state.
+
 ---
 
 ## Badge System

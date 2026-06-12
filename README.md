@@ -22,6 +22,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 - Phase 5B safe DataStore adapter implemented
 - Phase 5C controlled live persistence pilot implemented
 - Phase 5D Studio DataStore pilot safety polish implemented
+- Phase 6A player-facing UI polish implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 
@@ -46,6 +47,7 @@ Current focus: Episode 1 playable prototype with minimal player feedback and que
 [ANP Phase5BDataStoreAdapterSmokeTest] Phase 5B DataStore adapter smoke test passed.
 [ANP Phase5CControlledPersistencePilotSmokeTest] Phase 5C controlled persistence pilot smoke test passed.
 [ANP Phase5DStudioDataStorePilotSafetySmokeTest] Phase 5D Studio DataStore pilot safety smoke test passed.
+[ANP Phase6APlayerFacingUISmokeTest] Phase 6A player-facing UI smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -55,6 +57,8 @@ All Studio smoke tests passed.
 Phase 4C adds a small display-only quest tracker panel. The server sends `QuestTracker` payloads through the existing `PlayerFeedbackEvent`; the client only displays the current quest, current objective, progress text, and hint text.
 
 The client does not calculate quest progress, grant rewards, or mutate player state.
+
+Phase 6A polishes the display-only tracker, notification stack, and Episode Complete banner. UI still does not control gameplay, rewards, save/load, or inventory state.
 
 ## Skeleton Test Track
 
@@ -67,6 +71,8 @@ Dev labels are compact and configurable so the test track remains readable witho
 ## MVP Playtest Checklist
 
 Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 playtest pass.
+
+Use `docs/EP1_UI_PLAYTEST_CHECKLIST.md` for the Phase 6A UI presentation pass.
 
 ## Save Readiness
 

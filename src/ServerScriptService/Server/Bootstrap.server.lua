@@ -59,6 +59,7 @@ local Phase5ASaveReadinessSmokeTest = require(script.Parent.Tests.Phase5ASaveRea
 local Phase5BDataStoreAdapterSmokeTest = require(script.Parent.Tests.Phase5BDataStoreAdapterSmokeTest)
 local Phase5CControlledPersistencePilotSmokeTest = require(script.Parent.Tests.Phase5CControlledPersistencePilotSmokeTest)
 local Phase5DStudioDataStorePilotSafetySmokeTest = require(script.Parent.Tests.Phase5DStudioDataStorePilotSafetySmokeTest)
+local Phase6APlayerFacingUISmokeTest = require(script.Parent.Tests.Phase6APlayerFacingUISmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -271,7 +272,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, and Phase 5D services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, and Phase 6A services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -596,6 +597,19 @@ if RunService:IsStudio() then
 		WorldRegistryService = WorldRegistryService,
 	})
 	table.insert(passedSmokeTests, "Phase5DStudioDataStorePilotSafetySmokeTest")
+
+	Phase6APlayerFacingUISmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		PromptBindingService = PromptBindingService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+		SaveService = SaveService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase6APlayerFacingUISmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

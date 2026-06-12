@@ -38,6 +38,17 @@ Validation rules:
 - `Code` must be stable and not depend on localized UI text.
 - `Message` is diagnostic only and must not drive gameplay logic.
 
+## Player Feedback UI Contract
+
+Phase 6A UI consumes server-to-client `PlayerFeedbackEvent` payloads for display only.
+
+Validation rules:
+
+- `QuestTracker` payloads are built by the server.
+- Client UI must not calculate quest progress.
+- Client UI must not complete objectives, grant rewards, mutate inventory, or save/load data.
+- No RemoteFunction is used for UI state.
+
 ### PlayerRef
 
 Used by all player-facing methods.
