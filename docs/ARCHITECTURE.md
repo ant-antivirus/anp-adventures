@@ -336,6 +336,8 @@ Runtime-only systems include:
 
 Phase 5C adds a controlled persistence pilot layer. `PersistenceMode` defaults to `Mock`; `StudioDataStorePilot` uses a separate pilot DataStore name and must be explicitly allowed by config. Production DataStore mode is rejected unless `AllowProductionDataStore` is enabled. Normal Studio runs should not make real cloud calls.
 
+Phase 5D adds canary-gated pilot execution. Studio pilot load/save only runs for configured `PilotCanaryUserIds` by default, and production mode requires explicit confirmation before it is valid.
+
 ## Journal And Lore Architecture
 
 Journal and lore content are definition-driven systems.

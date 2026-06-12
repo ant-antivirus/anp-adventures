@@ -28,6 +28,7 @@ local SaveSerializationService = require(script.Parent.Services.SaveSerializatio
 local MockPersistenceService = require(script.Parent.Services.MockPersistenceService)
 local DataStorePersistenceService = require(script.Parent.Services.DataStorePersistenceService)
 local SaveService = require(script.Parent.Services.SaveService)
+local PersistencePilotService = require(script.Parent.Services.PersistencePilotService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
@@ -57,6 +58,7 @@ local Phase4EFullEP1MvpSmokeTest = require(script.Parent.Tests.Phase4EFullEP1Mvp
 local Phase5ASaveReadinessSmokeTest = require(script.Parent.Tests.Phase5ASaveReadinessSmokeTest)
 local Phase5BDataStoreAdapterSmokeTest = require(script.Parent.Tests.Phase5BDataStoreAdapterSmokeTest)
 local Phase5CControlledPersistencePilotSmokeTest = require(script.Parent.Tests.Phase5CControlledPersistencePilotSmokeTest)
+local Phase5DStudioDataStorePilotSafetySmokeTest = require(script.Parent.Tests.Phase5DStudioDataStorePilotSafetySmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -144,6 +146,23 @@ SaveService.Init({
 	DataStorePersistenceService = DataStorePersistenceService,
 	PersistenceConfig = PersistenceConfig,
 })
+
+PersistencePilotService.Init({
+	PersistenceConfig = PersistenceConfig,
+	SaveService = SaveService,
+	DataStorePersistenceService = DataStorePersistenceService,
+})
+
+local persistencePilotStatus = PersistencePilotService.GetPilotStatus()
+Logger.Info(
+	"Persistence",
+	"mode=" .. tostring(persistencePilotStatus.Mode)
+		.. " adapter=" .. tostring(persistencePilotStatus.ActiveAdapterName)
+		.. " realDataStore=" .. tostring(persistencePilotStatus.RealDataStoreEnabled)
+		.. " datastore=" .. tostring(persistencePilotStatus.DataStoreName)
+		.. " canaryRequired=" .. tostring(persistencePilotStatus.CanaryRequired)
+		.. " canaryCount=" .. tostring(persistencePilotStatus.CanaryCount)
+)
 
 ProgressionService.Init({
 	PlayerDataService = PlayerDataService,
@@ -252,7 +271,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, and Phase 5C services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, and Phase 5D services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -561,6 +580,23 @@ if RunService:IsStudio() then
 	})
 	table.insert(passedSmokeTests, "Phase5CControlledPersistencePilotSmokeTest")
 
+	Phase5DStudioDataStorePilotSafetySmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		SaveService = SaveService,
+		SaveSerializationService = SaveSerializationService,
+		MockPersistenceService = MockPersistenceService,
+		DataStorePersistenceService = DataStorePersistenceService,
+		PersistencePilotService = PersistencePilotService,
+		PersistenceConfig = PersistenceConfig,
+		PromptBindingService = PromptBindingService,
+		QuestService = QuestService,
+		InventoryService = InventoryService,
+		EpisodeService = EpisodeService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase5DStudioDataStorePilotSafetySmokeTest")
+
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")
 	for _, smokeTestName in ipairs(passedSmokeTests) do
@@ -578,13 +614,18 @@ local function onPlayerAdded(player)
 	end
 
 	if PersistenceConfig.EnableLoadOnPlayerAdded == true then
-		local loadResult = SaveService.LoadPlayer(player)
+		local isEligible, eligibilityCode = PersistencePilotService.IsPlayerEligibleForRealPersistence(player)
+		if not isEligible then
+			Logger.Info("Persistence", "Load skipped for " .. player.Name .. " reason=" .. tostring(eligibilityCode))
+		else
+			local loadResult = SaveService.LoadPlayer(player)
 		if not loadResult.Success then
 			warn("[ANP Persistence] Load failed for " .. player.Name .. " code=" .. loadResult.Code .. " saveBlocked=true")
 		elseif loadResult.Code ~= "PlayerSaveNotFound" then
 			Logger.Info("Persistence", "Load success for " .. player.Name .. " code=" .. tostring(loadResult.Code))
 		else
 			Logger.Info("Persistence", "Load missing for " .. player.Name .. ": using default data")
+		end
 		end
 	else
 		Logger.Info("Persistence", "Load skipped for " .. player.Name .. ": load disabled")
@@ -605,11 +646,20 @@ end
 
 local function onPlayerRemoving(player)
 	if PersistenceConfig.EnableSaveOnPlayerRemoving == true then
-		local saveResult = SaveService.SavePlayer(player)
-		if not saveResult.Success then
-			warn("[ANP Persistence] Save failed for " .. player.Name .. " code=" .. saveResult.Code)
+		local isEligible, eligibilityCode = PersistencePilotService.IsPlayerEligibleForRealPersistence(player)
+		if not isEligible then
+			Logger.Info("Persistence", "Save skipped for " .. player.Name .. " reason=" .. tostring(eligibilityCode))
+		elseif not PlayerDataService.IsLoaded(player) then
+			Logger.Info("Persistence", "Save skipped for " .. player.Name .. " reason=PlayerDataNotLoaded")
 		else
-			Logger.Info("Persistence", "Save success for " .. player.Name .. " code=" .. tostring(saveResult.Code))
+			local saveResult = SaveService.SavePlayer(player)
+			if not saveResult.Success then
+				warn("[ANP Persistence] Save failed for " .. player.Name .. " code=" .. saveResult.Code)
+			elseif string.find(saveResult.Code, "Skipped", 1, true) then
+				Logger.Info("Persistence", "Save skipped for " .. player.Name .. " code=" .. tostring(saveResult.Code))
+			else
+				Logger.Info("Persistence", "Save success for " .. player.Name .. " code=" .. tostring(saveResult.Code))
+			end
 		end
 	end
 
@@ -631,9 +681,12 @@ if PersistenceConfig.EnableAutosave == true then
 		while true do
 			task.wait(PersistenceConfig.AutosaveIntervalSeconds)
 			for _, player in ipairs(Players:GetPlayers()) do
-				local saveResult = SaveService.SavePlayer(player)
-				if not saveResult.Success then
-					warn("[ANP] Autosave failed for " .. player.Name .. ": " .. saveResult.Code)
+				local isEligible = PersistencePilotService.IsPlayerEligibleForRealPersistence(player)
+				if isEligible and PlayerDataService.IsLoaded(player) then
+					local saveResult = SaveService.SavePlayer(player)
+					if not saveResult.Success then
+						warn("[ANP] Autosave failed for " .. player.Name .. ": " .. saveResult.Code)
+					end
 				end
 			end
 		end
@@ -643,7 +696,8 @@ end
 if PersistenceConfig.EnableBindToCloseSave == true then
 	game:BindToClose(function()
 		for _, player in ipairs(Players:GetPlayers()) do
-			if PlayerDataService.IsLoaded(player) then
+			local isEligible = PersistencePilotService.IsPlayerEligibleForRealPersistence(player)
+			if isEligible and PlayerDataService.IsLoaded(player) then
 				local saveResult = SaveService.SavePlayer(player)
 				if not saveResult.Success then
 					warn("[ANP] BindToClose save failed for " .. player.Name .. ": " .. saveResult.Code)

@@ -215,6 +215,7 @@ function Phase5CControlledPersistencePilotSmokeTest.Run(services)
 		PersistenceMode = "StudioDataStorePilot",
 		EnableRealDataStore = true,
 		AllowStudioRealDataStore = true,
+		RequirePilotCanaryUserId = false,
 		MaxRetries = 1,
 		BaseRetryDelaySeconds = 0,
 		MaxRetryDelaySeconds = 0,

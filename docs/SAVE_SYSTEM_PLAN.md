@@ -114,3 +114,18 @@ Default safety remains:
 - `AllowSaveAfterLoadFailure = false`
 
 Use `docs/DATASTORE_PILOT_RUNBOOK.md` for manual Studio pilot steps. Production DataStore rollout remains a future step after pilot verification, migration planning, and conservative monitoring.
+
+## Phase 5D: Studio Pilot Runtime Safety
+
+Phase 5D hardens the manual Studio pilot workflow.
+
+Added safety:
+
+- Studio pilot real persistence requires `PilotCanaryUserIds` by default.
+- Non-canary players skip real load/save without touching DataStore.
+- Production mode requires both `AllowProductionDataStore` and `ProductionDataStoreConfirm`.
+- Autosave must use a conservative interval.
+- `PersistencePilotService` exposes server-only pilot status and session reports.
+- Reports include load/save result codes and blocked reasons, but never full save payloads.
+
+Normal Studio runs still use mock persistence and make no real cloud calls.

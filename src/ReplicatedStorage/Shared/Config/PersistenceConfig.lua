@@ -22,9 +22,12 @@ local PersistenceConfig = {
 	AllowDevClear = false,
 	AllowStudioRealDataStore = false,
 	AllowProductionDataStore = false,
+	ProductionDataStoreConfirm = false,
 	AllowDestructiveClear = false,
 	AllowSaveAfterLoadFailure = false,
 	RequireSuccessfulLoadBeforeSave = true,
+	PilotCanaryUserIds = {},
+	RequirePilotCanaryUserId = true,
 	DebugLogs = false,
 }
 
@@ -56,6 +59,29 @@ function PersistenceConfig.GetDataStoreName(config)
 	return effectiveConfig.MockDataStoreName
 end
 
+function PersistenceConfig.IsUserAllowedForPilot(userId, config)
+	local effectiveConfig = copyConfig(config)
+	if effectiveConfig.PersistenceMode ~= "StudioDataStorePilot" or effectiveConfig.EnableRealDataStore ~= true then
+		return true
+	end
+
+	if effectiveConfig.RequirePilotCanaryUserId ~= true then
+		return true
+	end
+
+	if type(userId) ~= "number" or type(effectiveConfig.PilotCanaryUserIds) ~= "table" then
+		return false
+	end
+
+	for _, canaryUserId in ipairs(effectiveConfig.PilotCanaryUserIds) do
+		if canaryUserId == userId then
+			return true
+		end
+	end
+
+	return false
+end
+
 function PersistenceConfig.Validate(config)
 	local effectiveConfig = copyConfig(config)
 	local errors = {}
@@ -69,8 +95,24 @@ function PersistenceConfig.Validate(config)
 		table.insert(errors, "ProductionDataStoreRequiresExplicitAllow")
 	end
 
+	if effectiveConfig.PersistenceMode == "ProductionDataStore" and effectiveConfig.ProductionDataStoreConfirm ~= true then
+		table.insert(errors, "ProductionDataStoreRequiresConfirmation")
+	end
+
 	if effectiveConfig.PersistenceMode == "StudioDataStorePilot" and effectiveConfig.AllowStudioRealDataStore ~= true then
 		table.insert(errors, "StudioDataStorePilotRequiresExplicitAllow")
+	end
+
+	if effectiveConfig.PersistenceMode == "StudioDataStorePilot" and effectiveConfig.EnableRealDataStore == true then
+		if PersistenceConfig.GetDataStoreName(effectiveConfig) ~= effectiveConfig.StudioPilotDataStoreName then
+			table.insert(errors, "StudioPilotDataStoreNameMismatch")
+		end
+		if effectiveConfig.DataStoreName == effectiveConfig.ProductionDataStoreName then
+			table.insert(errors, "StudioPilotCannotUseProductionDataStore")
+		end
+		if effectiveConfig.RequirePilotCanaryUserId == true and type(effectiveConfig.PilotCanaryUserIds) ~= "table" then
+			table.insert(errors, "PilotCanaryUserIdsRequired")
+		end
 	end
 
 	if effectiveConfig.EnableRealDataStore == true and effectiveConfig.PersistenceMode == "Mock" then
@@ -97,8 +139,11 @@ function PersistenceConfig.Validate(config)
 		if effectiveConfig.EnableRealDataStore ~= true then
 			table.insert(errors, "AutosaveRequiresRealDataStore")
 		end
-		if type(effectiveConfig.AutosaveIntervalSeconds) ~= "number" or effectiveConfig.AutosaveIntervalSeconds < 60 then
+		if type(effectiveConfig.AutosaveIntervalSeconds) ~= "number" or effectiveConfig.AutosaveIntervalSeconds < 120 then
 			table.insert(errors, "AutosaveIntervalTooLow")
+		end
+		if effectiveConfig.PersistenceMode == "StudioDataStorePilot" then
+			table.insert(warnings, "AutosaveEnabledInStudioPilot")
 		end
 	end
 

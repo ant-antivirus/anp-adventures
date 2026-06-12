@@ -45,6 +45,27 @@ local function getActiveAdapter()
 	return mockPersistenceService, "MockPersistenceService"
 end
 
+local function isRealPersistenceAdapter(adapterName)
+	return adapterName == "DataStorePersistenceService"
+end
+
+local function getEligibility(userId, adapterName)
+	if not isRealPersistenceAdapter(adapterName) then
+		return true, "MockPersistence"
+	end
+
+	if persistenceConfig
+		and persistenceConfig.PersistenceMode == "StudioDataStorePilot"
+		and persistenceConfig.RequirePilotCanaryUserId == true
+		and type(persistenceConfig.IsUserAllowedForPilot) == "function"
+		and not persistenceConfig.IsUserAllowedForPilot(userId, persistenceConfig)
+	then
+		return false, "PilotCanaryNotAllowed"
+	end
+
+	return true, "Eligible"
+end
+
 local function logPersistence(message)
 	if persistenceConfig and persistenceConfig.DebugLogs == false then
 		return
@@ -151,6 +172,11 @@ function SaveService.GetPersistenceState(player)
 	return getPersistenceState(getUserId(player))
 end
 
+function SaveService.IsPlayerEligibleForRealPersistence(player)
+	local _, adapterName = getActiveAdapter()
+	return getEligibility(getUserId(player), adapterName)
+end
+
 function SaveService.SavePlayer(player)
 	local payloadResult = saveSerializationService.BuildSavePayload(player)
 	if not payloadResult.Success then
@@ -159,6 +185,25 @@ function SaveService.SavePlayer(player)
 
 	local adapter, adapterName = getActiveAdapter()
 	local userId = getUserId(player)
+	local isEligible, eligibilityCode = getEligibility(userId, adapterName)
+	if not isEligible then
+		setPersistenceState(userId, {
+			UserId = userId,
+			AdapterName = adapterName,
+			SaveAttempted = false,
+			LastSaveSucceeded = false,
+			LastSaveFailed = false,
+			SaveBlockedReason = eligibilityCode,
+			LastSaveCode = "PersistenceSaveSkipped" .. eligibilityCode,
+		})
+		logPersistence("Save skipped for " .. tostring(player.Name or userId) .. " reason=" .. eligibilityCode)
+		return result(true, "PersistenceSaveSkipped" .. eligibilityCode, "Save skipped by persistence pilot safety rules.", {
+			UserId = userId,
+			AdapterName = adapterName,
+			Reason = eligibilityCode,
+		})
+	end
+
 	local state = getPersistenceState(userId)
 	setPersistenceState(userId, {
 		AdapterName = adapterName,
@@ -213,6 +258,26 @@ end
 function SaveService.LoadPlayer(player)
 	local adapter, adapterName = getActiveAdapter()
 	local userId = getUserId(player)
+	local isEligible, eligibilityCode = getEligibility(userId, adapterName)
+	if not isEligible then
+		setPersistenceState(userId, {
+			UserId = userId,
+			AdapterName = adapterName,
+			LoadAttempted = false,
+			LoadSucceeded = false,
+			LoadFailed = false,
+			UsingDefaultData = true,
+			SaveBlockedReason = eligibilityCode,
+			LastLoadCode = "PersistenceLoadSkipped" .. eligibilityCode,
+		})
+		logPersistence("Load skipped for " .. tostring(player.Name or userId) .. " reason=" .. eligibilityCode)
+		return result(true, "PersistenceLoadSkipped" .. eligibilityCode, "Load skipped by persistence pilot safety rules.", {
+			UserId = userId,
+			AdapterName = adapterName,
+			Reason = eligibilityCode,
+		})
+	end
+
 	setPersistenceState(userId, {
 		UserId = userId,
 		AdapterName = adapterName,

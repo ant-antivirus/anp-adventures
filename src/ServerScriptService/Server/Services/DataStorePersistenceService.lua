@@ -154,7 +154,7 @@ function DataStorePersistenceService.LoadAsync(userId)
 end
 
 function DataStorePersistenceService.ClearAsync(userId)
-	if not config or (config.AllowDevClear ~= true and config.AllowDestructiveClear ~= true) then
+	if not config or config.AllowDestructiveClear ~= true then
 		return result(false, "DataStoreClearDisabled", "DataStore clear is disabled by config.")
 	end
 

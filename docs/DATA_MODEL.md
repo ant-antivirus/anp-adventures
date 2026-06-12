@@ -415,6 +415,8 @@ Phase 5B adds `DataStorePersistenceService`, but lifecycle load/save hooks remai
 
 Phase 5C adds `PersistenceMode`, separate Studio pilot and production DataStore names, config validation, and server-only persistence session state. Session state tracks load/save attempts, last result codes, default-data usage, timestamps, and blocked-save reasons for diagnostics.
 
+Phase 5D adds canary gating for Studio pilot persistence. Real pilot load/save is skipped for non-canary UserIds by default, and production mode requires explicit confirmation flags.
+
 Recommended save key:
 
 ```text

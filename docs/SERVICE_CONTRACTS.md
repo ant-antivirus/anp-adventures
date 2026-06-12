@@ -182,6 +182,8 @@ Phase 5B note: Real save calls are routed through `SaveService` and are disabled
 
 Phase 5C note: `PersistenceConfig.Validate` must reject unsafe DataStore mode combinations before live lifecycle hooks are used.
 
+Phase 5D note: Studio pilot lifecycle save/load must respect canary UserId gating and production mode must require explicit confirmation.
+
 ## SaveService
 
 ### Responsibilities
@@ -192,6 +194,7 @@ Phase 5C note: `PersistenceConfig.Validate` must reject unsafe DataStore mode co
 - Keep client code out of save/load decisions.
 - Block saves after real DataStore load failure by default.
 - Track server-only persistence session diagnostics for load/save attempts, result codes, timestamps, default-data use, and blocked-save reasons.
+- Skip real persistence for non-canary Studio pilot players by default.
 
 ### Public Methods
 

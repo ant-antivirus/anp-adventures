@@ -114,6 +114,8 @@ Phase 5B adds a server-side DataStore adapter behind config. Real persistence re
 
 Phase 5C adds a controlled Studio DataStore pilot profile. The default mode remains mock-only; pilot testing must explicitly enable the Studio pilot mode and should use the separate pilot DataStore name.
 
+Phase 5D adds canary UserId gating and pilot diagnostics so real Studio DataStore tests can be run with a controlled test account while normal Studio runs remain mock-only.
+
 ---
 
 ## Badge System
