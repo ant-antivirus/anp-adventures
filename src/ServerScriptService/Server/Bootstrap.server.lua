@@ -65,6 +65,7 @@ local Phase6BVisualWorldPresentationSmokeTest = require(script.Parent.Tests.Phas
 local Phase6COnboardingFlowSmokeTest = require(script.Parent.Tests.Phase6COnboardingFlowSmokeTest)
 local Phase6DEP1ContentLockSmokeTest = require(script.Parent.Tests.Phase6DEP1ContentLockSmokeTest)
 local Phase6DEP1FinalMvpRegressionSmokeTest = require(script.Parent.Tests.Phase6DEP1FinalMvpRegressionSmokeTest)
+local Phase6EThaiLocalizationSmokeTest = require(script.Parent.Tests.Phase6EThaiLocalizationSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -282,7 +283,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, Phase 6B, Phase 6C, and Phase 6D services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, Phase 6B, Phase 6C, Phase 6D, and Phase 6E services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -672,6 +673,17 @@ if RunService:IsStudio() then
 		EpisodeService = EpisodeService,
 	})
 	table.insert(passedSmokeTests, "Phase6DEP1FinalMvpRegressionSmokeTest")
+
+	Phase6EThaiLocalizationSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		OnboardingService = OnboardingService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase6EThaiLocalizationSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

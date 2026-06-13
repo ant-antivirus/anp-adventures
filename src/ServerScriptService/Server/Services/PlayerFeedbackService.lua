@@ -100,42 +100,42 @@ function PlayerFeedbackService.GetFeedbackEvent()
 end
 
 function PlayerFeedbackService.SendHint(player, message, data)
-	local title = data and data.Title or "Guide"
+	local title = data and data.Title or "คำแนะนำ"
 	return sendPayload(player, buildPayload("Hint", title, message, data))
 end
 
 function PlayerFeedbackService.SendBlocked(player, message, data)
-	local title = data and data.Title or "Not Yet"
+	local title = data and data.Title or "ยังไม่ได้"
 	return sendPayload(player, buildPayload("Blocked", title, message, data))
 end
 
 function PlayerFeedbackService.SendQuestStarted(player, questId, message)
-	return sendPayload(player, buildPayload("QuestStarted", "Quest Started", message or "Quest started. Follow the next objective.", {
+	return sendPayload(player, buildPayload("QuestStarted", "เริ่มภารกิจแล้ว", message or "เริ่มภารกิจแล้ว ตามเป้าหมายถัดไป", {
 		QuestId = questId,
 	}))
 end
 
 function PlayerFeedbackService.SendQuestCompleted(player, questId, message)
-	return sendPayload(player, buildPayload("QuestCompleted", "Quest Complete", message or "Quest complete.", {
+	return sendPayload(player, buildPayload("QuestCompleted", "ส่งภารกิจแล้ว", message or "ส่งภารกิจสำเร็จ", {
 		QuestId = questId,
 	}))
 end
 
 function PlayerFeedbackService.SendObjectiveUpdated(player, questId, objectiveId, message)
-	return sendPayload(player, buildPayload("ObjectiveUpdated", "Objective Complete", message or "Objective complete. Check the next step.", {
+	return sendPayload(player, buildPayload("ObjectiveUpdated", "ทำเป้าหมายสำเร็จ", message or "ทำเป้าหมายสำเร็จ ดูขั้นตอนถัดไป", {
 		QuestId = questId,
 		ObjectiveId = objectiveId,
 	}))
 end
 
 function PlayerFeedbackService.SendRewardReceived(player, rewardBundleId, message)
-	return sendPayload(player, buildPayload("RewardReceived", "Reward Received", message or "Reward received.", {
+	return sendPayload(player, buildPayload("RewardReceived", "ได้รับรางวัล", message or "ได้รับรางวัลแล้ว", {
 		RewardBundleId = rewardBundleId,
 	}))
 end
 
 function PlayerFeedbackService.SendEpisodeCompleted(player, episodeId, message)
-	return sendPayload(player, buildPayload("EpisodeCompleted", "Episode Complete", message or "Episode 1 complete. Star Core Segment 01 has been restored.", {
+	return sendPayload(player, buildPayload("EpisodeCompleted", "จบตอนแล้ว", message or "จบตอนที่ 1 แล้ว ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ", {
 		EpisodeId = episodeId,
 		Duration = 6,
 	}))

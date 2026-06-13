@@ -74,6 +74,18 @@ Validation rules:
 - Save payloads must validate under `SaveSchema` v1 after full EP1 completion.
 - No active EP2 gameplay content should be added to the EP1 MVP baseline.
 
+## Localization Contract
+
+Phase 6E localization is player-facing copy only.
+
+Validation rules:
+
+- Runtime IDs must not be translated.
+- RemoteEvent payload field names must not be translated.
+- SaveSchema field names must not be translated.
+- Client UI may render Thai text but must remain display-only.
+- Server services still own tracker, onboarding, hint, quest, reward, and episode payload values.
+
 ### PlayerRef
 
 Used by all player-facing methods.

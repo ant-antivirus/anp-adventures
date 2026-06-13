@@ -225,28 +225,28 @@ function Phase3HPlaytestPolishSmokeTest.Run(services)
 	assertHintText(earlyDisplayResult, "Early Star Core Display should include HintText.")
 
 	completeQuest001(PromptBindingService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 002" }, "Guidance after Quest 001 should point to Quest 002.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 2" }, "Guidance after Quest 001 should point to Quest 002.")
 
 	completeQuest002(PromptBindingService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 003" }, "Guidance after Quest 002 should point to Quest 003.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 3" }, "Guidance after Quest 002 should point to Quest 003.")
 
 	completeQuest003(PromptBindingService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 004" }, "Guidance after Quest 003 should point to Quest 004.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 4" }, "Guidance after Quest 003 should point to Quest 004.")
 
 	completeQuest004(PromptBindingService, ZoneService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 005", "THEOS" }, "Guidance after Quest 004 should point to Quest 005 / THEOS.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 5", "THEOS" }, "Guidance after Quest 004 should point to Quest 005 / THEOS.")
 
 	completeQuest005(PromptBindingService, ZoneService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 006", "Rocket" }, "Guidance after Quest 005 should point to Quest 006 / Rocket.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 6", "จรวด" }, "Guidance after Quest 005 should point to Quest 006 / Rocket.")
 
 	completeQuest006(PromptBindingService, ZoneService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 007", "Astronaut" }, "Guidance after Quest 006 should point to Quest 007 / Astronaut Training.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 7", "นักบินอวกาศ" }, "Guidance after Quest 006 should point to Quest 007 / Astronaut Training.")
 
 	completeQuest007(PromptBindingService, ZoneService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Quest 008", "Moon" }, "Guidance after Quest 007 should point to Quest 008 / Moon Walk.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "ภารกิจที่ 8", "ดวงจันทร์" }, "Guidance after Quest 007 should point to Quest 008 / Moon Walk.")
 
 	completeQuest008(PromptBindingService, ZoneService, player)
-	assertGuidanceContainsAll(PromptBindingService, player, { "Episode 1", "complete", "Star Core Segment 01" }, "Guidance after Quest 008 should confirm Episode 1 completion.")
+	assertGuidanceContainsAll(PromptBindingService, player, { "จบตอนที่ 1", "สตาร์คอร์ส่วนที่ 1" }, "Guidance after Quest 008 should confirm Episode 1 completion.")
 
 	for _, itemId in ipairs(REQUIRED_EP01_FRAGMENTS) do
 		assertCondition(InventoryService.HasItem(player, itemId, 1), "Final inventory should include " .. itemId .. ".")

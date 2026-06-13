@@ -316,7 +316,7 @@ function Phase3G4SmokeTest.Run(services)
 	assertCondition(episodeState.Data.IsCompleted == true, "Episode 1 should be completed after Quest 008 finale.")
 
 	local postQuest008Guidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContainsAll(postQuest008Guidance, { "Episode 1", "complete", "Star Core Segment 01" }, "Guidance after Quest 008 should confirm Episode 1 completion.")
+	assertGuidanceContainsAll(postQuest008Guidance, { "จบตอนที่ 1", "สตาร์คอร์ส่วนที่ 1" }, "Guidance after Quest 008 should confirm Episode 1 completion.")
 
 	assertResultSuccess(
 		AnalyticsService.Track(player, "QuestCompleted", {

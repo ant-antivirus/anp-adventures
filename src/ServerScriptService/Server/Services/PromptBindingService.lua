@@ -41,22 +41,22 @@ end
 
 local function getDefaultActionText(interactionType)
 	if interactionType == "NPCGuide" then
-		return "Ask"
+		return "ถาม"
 	elseif interactionType == "QuestStart" then
-		return "Start Quest"
+		return "เริ่มภารกิจ"
 	elseif interactionType == "QuestComplete" then
-		return "Complete Quest"
+		return "ส่งภารกิจ"
 	elseif interactionType == "Discovery" then
-		return "Inspect"
+		return "ตรวจ"
 	elseif interactionType == "ZoneTravel" then
-		return "Travel"
+		return "เดินทาง"
 	elseif interactionType == "NPC" or interactionType == "NPCMarker" then
-		return "Talk"
+		return "คุย"
 	elseif interactionType == "Generic" then
-		return "Use"
+		return "ใช้"
 	end
 
-	return "Interact"
+	return "โต้ตอบ"
 end
 
 local function shouldHideAfterObjectiveComplete(definition)

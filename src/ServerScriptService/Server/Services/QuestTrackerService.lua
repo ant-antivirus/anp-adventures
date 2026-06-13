@@ -180,10 +180,10 @@ function QuestTrackerService.BuildTrackerState(player)
 	if episodeDefinition and episodeSnapshot.Data.CompletedEpisodeIds[activeEpisodeId] == true then
 		local payload = buildBasePayload("EpisodeCompleted")
 		payload.EpisodeId = activeEpisodeId
-		payload.ProgressText = "Episode 1 complete"
-		payload.HintText = "Star Core Segment 01 restored."
-		payload.QuestTitle = "Episode 1 complete!"
-		payload.CurrentObjectiveText = "Star Core Segment 01 restored."
+		payload.ProgressText = "จบตอนที่ 1 แล้ว"
+		payload.HintText = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
+		payload.QuestTitle = "จบตอนที่ 1 แล้ว!"
+		payload.CurrentObjectiveText = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
 		return result(true, "QuestTrackerStateBuilt", nil, payload)
 	end
 
@@ -202,22 +202,22 @@ function QuestTrackerService.BuildTrackerState(player)
 		payload.QuestTitle = questDefinition.Title or activeQuestId
 		payload.QuestDescription = questDefinition.Description
 		payload.CurrentObjectiveId = currentObjectiveId
-		payload.CurrentObjectiveText = currentObjectiveDefinition and (currentObjectiveDefinition.TrackerText or currentObjectiveDefinition.ObjectiveText) or "All objectives complete."
+		payload.CurrentObjectiveText = currentObjectiveDefinition and (currentObjectiveDefinition.TrackerText or currentObjectiveDefinition.ObjectiveText) or "ทำเป้าหมายครบแล้ว"
 		payload.CompletedObjectiveCount = completedCount
 		payload.TotalObjectiveCount = totalCount
-		payload.ProgressText = tostring(completedCount) .. " / " .. tostring(totalCount) .. " objectives"
+		payload.ProgressText = tostring(completedCount) .. " / " .. tostring(totalCount) .. " เป้าหมาย"
 		payload.ZoneId = questDefinition.ZoneId
 		payload.ZoneName = getZoneName(questDefinition.ZoneId)
 
 		if completedCount >= totalCount then
-			payload.HintText = "Use the cyan Quest Complete marker."
+			payload.HintText = "ไปที่สัญลักษณ์สีฟ้าเพื่อส่งภารกิจ"
 		elseif missingDependencyId then
-			payload.HintText = "Finish the previous step first."
+			payload.HintText = "ทำขั้นตอนก่อนหน้าให้เสร็จก่อนนะ"
 			payload.BlockedByObjectiveId = missingDependencyId
 		elseif currentObjectiveDefinition and currentObjectiveDefinition.HintText then
 			payload.HintText = currentObjectiveDefinition.HintText
 		else
-			payload.HintText = "Follow the blue objective marker."
+			payload.HintText = "เดินตามสัญลักษณ์สีน้ำเงินเพื่อทำเป้าหมายถัดไป"
 		end
 
 		return result(true, "QuestTrackerStateBuilt", nil, payload)
@@ -231,9 +231,9 @@ function QuestTrackerService.BuildTrackerState(player)
 				local payload = buildBasePayload("NoQuest")
 				payload.QuestId = nextQuestId
 				payload.QuestTitle = "ANP Adventures"
-				payload.ProgressText = "No active quest"
-				payload.HintText = "Look for a green Quest Start marker."
-				payload.CurrentObjectiveText = "No active quest. Find the green Quest Start marker."
+				payload.ProgressText = "ยังไม่มีภารกิจที่กำลังทำ"
+				payload.HintText = "มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจ"
+				payload.CurrentObjectiveText = "ยังไม่มีภารกิจที่กำลังทำ มองหาสัญลักษณ์สีเขียว"
 				payload.ZoneId = questDefinition and questDefinition.ZoneId
 				payload.ZoneName = questDefinition and getZoneName(questDefinition.ZoneId)
 				return result(true, "QuestTrackerStateBuilt", nil, payload)
@@ -242,8 +242,8 @@ function QuestTrackerService.BuildTrackerState(player)
 			local payload = buildBasePayload("QuestCompleted")
 			payload.QuestId = nextQuestId
 			payload.QuestTitle = questDefinition and (questDefinition.Title or nextQuestId) or nextQuestId
-			payload.ProgressText = "Quest complete"
-			payload.HintText = "Start the next quest at the green marker."
+			payload.ProgressText = "ส่งภารกิจแล้ว"
+			payload.HintText = "เริ่มภารกิจถัดไปที่สัญลักษณ์สีเขียว"
 			payload.ZoneId = questDefinition and questDefinition.ZoneId
 			payload.ZoneName = questDefinition and getZoneName(questDefinition.ZoneId)
 			return result(true, "QuestTrackerStateBuilt", nil, payload)
@@ -252,9 +252,9 @@ function QuestTrackerService.BuildTrackerState(player)
 
 	local payload = buildBasePayload("NoQuest")
 	payload.QuestTitle = "ANP Adventures"
-	payload.ProgressText = "No active quest"
-	payload.HintText = "Look for a green Quest Start marker."
-	payload.CurrentObjectiveText = "No active quest. Find the green Quest Start marker."
+	payload.ProgressText = "ยังไม่มีภารกิจที่กำลังทำ"
+	payload.HintText = "มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจ"
+	payload.CurrentObjectiveText = "ยังไม่มีภารกิจที่กำลังทำ มองหาสัญลักษณ์สีเขียว"
 	return result(true, "QuestTrackerStateBuilt", nil, payload)
 end
 

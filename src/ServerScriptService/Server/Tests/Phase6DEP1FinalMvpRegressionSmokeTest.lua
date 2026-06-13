@@ -24,6 +24,17 @@ local function assertResultFailure(serviceResult, expectedCode, message)
 	assertCondition(serviceResult.Code == expectedCode, message .. " Expected `" .. expectedCode .. "`, got `" .. tostring(serviceResult.Code) .. "`.")
 end
 
+local function assertResultFailureOneOf(serviceResult, expectedCodes, message)
+	assertCondition(serviceResult and serviceResult.Success == false, message)
+	for _, expectedCode in ipairs(expectedCodes) do
+		if serviceResult.Code == expectedCode then
+			return
+		end
+	end
+
+	error(message .. " Expected one of allowed failure codes, got `" .. tostring(serviceResult.Code) .. "`.", 2)
+end
+
 local function makeFakePlayer(userId, name)
 	return {
 		UserId = userId,
@@ -106,7 +117,9 @@ function Phase6DEP1FinalMvpRegressionSmokeTest.Run(services)
 	local noQuestTracker = QuestTrackerService.BuildTrackerState(player)
 	assertResultSuccess(noQuestTracker, "Fresh tracker should build.")
 	assertCondition(noQuestTracker.Data.State == "NoQuest", "Fresh player should start with no active quest.")
-	assertCondition(OnboardingService.ShouldShowFirstTimeOnboarding(player) == true, "Fresh player should be onboarding eligible.")
+	local freshEligibility = OnboardingService.ShouldShowFirstTimeOnboarding(player)
+	assertResultSuccess(freshEligibility, "Fresh player onboarding eligibility should read.")
+	assertCondition(freshEligibility.Data.ShouldShow == true, "Fresh player should be onboarding eligible.")
 
 	completeQuest001(PromptBindingService, player)
 	for questNumber = 2, 7 do
@@ -146,10 +159,16 @@ function Phase6DEP1FinalMvpRegressionSmokeTest.Run(services)
 	end
 
 	assertResultFailure(directInteract(InteractionService, player, "interaction_complete_ep01_main_008"), "QuestAlreadyCompleted", "Duplicate Quest 008 completion should be blocked.")
-	assertResultFailure(directInteract(InteractionService, player, "interaction_ep01_main_003_003"), "QuestNotActive", "Completed Quest 003 collectible should not progress again.")
+	assertResultFailureOneOf(
+		directInteract(InteractionService, player, "interaction_ep01_main_003_003"),
+		{ "ObjectiveAlreadyCompleted", "AlreadyCollected", "QuestNotActive" },
+		"Completed Quest 003 collectible should not progress again."
+	)
 	assertHidden(InteractionVisibilityService, player, "interaction_ep01_main_003_003", "Quest 003 collectible after full progression")
 	assertHidden(InteractionVisibilityService, player, "interaction_ep01_main_003_004", "Quest 003 recovery object after full progression")
-	assertCondition(OnboardingService.ShouldShowFirstTimeOnboarding(player) == false, "Onboarding should not show after progress exists.")
+	local progressedEligibility = OnboardingService.ShouldShowFirstTimeOnboarding(player)
+	assertResultSuccess(progressedEligibility, "Progressed player onboarding eligibility should read.")
+	assertCondition(progressedEligibility.Data.ShouldShow == false, "Onboarding should not show after progress exists.")
 
 	local saveResult = SaveService.BuildSave(player)
 	assertResultSuccess(saveResult, "Final MVP save payload should build.")

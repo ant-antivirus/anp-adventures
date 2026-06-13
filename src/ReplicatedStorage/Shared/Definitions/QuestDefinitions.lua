@@ -3,7 +3,7 @@ return {
 		QuestId = "quest_ep01_main_001",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_command_center",
-		Title = "Quest 001",
+		Title = "ภารกิจที่ 1: เริ่มต้นการสำรวจ",
 		ObjectiveIds = {
 			"obj_ep01_main_001_001",
 			"obj_ep01_main_001_002",
@@ -11,10 +11,10 @@ return {
 			"obj_ep01_main_001_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_001_001 = { RequiredAmount = 1, ObjectiveText = "Use the Expedition Terminal." },
-			obj_ep01_main_001_002 = { RequiredAmount = 1, ObjectiveText = "Review the mission briefing." },
-			obj_ep01_main_001_003 = { RequiredAmount = 1, ObjectiveText = "Check the launch console." },
-			obj_ep01_main_001_004 = { RequiredAmount = 1, ObjectiveText = "Inspect the Star Core Display." },
+			obj_ep01_main_001_001 = { RequiredAmount = 1, ObjectiveText = "ใช้งานเครื่องควบคุมการสำรวจ" },
+			obj_ep01_main_001_002 = { RequiredAmount = 1, ObjectiveText = "อ่านข้อมูลภารกิจ" },
+			obj_ep01_main_001_003 = { RequiredAmount = 1, ObjectiveText = "ตรวจแผงควบคุมการออกเดินทาง" },
+			obj_ep01_main_001_004 = { RequiredAmount = 1, ObjectiveText = "ตรวจดูจอแสดงผลสตาร์คอร์" },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_001_001",
@@ -37,7 +37,7 @@ return {
 		QuestId = "quest_ep01_main_002",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_universe_explorer",
-		Title = "Map the Broken Star Signal",
+		Title = "ภารกิจที่ 2: ตามหาสัญญาณดาวที่ขาดหาย",
 		ObjectiveIds = {
 			"obj_ep01_main_002_001",
 			"obj_ep01_main_002_002",
@@ -45,10 +45,10 @@ return {
 			"obj_ep01_main_002_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_002_001 = { RequiredAmount = 1, ObjectiveText = "Enter the Universe Explorer zone." },
-			obj_ep01_main_002_002 = { RequiredAmount = 1, ObjectiveText = "Locate the first signal marker." },
-			obj_ep01_main_002_003 = { RequiredAmount = 1, ObjectiveText = "Scan the signal marker." },
-			obj_ep01_main_002_004 = { RequiredAmount = 1, ObjectiveText = "Return signal data to Neutron's analysis station." },
+			obj_ep01_main_002_001 = { RequiredAmount = 1, ObjectiveText = "เข้าสู่พื้นที่นักสำรวจจักรวาล" },
+			obj_ep01_main_002_002 = { RequiredAmount = 1, ObjectiveText = "หาสัญลักษณ์สัญญาณจุดแรก" },
+			obj_ep01_main_002_003 = { RequiredAmount = 1, ObjectiveText = "สแกนสัญลักษณ์สัญญาณ" },
+			obj_ep01_main_002_004 = { RequiredAmount = 1, ObjectiveText = "นำข้อมูลสัญญาณกลับไปที่สถานีวิเคราะห์ของนิวตรอน" },
 		},
 		RequiredObjectiveIds = {
 			"obj_ep01_main_002_001",
@@ -71,7 +71,7 @@ return {
 		QuestId = "quest_ep01_main_003",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_universe_explorer",
-		Title = "Recover the Universe Fragment",
+		Title = "ภารกิจที่ 3: กู้คืนชิ้นส่วนจักรวาล",
 		ObjectiveIds = {
 			"obj_ep01_main_003_001",
 			"obj_ep01_main_003_002",
@@ -79,16 +79,16 @@ return {
 			"obj_ep01_main_003_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_003_001 = { RequiredAmount = 1, ObjectiveText = "Follow the star signal trail." },
-			obj_ep01_main_003_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the unstable signal echo." },
+			obj_ep01_main_003_001 = { RequiredAmount = 1, ObjectiveText = "ตามร่องรอยสัญญาณดาว" },
+			obj_ep01_main_003_002 = { RequiredAmount = 1, ObjectiveText = "ตรวจเสียงสะท้อนสัญญาณที่ไม่เสถียร" },
 			obj_ep01_main_003_003 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Stabilize the Universe Fragment.",
+				ObjectiveText = "ทำให้ชิ้นส่วนจักรวาลเสถียร",
 				RequiresObjectiveIds = { "obj_ep01_main_003_002" },
 			},
 			obj_ep01_main_003_004 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Recover the Universe Fragment.",
+				ObjectiveText = "เก็บชิ้นส่วนจักรวาล",
 				RequiresObjectiveIds = { "obj_ep01_main_003_003" },
 			},
 		},
@@ -114,7 +114,7 @@ return {
 		QuestId = "quest_ep01_main_004",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_terrain_sandbox",
-		Title = "Stabilize the Terrain Flow",
+		Title = "ภารกิจที่ 4: ฟื้นฟูเส้นทางความทรงจำพื้นดิน",
 		ObjectiveIds = {
 			"obj_ep01_main_004_001",
 			"obj_ep01_main_004_002",
@@ -122,16 +122,16 @@ return {
 			"obj_ep01_main_004_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_004_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the Terrain Sandbox." },
-			obj_ep01_main_004_002 = { RequiredAmount = 1, ObjectiveText = "Find the Earth memory marker." },
+			obj_ep01_main_004_001 = { RequiredAmount = 1, ObjectiveText = "เดินทางไปยังพื้นที่จำลองพื้นดิน" },
+			obj_ep01_main_004_002 = { RequiredAmount = 1, ObjectiveText = "หาสัญลักษณ์ความทรงจำของโลก" },
 			obj_ep01_main_004_003 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Rebuild the terrain memory path.",
+				ObjectiveText = "ประกอบเส้นทางความทรงจำพื้นดิน",
 				RequiresObjectiveIds = { "obj_ep01_main_004_002" },
 			},
 			obj_ep01_main_004_004 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Recover the Earth Fragment.",
+				ObjectiveText = "เก็บชิ้นส่วนโลก",
 				RequiresObjectiveIds = { "obj_ep01_main_004_003" },
 			},
 		},
@@ -157,7 +157,7 @@ return {
 		QuestId = "quest_ep01_main_005",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_theos_satellite_center",
-		Title = "Calibrate the THEOS Link",
+		Title = "ภารกิจที่ 5: ปรับสัญญาณดาวเทียม THEOS",
 		ObjectiveIds = {
 			"obj_ep01_main_005_001",
 			"obj_ep01_main_005_002",
@@ -168,16 +168,16 @@ return {
 			"obj_ep01_main_005_optional_003",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_005_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the THEOS Satellite Center." },
-			obj_ep01_main_005_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the satellite archive." },
+			obj_ep01_main_005_001 = { RequiredAmount = 1, ObjectiveText = "เดินทางไปยังศูนย์ดาวเทียม THEOS" },
+			obj_ep01_main_005_002 = { RequiredAmount = 1, ObjectiveText = "ตรวจคลังข้อมูลดาวเทียม" },
 			obj_ep01_main_005_003 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Restore the signal relay.",
+				ObjectiveText = "ซ่อมตัวส่งต่อสัญญาณ",
 				RequiresObjectiveIds = { "obj_ep01_main_005_002" },
 			},
 			obj_ep01_main_005_004 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Recover the THEOS Fragment.",
+				ObjectiveText = "เก็บชิ้นส่วน THEOS",
 				RequiresObjectiveIds = { "obj_ep01_main_005_003" },
 			},
 			obj_ep01_main_005_optional_001 = { RequiredAmount = 1 },
@@ -219,7 +219,7 @@ return {
 		QuestId = "quest_ep01_main_006",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_rocket_mission",
-		Title = "Prepare the Rocket Mission",
+		Title = "ภารกิจที่ 6: เตรียมภารกิจจรวด",
 		ObjectiveIds = {
 			"obj_ep01_main_006_001",
 			"obj_ep01_main_006_002",
@@ -227,16 +227,16 @@ return {
 			"obj_ep01_main_006_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_006_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the Rocket Mission zone." },
-			obj_ep01_main_006_002 = { RequiredAmount = 1, ObjectiveText = "Inspect the rocket control panel." },
+			obj_ep01_main_006_001 = { RequiredAmount = 1, ObjectiveText = "เดินทางไปยังพื้นที่ภารกิจจรวด" },
+			obj_ep01_main_006_002 = { RequiredAmount = 1, ObjectiveText = "ตรวจแผงควบคุมจรวด" },
 			obj_ep01_main_006_003 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Run launch diagnostics.",
+				ObjectiveText = "ตรวจระบบก่อนปล่อยจรวด",
 				RequiresObjectiveIds = { "obj_ep01_main_006_002" },
 			},
 			obj_ep01_main_006_004 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Recover the Rocket Fragment.",
+				ObjectiveText = "เก็บชิ้นส่วนจรวด",
 				RequiresObjectiveIds = { "obj_ep01_main_006_003" },
 			},
 		},
@@ -262,7 +262,7 @@ return {
 		QuestId = "quest_ep01_main_007",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_astronaut_training",
-		Title = "Complete Astronaut Readiness",
+		Title = "ภารกิจที่ 7: เตรียมตัวเป็นนักบินอวกาศ",
 		ObjectiveIds = {
 			"obj_ep01_main_007_001",
 			"obj_ep01_main_007_002",
@@ -270,16 +270,16 @@ return {
 			"obj_ep01_main_007_004",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_007_001 = { RequiredAmount = 1, ObjectiveText = "Travel to Astronaut Training." },
-			obj_ep01_main_007_002 = { RequiredAmount = 1, ObjectiveText = "Complete the movement training station." },
+			obj_ep01_main_007_001 = { RequiredAmount = 1, ObjectiveText = "เดินทางไปยังพื้นที่ฝึกนักบินอวกาศ" },
+			obj_ep01_main_007_002 = { RequiredAmount = 1, ObjectiveText = "ผ่านสถานีฝึกการเคลื่อนที่" },
 			obj_ep01_main_007_003 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Complete the oxygen safety check.",
+				ObjectiveText = "ตรวจความปลอดภัยของออกซิเจน",
 				RequiresObjectiveIds = { "obj_ep01_main_007_002" },
 			},
 			obj_ep01_main_007_004 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Receive Moon mission clearance.",
+				ObjectiveText = "รับอนุญาตสำหรับภารกิจดวงจันทร์",
 				RequiresObjectiveIds = { "obj_ep01_main_007_003" },
 			},
 		},
@@ -304,7 +304,7 @@ return {
 		QuestId = "quest_ep01_main_008",
 		EpisodeId = "ep01_lost_star_core",
 		ZoneId = "zone_ep01_moon_walk",
-		Title = "Restore Star Core Segment 01",
+		Title = "ภารกิจที่ 8: ฟื้นฟูสตาร์คอร์ส่วนที่ 1",
 		ObjectiveIds = {
 			"obj_ep01_main_008_001",
 			"obj_ep01_main_008_002",
@@ -313,22 +313,22 @@ return {
 			"obj_ep01_main_008_005",
 		},
 		ObjectiveDefinitions = {
-			obj_ep01_main_008_001 = { RequiredAmount = 1, ObjectiveText = "Travel to the Moon Walk zone." },
-			obj_ep01_main_008_002 = { RequiredAmount = 1, ObjectiveText = "Follow the Moon signal trail." },
+			obj_ep01_main_008_001 = { RequiredAmount = 1, ObjectiveText = "เดินทางไปยังพื้นที่เดินบนดวงจันทร์" },
+			obj_ep01_main_008_002 = { RequiredAmount = 1, ObjectiveText = "ตามร่องรอยสัญญาณดวงจันทร์" },
 			obj_ep01_main_008_003 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Recover the Moon Fragment.",
+				ObjectiveText = "เก็บชิ้นส่วนดวงจันทร์",
 				RequiresObjectiveIds = { "obj_ep01_main_008_002" },
 				RewardBundleIds = { "reward_ep01_objective_008_moon_fragment" },
 			},
 			obj_ep01_main_008_004 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Verify all Episode 1 fragments.",
+				ObjectiveText = "ตรวจชิ้นส่วนทั้งหมดของตอนที่ 1",
 				RequiresObjectiveIds = { "obj_ep01_main_008_003" },
 			},
 			obj_ep01_main_008_005 = {
 				RequiredAmount = 1,
-				ObjectiveText = "Restore Star Core Segment 01.",
+				ObjectiveText = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1",
 				RequiresObjectiveIds = { "obj_ep01_main_008_004" },
 			},
 		},

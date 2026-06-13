@@ -84,8 +84,8 @@ function OnboardingService.BuildWelcomePayload()
 	return {
 		Type = "Onboarding",
 		State = "Welcome",
-		Title = "Welcome to ANP Adventures",
-		Message = "Join the ANP crew on a friendly science adventure.",
+		Title = "ยินดีต้อนรับสู่ ANP Adventures",
+		Message = "ร่วมผจญภัยวิทยาศาสตร์กับ Atom, Neutron และ Proton",
 		Duration = 7,
 	}
 end
@@ -94,8 +94,8 @@ function OnboardingService.BuildEpisodeGoalPayload()
 	return {
 		Type = "Onboarding",
 		State = "EpisodeGoal",
-		Title = "Episode 1",
-		Message = "Start your first expedition and restore Star Core Segment 01.",
+		Title = "ตอนที่ 1",
+		Message = "เริ่มการสำรวจครั้งแรกและฟื้นฟูสตาร์คอร์ส่วนที่ 1",
 		Duration = 7,
 	}
 end
@@ -112,8 +112,8 @@ function OnboardingService.BuildMarkerLegendPayload()
 	return {
 		Type = "Onboarding",
 		State = "MarkerLegend",
-		Title = "Marker Guide",
-		Message = "Use marker colors to find your next step.",
+		Title = "คู่มือสัญลักษณ์",
+		Message = "ดูสีของสัญลักษณ์เพื่อหาขั้นตอนถัดไป",
 		Lines = lines,
 		Duration = 9,
 	}
@@ -123,8 +123,8 @@ function OnboardingService.BuildFirstQuestHintPayload()
 	return {
 		Type = "Onboarding",
 		State = "FirstQuestHint",
-		Title = "First Step",
-		Message = "Look for the green Quest Start marker in the Command Center.",
+		Title = "ขั้นตอนแรก",
+		Message = "มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจในศูนย์บัญชาการ",
 		QuestId = FIRST_QUEST_ID,
 		Duration = 7,
 	}

@@ -1,27 +1,27 @@
 local MarkerLegendConfig = {
 	QuestStart = {
-		Label = "Green",
-		Meaning = "Start Quest",
+		Label = "สีเขียว",
+		Meaning = "เริ่มภารกิจ",
 	},
 	QuestObjective = {
-		Label = "Blue",
-		Meaning = "Current Objective",
+		Label = "สีน้ำเงิน",
+		Meaning = "เป้าหมายปัจจุบัน",
 	},
 	QuestComplete = {
-		Label = "Cyan",
-		Meaning = "Complete Quest",
+		Label = "สีฟ้า",
+		Meaning = "ส่งภารกิจ",
 	},
 	Discovery = {
-		Label = "Yellow",
-		Meaning = "Discovery",
+		Label = "สีเหลือง",
+		Meaning = "จุดค้นพบ",
 	},
 	ZoneTravel = {
-		Label = "Purple",
-		Meaning = "Travel",
+		Label = "สีม่วง",
+		Meaning = "เดินทาง",
 	},
 	NPCGuide = {
-		Label = "Orange",
-		Meaning = "Guide",
+		Label = "สีส้ม",
+		Meaning = "ผู้ช่วยนำทาง",
 	},
 }
 

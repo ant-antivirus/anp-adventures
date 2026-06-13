@@ -49,12 +49,12 @@ end
 
 local function assertMarkerLegend()
 	local expected = {
-		QuestStart = { Label = "Green", Meaning = "Start Quest" },
-		QuestObjective = { Label = "Blue", Meaning = "Current Objective" },
-		QuestComplete = { Label = "Cyan", Meaning = "Complete Quest" },
-		Discovery = { Label = "Yellow", Meaning = "Discovery" },
-		ZoneTravel = { Label = "Purple", Meaning = "Travel" },
-		NPCGuide = { Label = "Orange", Meaning = "Guide" },
+		QuestStart = { Label = "สีเขียว", Meaning = "เริ่มภารกิจ" },
+		QuestObjective = { Label = "สีน้ำเงิน", Meaning = "เป้าหมายปัจจุบัน" },
+		QuestComplete = { Label = "สีฟ้า", Meaning = "ส่งภารกิจ" },
+		Discovery = { Label = "สีเหลือง", Meaning = "จุดค้นพบ" },
+		ZoneTravel = { Label = "สีม่วง", Meaning = "เดินทาง" },
+		NPCGuide = { Label = "สีส้ม", Meaning = "ผู้ช่วยนำทาง" },
 	}
 
 	for markerType, markerData in pairs(expected) do

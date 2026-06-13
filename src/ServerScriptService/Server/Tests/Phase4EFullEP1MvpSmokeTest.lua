@@ -190,7 +190,7 @@ local function completeQuest008(PromptBindingService, QuestTrackerService, Inven
 	assertResultSuccess(episodeState, "Episode 1 state should read after finale.")
 	assertCondition(episodeState.Data.IsCompleted == true, "Episode 1 should be marked complete.")
 	local tracker = assertTracker(QuestTrackerService, player, "EpisodeCompleted", "Episode complete tracker should read.")
-	assertCondition(string.find(tracker.HintText or "", "Star Core Segment 01", 1, true) ~= nil, "Episode complete tracker should mention Star Core Segment 01.")
+	assertCondition(string.find(tracker.HintText or "", "สตาร์คอร์ส่วนที่ 1", 1, true) ~= nil, "Episode complete tracker should mention Star Core Segment 01.")
 end
 
 local function assertEarlyStarCoreBridge(services)
@@ -255,7 +255,7 @@ function Phase4EFullEP1MvpSmokeTest.Run(services)
 	local player = makeFakePlayer(948701, "Phase4EFullEP1Mvp")
 	assertResultSuccess(PlayerDataService.InitPlayer(player), "Phase 4E player data should initialize.")
 	local noQuestTracker = assertTracker(QuestTrackerService, player, "NoQuest", "Fresh player tracker should read.")
-	assertCondition(string.find(noQuestTracker.HintText or "", "green", 1, true) ~= nil, "Fresh player tracker should point to green Quest Start marker.")
+	assertCondition(string.find(noQuestTracker.HintText or "", "สีเขียว", 1, true) ~= nil, "Fresh player tracker should point to green Quest Start marker.")
 
 	local q2CanStart, q2BlockCode = services.QuestService.CanStartQuest(player, "quest_ep01_main_002")
 	assertCondition(q2CanStart == false and q2BlockCode == "QuestPrerequisiteMissing", "Quest 002 should require Quest 001 completion.")

@@ -41,316 +41,316 @@ end
 local function buildCharacterHint(characterId, guidanceType, objectiveText)
 	if guidanceType == "StartQuest001" then
 		if characterId == CharacterConfig.Ids.Proton then
-			return "Look for the green Quest Start marker in the Command Center."
+			return "มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจในศูนย์บัญชาการ"
 		elseif characterId == CharacterConfig.Ids.Neutron then
-			return "We need to begin the expedition before analyzing clues."
+			return "เราต้องเริ่มการสำรวจก่อน จึงจะวิเคราะห์เบาะแสได้"
 		end
 
-		return "Start your first ANP expedition at the Quest 001 start point."
+		return "เริ่มการสำรวจ ANP ครั้งแรกที่จุดเริ่มภารกิจที่ 1"
 	elseif guidanceType == "NextObjective" then
 		if characterId == CharacterConfig.Ids.Proton then
-			return "Next step: " .. objectiveText
+			return "ขั้นตอนถัดไป: " .. objectiveText
 		elseif characterId == CharacterConfig.Ids.Neutron then
-			return "Let's investigate this next clue: " .. objectiveText
+			return "มาสำรวจเบาะแสถัดไปกัน: " .. objectiveText
 		end
 
-		return "Keep moving. Your next objective is: " .. objectiveText
+		return "เดินหน้าต่อ เป้าหมายถัดไปคือ: " .. objectiveText
 	elseif guidanceType == "CompleteQuest" then
 		if characterId == CharacterConfig.Ids.Proton then
-			return "All objectives are complete. Look for the cyan Quest Complete marker."
+			return "ทำเป้าหมายครบแล้ว มองหาสัญลักษณ์สีฟ้าเพื่อส่งภารกิจ"
 		elseif characterId == CharacterConfig.Ids.Neutron then
-			return "The required data is complete. Finish the quest at the Quest Complete marker."
+			return "ข้อมูลที่ต้องใช้ครบแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		end
 
-		return "Great work. Return to the cyan Quest Complete marker to finish this mission."
+		return "ทำได้ดีมาก กลับไปที่สัญลักษณ์สีฟ้าเพื่อจบภารกิจนี้"
 	elseif guidanceType == "CompleteQuest002" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "All signal data is mapped. Finish the quest at the cyan Quest Complete marker."
+			return "แผนที่สัญญาณครบแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The signal map is complete. Use the cyan Quest Complete marker to finish strong."
+			return "แผนที่สัญญาณพร้อมแล้ว ใช้สัญลักษณ์สีฟ้าเพื่อจบภารกิจ"
 		end
 
-		return "All signal data is mapped. Look for the cyan Quest Complete marker."
+		return "บันทึกข้อมูลสัญญาณครบแล้ว มองหาสัญลักษณ์สีฟ้า"
 	elseif guidanceType == "Quest002Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Quest 002 is available. The next signal trace begins in the Universe Explorer area."
+			return "ภารกิจที่ 2 พร้อมแล้ว ร่องรอยสัญญาณถัดไปอยู่ในพื้นที่นักสำรวจจักรวาล"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Quest 002 is ready. Head for the green Quest Start marker in Universe Explorer."
+			return "ภารกิจที่ 2 พร้อมแล้ว ไปที่สัญลักษณ์สีเขียวในพื้นที่นักสำรวจจักรวาล"
 		end
 
-		return "Quest 002 is available. Look for the green Quest Start marker in the Universe Explorer area."
+		return "ภารกิจที่ 2 พร้อมแล้ว มองหาสัญลักษณ์สีเขียวในพื้นที่นักสำรวจจักรวาล"
 	elseif guidanceType == "Quest003Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Quest 003 is available. The mapped signal can guide us deeper into Universe Explorer."
+			return "ภารกิจที่ 3 พร้อมแล้ว แผนที่สัญญาณจะพาเราเข้าไปลึกขึ้น"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Quest 003 is available. Follow the next green Quest Start marker in Universe Explorer."
+			return "ภารกิจที่ 3 พร้อมแล้ว ตามสัญลักษณ์สีเขียวถัดไป"
 		end
 
-		return "Quest 003 is available. Follow the next green Quest Start marker in Universe Explorer."
+		return "ภารกิจที่ 3 พร้อมแล้ว ตามสัญลักษณ์สีเขียวถัดไป"
 	elseif guidanceType == "CompleteQuest003" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The Universe Fragment is stable. Finish the quest at the cyan Quest Complete marker."
+			return "ชิ้นส่วนจักรวาลเสถียรแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The Universe Fragment is secure. Use the cyan Quest Complete marker to finish this step."
+			return "ชิ้นส่วนจักรวาลปลอดภัยแล้ว ใช้สัญลักษณ์สีฟ้าเพื่อจบขั้นตอนนี้"
 		end
 
-		return "The Universe Fragment is secure. Look for the cyan Quest Complete marker."
+		return "ชิ้นส่วนจักรวาลปลอดภัยแล้ว มองหาสัญลักษณ์สีฟ้า"
 	elseif guidanceType == "Quest004Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Quest 004 is available. The next evidence points toward the Terrain Sandbox."
+			return "ภารกิจที่ 4 พร้อมแล้ว เบาะแสถัดไปชี้ไปยังพื้นที่จำลองพื้นดิน"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Quest 004 is available. Head toward the Terrain Sandbox path."
+			return "ภารกิจที่ 4 พร้อมแล้ว ไปตามทางสู่พื้นที่จำลองพื้นดิน"
 		end
 
-		return "Quest 004 is available. Look for the green Quest Start marker near the Terrain Sandbox."
+		return "ภารกิจที่ 4 พร้อมแล้ว มองหาสัญลักษณ์สีเขียวใกล้พื้นที่จำลองพื้นดิน"
 	elseif guidanceType == "CompleteQuest004" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The Earth Fragment data is complete. Finish at the cyan Quest Complete marker."
+			return "ข้อมูลชิ้นส่วนโลกครบแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The Earth Fragment is ready. Finish strong at the cyan Quest Complete marker."
+			return "ชิ้นส่วนโลกพร้อมแล้ว จบภารกิจที่สัญลักษณ์สีฟ้า"
 		end
 
-		return "The Earth Fragment is ready. Look for the cyan Quest Complete marker."
+		return "ชิ้นส่วนโลกพร้อมแล้ว มองหาสัญลักษณ์สีฟ้า"
 	elseif guidanceType == "Quest005Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Quest 005 is available. The satellite path leads to THEOS data."
+			return "ภารกิจที่ 5 พร้อมแล้ว เส้นทางดาวเทียมนำไปสู่ข้อมูล THEOS"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Quest 005 is available. Follow the satellite path to the THEOS Satellite Center."
+			return "ภารกิจที่ 5 พร้อมแล้ว ตามเส้นทางดาวเทียมไปยังศูนย์ THEOS"
 		end
 
-		return "Quest 005 is available. Follow the satellite path to the THEOS Satellite Center."
+		return "ภารกิจที่ 5 พร้อมแล้ว ตามเส้นทางดาวเทียมไปยังศูนย์ THEOS"
 	elseif guidanceType == "CompleteQuest005" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The THEOS Fragment signal is stable. Finish at the cyan Quest Complete marker."
+			return "สัญญาณชิ้นส่วน THEOS เสถียรแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The THEOS Fragment is secure. Use the cyan Quest Complete marker to finish this mission."
+			return "ชิ้นส่วน THEOS ปลอดภัยแล้ว ใช้สัญลักษณ์สีฟ้าเพื่อจบภารกิจ"
 		end
 
-		return "The THEOS Fragment is secure. Look for the cyan Quest Complete marker."
+		return "ชิ้นส่วน THEOS ปลอดภัยแล้ว มองหาสัญลักษณ์สีฟ้า"
 	elseif guidanceType == "Quest006Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Quest 006 is available. The satellite signal points toward the Rocket Mission."
+			return "ภารกิจที่ 6 พร้อมแล้ว สัญญาณดาวเทียมชี้ไปยังภารกิจจรวด"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Quest 006 is available. Follow the rocket path to the Rocket Mission zone."
+			return "ภารกิจที่ 6 พร้อมแล้ว ตามเส้นทางจรวดไปยังพื้นที่ภารกิจจรวด"
 		end
 
-		return "Quest 006 is available. Follow the rocket path to the Rocket Mission zone."
+		return "ภารกิจที่ 6 พร้อมแล้ว ตามเส้นทางจรวดไปยังพื้นที่ภารกิจจรวด"
 	elseif guidanceType == "CompleteQuest006" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The Rocket Fragment data is ready. Finish at the cyan Quest Complete marker."
+			return "ข้อมูลชิ้นส่วนจรวดพร้อมแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The Rocket Fragment is ready. Finish strong at the cyan Quest Complete marker."
+			return "ชิ้นส่วนจรวดพร้อมแล้ว จบภารกิจที่สัญลักษณ์สีฟ้า"
 		end
 
-		return "The Rocket Fragment is ready. Look for the cyan Quest Complete marker."
+		return "ชิ้นส่วนจรวดพร้อมแล้ว มองหาสัญลักษณ์สีฟ้า"
 	elseif guidanceType == "Quest007Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "The Rocket Fragment is secure. Quest 007 is available. Astronaut training should prepare us for the next step."
+			return "ชิ้นส่วนจรวดปลอดภัยแล้ว ภารกิจที่ 7 พร้อมแล้ว การฝึกนักบินอวกาศจะช่วยเตรียมเรา"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "The Rocket Fragment is secure. Quest 007 is available. Head to Astronaut Training."
+			return "ชิ้นส่วนจรวดปลอดภัยแล้ว ภารกิจที่ 7 พร้อมแล้ว ไปฝึกนักบินอวกาศกัน"
 		end
 
-		return "The Rocket Fragment is secure. Quest 007 is available. Head to Astronaut Training."
+		return "ชิ้นส่วนจรวดปลอดภัยแล้ว ภารกิจที่ 7 พร้อมแล้ว ไปฝึกนักบินอวกาศกัน"
 	elseif guidanceType == "CompleteQuest007" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Astronaut training is complete. Finish at the cyan Quest Complete marker."
+			return "ฝึกนักบินอวกาศครบแล้ว ไปส่งภารกิจที่สัญลักษณ์สีฟ้า"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Astronaut training is complete. Use the cyan Quest Complete marker to clear the mission."
+			return "ฝึกนักบินอวกาศครบแล้ว ใช้สัญลักษณ์สีฟ้าเพื่อจบภารกิจ"
 		end
 
-		return "Astronaut training is complete. Look for the cyan Quest Complete marker."
+		return "ฝึกนักบินอวกาศครบแล้ว มองหาสัญลักษณ์สีฟ้า"
 	elseif guidanceType == "Quest008Available" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Quest 008 is available. The Moon Walk mission is ready."
+			return "ภารกิจที่ 8 พร้อมแล้ว ภารกิจเดินบนดวงจันทร์เริ่มได้แล้ว"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Quest 008 is available. Head to the Moon Walk zone."
+			return "ภารกิจที่ 8 พร้อมแล้ว ไปยังพื้นที่เดินบนดวงจันทร์"
 		end
 
-		return "Quest 008 is available. Head to the Moon Walk zone."
+		return "ภารกิจที่ 8 พร้อมแล้ว ไปยังพื้นที่เดินบนดวงจันทร์"
 	elseif guidanceType == "CompleteQuest008" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "All Star Core fragments are ready. Complete Episode 1 at the cyan finale marker."
+			return "ชิ้นส่วนสตาร์คอร์ครบแล้ว จบตอนที่ 1 ที่สัญลักษณ์สีฟ้าสุดท้าย"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "All Star Core fragments are ready. Finish Episode 1 at the cyan finale marker."
+			return "ชิ้นส่วนสตาร์คอร์ครบแล้ว ไปจบตอนที่ 1 ที่สัญลักษณ์สีฟ้าสุดท้าย"
 		end
 
-		return "All Star Core fragments are ready. Complete Episode 1 at the cyan finale marker."
+		return "ชิ้นส่วนสตาร์คอร์ครบแล้ว จบตอนที่ 1 ที่สัญลักษณ์สีฟ้าสุดท้าย"
 	elseif guidanceType == "Episode1Complete" then
 		if characterId == CharacterConfig.Ids.Neutron then
-			return "Episode 1 is complete. Star Core Segment 01 has been restored."
+			return "จบตอนที่ 1 แล้ว ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
 		elseif characterId == CharacterConfig.Ids.Atom then
-			return "Episode 1 is complete. Star Core Segment 01 has been restored."
+			return "จบตอนที่ 1 แล้ว ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
 		end
 
-		return "Episode 1 is complete. Star Core Segment 01 has been restored."
+		return "จบตอนที่ 1 แล้ว ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
 	end
 
-	return "Explore nearby discoveries or return to the Command Center."
+	return "สำรวจจุดค้นพบใกล้ ๆ หรือกลับไปที่ศูนย์บัญชาการ"
 end
 
 local QUEST_002_OBJECTIVE_HINTS = {
 	obj_ep01_main_002_001 = {
-		Atom = "Move out. Travel to the Universe Explorer zone and enter the mission area.",
-		Neutron = "We need fresh signal context. Enter the Universe Explorer zone first.",
-		Proton = "Travel to the Universe Explorer zone and enter the mission area.",
+		Atom = "ออกเดินทาง ไปยังพื้นที่นักสำรวจจักรวาลและเข้าสู่เขตภารกิจ",
+		Neutron = "เราต้องดูสัญญาณในพื้นที่จริง เข้าพื้นที่นักสำรวจจักรวาลก่อน",
+		Proton = "เดินทางไปยังพื้นที่นักสำรวจจักรวาลและเข้าสู่เขตภารกิจ",
 	},
 	obj_ep01_main_002_002 = {
-		Atom = "Track the signal. Find the first signal marker in Universe Explorer.",
-		Neutron = "The signal source should be nearby. Locate the first signal marker.",
-		Proton = "Find the first signal marker in the Universe Explorer zone.",
+		Atom = "ตามสัญญาณไป หาสัญลักษณ์สัญญาณจุดแรก",
+		Neutron = "แหล่งสัญญาณน่าจะอยู่ใกล้ ๆ หาสัญลักษณ์จุดแรกให้เจอ",
+		Proton = "หาสัญลักษณ์สัญญาณจุดแรกในพื้นที่นักสำรวจจักรวาล",
 	},
 	obj_ep01_main_002_003 = {
-		Atom = "Scan the marker and secure that data.",
-		Neutron = "Scan the signal marker so we can study its pattern.",
-		Proton = "Scan the signal marker to collect signal data.",
+		Atom = "สแกนสัญลักษณ์และเก็บข้อมูลให้ปลอดภัย",
+		Neutron = "สแกนสัญลักษณ์สัญญาณเพื่อดูรูปแบบของมัน",
+		Proton = "สแกนสัญลักษณ์เพื่อเก็บข้อมูลสัญญาณ",
 	},
 	obj_ep01_main_002_004 = {
-		Atom = "Bring the signal data back for analysis.",
-		Neutron = "Return the signal data to my analysis station.",
-		Proton = "Return the signal data to Neutron's analysis station.",
+		Atom = "นำข้อมูลสัญญาณกลับมาเพื่อวิเคราะห์",
+		Neutron = "นำข้อมูลสัญญาณกลับมาที่สถานีวิเคราะห์ของฉัน",
+		Proton = "นำข้อมูลสัญญาณกลับไปที่สถานีวิเคราะห์ของนิวตรอน",
 	},
 }
 
 local QUEST_003_OBJECTIVE_HINTS = {
 	obj_ep01_main_003_001 = {
-		Atom = "Follow the star signal trail deeper into Universe Explorer.",
-		Neutron = "The mapped signal is extending. Follow the star signal trail.",
-		Proton = "Follow the star signal trail deeper into Universe Explorer.",
+		Atom = "ตามร่องรอยสัญญาณดาวเข้าไปลึกขึ้น",
+		Neutron = "สัญญาณที่ทำแผนที่ไว้กำลังยืดออก ตามร่องรอยสัญญาณดาวไป",
+		Proton = "ตามร่องรอยสัญญาณดาวเข้าไปในพื้นที่นักสำรวจจักรวาล",
 	},
 	obj_ep01_main_003_002 = {
-		Atom = "Inspect the unstable signal echo and stay steady.",
-		Neutron = "Inspect the unstable signal echo so we can understand the distortion.",
-		Proton = "Inspect the unstable signal echo.",
+		Atom = "ตรวจเสียงสะท้อนสัญญาณที่ไม่เสถียรและค่อย ๆ ทำ",
+		Neutron = "ตรวจเสียงสะท้อนสัญญาณ เพื่อเข้าใจความผิดเพี้ยน",
+		Proton = "ตรวจเสียงสะท้อนสัญญาณที่ไม่เสถียร",
 	},
 	obj_ep01_main_003_003 = {
-		Atom = "Stabilize the Universe Fragment before it fades.",
-		Neutron = "Stabilize the Universe Fragment before its signal collapses.",
-		Proton = "Stabilize the Universe Fragment before it fades.",
+		Atom = "ทำให้ชิ้นส่วนจักรวาลเสถียรก่อนที่มันจะจางหาย",
+		Neutron = "ทำให้ชิ้นส่วนจักรวาลเสถียรก่อนสัญญาณจะหายไป",
+		Proton = "ทำให้ชิ้นส่วนจักรวาลเสถียร",
 	},
 	obj_ep01_main_003_004 = {
-		Atom = "Recover the Universe Fragment.",
-		Neutron = "Recover the Universe Fragment for the Star Core record.",
-		Proton = "Recover the Universe Fragment.",
+		Atom = "เก็บชิ้นส่วนจักรวาล",
+		Neutron = "เก็บชิ้นส่วนจักรวาลไว้ในบันทึกของสตาร์คอร์",
+		Proton = "เก็บชิ้นส่วนจักรวาล",
 	},
 }
 
 local QUEST_004_OBJECTIVE_HINTS = {
 	obj_ep01_main_004_001 = {
-		Atom = "Travel to the Terrain Sandbox.",
-		Neutron = "Move to the Terrain Sandbox so we can compare the terrain memory.",
-		Proton = "Travel to the Terrain Sandbox.",
+		Atom = "เดินทางไปยังพื้นที่จำลองพื้นดิน",
+		Neutron = "ไปยังพื้นที่จำลองพื้นดิน เพื่อเทียบข้อมูลความทรงจำพื้นดิน",
+		Proton = "เดินทางไปยังพื้นที่จำลองพื้นดิน",
 	},
 	obj_ep01_main_004_002 = {
-		Atom = "Find the Earth memory marker.",
-		Neutron = "Find the Earth memory marker. It should reveal the terrain pattern.",
-		Proton = "Find the Earth memory marker.",
+		Atom = "หาสัญลักษณ์ความทรงจำของโลก",
+		Neutron = "หาสัญลักษณ์ความทรงจำของโลก มันน่าจะบอกแบบพื้นดินได้",
+		Proton = "หาสัญลักษณ์ความทรงจำของโลก",
 	},
 	obj_ep01_main_004_003 = {
-		Atom = "Rebuild the terrain memory path.",
-		Neutron = "Rebuild the terrain memory path so the Earth Fragment can stabilize.",
-		Proton = "Rebuild the terrain memory path.",
+		Atom = "ประกอบเส้นทางความทรงจำพื้นดิน",
+		Neutron = "ประกอบเส้นทางความทรงจำ เพื่อให้ชิ้นส่วนโลกเสถียร",
+		Proton = "ประกอบเส้นทางความทรงจำพื้นดิน",
 	},
 	obj_ep01_main_004_004 = {
-		Atom = "Recover the Earth Fragment.",
-		Neutron = "Recover the Earth Fragment once the terrain memory is stable.",
-		Proton = "Recover the Earth Fragment.",
+		Atom = "เก็บชิ้นส่วนโลก",
+		Neutron = "เก็บชิ้นส่วนโลกเมื่อความทรงจำพื้นดินเสถียรแล้ว",
+		Proton = "เก็บชิ้นส่วนโลก",
 	},
 }
 
 local QUEST_005_OBJECTIVE_HINTS = {
 	obj_ep01_main_005_001 = {
-		Atom = "Travel to the THEOS Satellite Center.",
-		Neutron = "Move to the THEOS Satellite Center so we can inspect the satellite data.",
-		Proton = "Travel to the THEOS Satellite Center.",
+		Atom = "เดินทางไปยังศูนย์ดาวเทียม THEOS",
+		Neutron = "ไปยังศูนย์ดาวเทียม THEOS เพื่อดูข้อมูลดาวเทียม",
+		Proton = "เดินทางไปยังศูนย์ดาวเทียม THEOS",
 	},
 	obj_ep01_main_005_002 = {
-		Atom = "Inspect the satellite archive for the missing signal.",
-		Neutron = "Inspect the satellite archive for the missing signal pattern.",
-		Proton = "Inspect the satellite archive for the missing signal.",
+		Atom = "ตรวจคลังข้อมูลดาวเทียมเพื่อหาสัญญาณที่หายไป",
+		Neutron = "ตรวจคลังข้อมูลดาวเทียมเพื่อดูรูปแบบสัญญาณที่หายไป",
+		Proton = "ตรวจคลังข้อมูลดาวเทียมเพื่อหาสัญญาณที่หายไป",
 	},
 	obj_ep01_main_005_003 = {
-		Atom = "Restore the signal relay.",
-		Neutron = "Restore the signal relay so the THEOS Fragment can stabilize.",
-		Proton = "Restore the signal relay.",
+		Atom = "ซ่อมตัวส่งต่อสัญญาณ",
+		Neutron = "ซ่อมตัวส่งต่อสัญญาณเพื่อให้ชิ้นส่วน THEOS เสถียร",
+		Proton = "ซ่อมตัวส่งต่อสัญญาณ",
 	},
 	obj_ep01_main_005_004 = {
-		Atom = "Recover the THEOS Fragment.",
-		Neutron = "Recover the THEOS Fragment once the relay is stable.",
-		Proton = "Recover the THEOS Fragment.",
+		Atom = "เก็บชิ้นส่วน THEOS",
+		Neutron = "เก็บชิ้นส่วน THEOS เมื่อตัวส่งต่อสัญญาณเสถียรแล้ว",
+		Proton = "เก็บชิ้นส่วน THEOS",
 	},
 }
 
 local QUEST_006_OBJECTIVE_HINTS = {
 	obj_ep01_main_006_001 = {
-		Atom = "Travel to the Rocket Mission zone.",
-		Neutron = "Travel to the Rocket Mission zone to inspect the launch path.",
-		Proton = "Travel to the Rocket Mission zone.",
+		Atom = "เดินทางไปยังพื้นที่ภารกิจจรวด",
+		Neutron = "ไปยังพื้นที่ภารกิจจรวดเพื่อตรวจเส้นทางปล่อยจรวด",
+		Proton = "เดินทางไปยังพื้นที่ภารกิจจรวด",
 	},
 	obj_ep01_main_006_002 = {
-		Atom = "Inspect the rocket control panel.",
-		Neutron = "Inspect the rocket control panel for launch system data.",
-		Proton = "Inspect the rocket control panel.",
+		Atom = "ตรวจแผงควบคุมจรวด",
+		Neutron = "ตรวจแผงควบคุมจรวดเพื่อดูข้อมูลระบบปล่อย",
+		Proton = "ตรวจแผงควบคุมจรวด",
 	},
 	obj_ep01_main_006_003 = {
-		Atom = "Run the launch diagnostics.",
-		Neutron = "Run the launch diagnostics to verify the rocket path.",
-		Proton = "Run the launch diagnostics.",
+		Atom = "ตรวจระบบก่อนปล่อยจรวด",
+		Neutron = "ตรวจระบบก่อนปล่อยเพื่อยืนยันเส้นทางจรวด",
+		Proton = "ตรวจระบบก่อนปล่อยจรวด",
 	},
 	obj_ep01_main_006_004 = {
-		Atom = "Recover the Rocket Fragment.",
-		Neutron = "Recover the Rocket Fragment after diagnostics are complete.",
-		Proton = "Recover the Rocket Fragment.",
+		Atom = "เก็บชิ้นส่วนจรวด",
+		Neutron = "เก็บชิ้นส่วนจรวดหลังตรวจระบบเสร็จ",
+		Proton = "เก็บชิ้นส่วนจรวด",
 	},
 }
 
 local QUEST_007_OBJECTIVE_HINTS = {
 	obj_ep01_main_007_001 = {
-		Atom = "Travel to Astronaut Training.",
-		Neutron = "Travel to Astronaut Training so we can verify mission readiness.",
-		Proton = "Travel to Astronaut Training.",
+		Atom = "เดินทางไปยังพื้นที่ฝึกนักบินอวกาศ",
+		Neutron = "ไปยังพื้นที่ฝึกนักบินอวกาศเพื่อยืนยันความพร้อม",
+		Proton = "เดินทางไปยังพื้นที่ฝึกนักบินอวกาศ",
 	},
 	obj_ep01_main_007_002 = {
-		Atom = "Complete the movement training station.",
-		Neutron = "Complete the movement training station to test control in space-like conditions.",
-		Proton = "Complete the movement training station.",
+		Atom = "ผ่านสถานีฝึกการเคลื่อนที่",
+		Neutron = "ผ่านสถานีฝึกการเคลื่อนที่ เพื่อทดสอบการควบคุมแบบอวกาศ",
+		Proton = "ผ่านสถานีฝึกการเคลื่อนที่",
 	},
 	obj_ep01_main_007_003 = {
-		Atom = "Complete the oxygen safety check.",
-		Neutron = "Complete the oxygen safety check before Moon clearance.",
-		Proton = "Complete the oxygen safety check.",
+		Atom = "ตรวจความปลอดภัยของออกซิเจน",
+		Neutron = "ตรวจความปลอดภัยของออกซิเจนก่อนรับอนุญาตไปดวงจันทร์",
+		Proton = "ตรวจความปลอดภัยของออกซิเจน",
 	},
 	obj_ep01_main_007_004 = {
-		Atom = "Receive Moon mission clearance.",
-		Neutron = "Receive Moon mission clearance after safety checks are complete.",
-		Proton = "Receive Moon mission clearance.",
+		Atom = "รับอนุญาตสำหรับภารกิจดวงจันทร์",
+		Neutron = "รับอนุญาตภารกิจดวงจันทร์หลังตรวจความปลอดภัยครบ",
+		Proton = "รับอนุญาตสำหรับภารกิจดวงจันทร์",
 	},
 }
 
 local QUEST_008_OBJECTIVE_HINTS = {
 	obj_ep01_main_008_001 = {
-		Atom = "Travel to the Moon Walk zone.",
-		Neutron = "Travel to the Moon Walk zone to follow the final signal.",
-		Proton = "Travel to the Moon Walk zone.",
+		Atom = "เดินทางไปยังพื้นที่เดินบนดวงจันทร์",
+		Neutron = "ไปยังพื้นที่เดินบนดวงจันทร์เพื่อตามสัญญาณสุดท้าย",
+		Proton = "เดินทางไปยังพื้นที่เดินบนดวงจันทร์",
 	},
 	obj_ep01_main_008_002 = {
-		Atom = "Follow the Moon signal trail.",
-		Neutron = "Follow the Moon signal trail and watch how the fragment signature changes.",
-		Proton = "Follow the Moon signal trail.",
+		Atom = "ตามร่องรอยสัญญาณดวงจันทร์",
+		Neutron = "ตามร่องรอยสัญญาณดวงจันทร์และดูการเปลี่ยนแปลงของชิ้นส่วน",
+		Proton = "ตามร่องรอยสัญญาณดวงจันทร์",
 	},
 	obj_ep01_main_008_003 = {
-		Atom = "Recover the Moon Fragment.",
-		Neutron = "Recover the Moon Fragment before the final restoration.",
-		Proton = "Recover the Moon Fragment.",
+		Atom = "เก็บชิ้นส่วนดวงจันทร์",
+		Neutron = "เก็บชิ้นส่วนดวงจันทร์ก่อนการฟื้นฟูสุดท้าย",
+		Proton = "เก็บชิ้นส่วนดวงจันทร์",
 	},
 	obj_ep01_main_008_004 = {
-		Atom = "Verify the Episode 1 fragment set.",
-		Neutron = "Verify all five Episode 1 fragments before restoring the segment.",
-		Proton = "Verify all Episode 1 fragments.",
+		Atom = "ตรวจชุดชิ้นส่วนของตอนที่ 1",
+		Neutron = "ตรวจชิ้นส่วนทั้งห้าของตอนที่ 1 ก่อนฟื้นฟูส่วนหลัก",
+		Proton = "ตรวจชิ้นส่วนทั้งหมดของตอนที่ 1",
 	},
 	obj_ep01_main_008_005 = {
-		Atom = "Restore Star Core Segment 01.",
-		Neutron = "Restore Star Core Segment 01 using the complete fragment set.",
-		Proton = "Restore Star Core Segment 01.",
+		Atom = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1",
+		Neutron = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 ด้วยชุดชิ้นส่วนที่ครบแล้ว",
+		Proton = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1",
 	},
 }
 

@@ -19,45 +19,45 @@ screenGui.Parent = playerGui
 
 local typeStyles = {
 	Hint = {
-		Title = "Guide",
+		Title = "คำแนะนำ",
 		Accent = Color3.fromRGB(92, 180, 255),
 		Background = Color3.fromRGB(22, 32, 44),
 	},
 	Blocked = {
-		Title = "Not Yet",
+		Title = "ยังไม่ได้",
 		Accent = Color3.fromRGB(255, 190, 92),
 		Background = Color3.fromRGB(44, 34, 22),
 	},
 	QuestStarted = {
-		Title = "Quest Started",
+		Title = "เริ่มภารกิจแล้ว",
 		Accent = Color3.fromRGB(99, 218, 132),
 		Background = Color3.fromRGB(20, 38, 28),
 	},
 	ObjectiveUpdated = {
-		Title = "Objective Complete",
+		Title = "ทำเป้าหมายสำเร็จ",
 		Accent = Color3.fromRGB(106, 202, 255),
 		Background = Color3.fromRGB(20, 34, 42),
 	},
 	QuestCompleted = {
-		Title = "Quest Complete",
+		Title = "ส่งภารกิจแล้ว",
 		Accent = Color3.fromRGB(77, 225, 218),
 		Background = Color3.fromRGB(18, 42, 42),
 		Long = true,
 	},
 	RewardReceived = {
-		Title = "Reward Received",
+		Title = "ได้รับรางวัล",
 		Accent = Color3.fromRGB(255, 216, 96),
 		Background = Color3.fromRGB(46, 38, 18),
 		Long = true,
 	},
 	EpisodeCompleted = {
-		Title = "Episode Complete",
+		Title = "จบตอนแล้ว",
 		Accent = Color3.fromRGB(255, 244, 140),
 		Background = Color3.fromRGB(38, 32, 56),
 		Long = true,
 	},
 	Onboarding = {
-		Title = "Welcome",
+		Title = "ยินดีต้อนรับ",
 		Accent = Color3.fromRGB(99, 218, 132),
 		Background = Color3.fromRGB(22, 36, 36),
 		Long = true,
@@ -147,17 +147,17 @@ questTitleLabel.Text = "ANP Adventures"
 local objectiveLabel = createLabel("CurrentObjective", questFrame, Enum.Font.GothamMedium, 14, Color3.fromRGB(230, 238, 246))
 objectiveLabel.Position = UDim2.fromOffset(18, 44)
 objectiveLabel.Size = UDim2.new(1, -34, 0, 42)
-objectiveLabel.Text = "No active quest"
+objectiveLabel.Text = "ยังไม่มีภารกิจที่กำลังทำ"
 
 local progressLabel = createLabel("Progress", questFrame, Enum.Font.GothamBold, 13, Color3.fromRGB(151, 222, 255))
 progressLabel.Position = UDim2.fromOffset(18, 90)
 progressLabel.Size = UDim2.new(1, -34, 0, 20)
-progressLabel.Text = "Progress: No active quest"
+progressLabel.Text = "ความคืบหน้า: ยังไม่มีภารกิจ"
 
 local hintLabel = createLabel("Hint", questFrame, Enum.Font.Gotham, 12, Color3.fromRGB(202, 216, 230))
 hintLabel.Position = UDim2.fromOffset(18, 112)
 hintLabel.Size = UDim2.new(1, -34, 0, 34)
-hintLabel.Text = "Hint: Look for a green Quest Start marker."
+hintLabel.Text = "คำแนะนำ: มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจ"
 
 local zoneLabel = createLabel("Zone", questFrame, Enum.Font.GothamMedium, 11, Color3.fromRGB(176, 192, 208))
 zoneLabel.Position = UDim2.fromOffset(18, 148)
@@ -182,13 +182,13 @@ local episodeTitle = createLabel("Title", episodeBanner, Enum.Font.GothamBold, 2
 episodeTitle.Position = UDim2.fromOffset(22, 18)
 episodeTitle.Size = UDim2.new(1, -44, 0, 34)
 episodeTitle.TextXAlignment = Enum.TextXAlignment.Center
-episodeTitle.Text = "Episode 1 Complete!"
+episodeTitle.Text = "จบตอนที่ 1 แล้ว!"
 
 local episodeMessage = createLabel("Message", episodeBanner, Enum.Font.GothamMedium, 16, Color3.fromRGB(245, 248, 255))
 episodeMessage.Position = UDim2.fromOffset(22, 58)
 episodeMessage.Size = UDim2.new(1, -44, 0, 42)
 episodeMessage.TextXAlignment = Enum.TextXAlignment.Center
-episodeMessage.Text = "Star Core Segment 01 Restored"
+episodeMessage.Text = "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
 
 local activeNotifications = {}
 local lastNotificationKey = nil
@@ -319,27 +319,27 @@ end
 local function updateQuestPanel(payload)
 	local state = tostring(payload.State or "NoQuest")
 	local title = payload.QuestTitle or payload.QuestId or "ANP Adventures"
-	local objective = payload.CurrentObjectiveText or "No active quest"
+	local objective = payload.CurrentObjectiveText or "ยังไม่มีภารกิจที่กำลังทำ"
 	local progress = payload.ProgressText or state
-	local hint = payload.HintText or "Look for a green Quest Start marker."
+	local hint = payload.HintText or "มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจ"
 	local zoneName = payload.ZoneName
 
 	if state == "NoQuest" then
 		title = payload.QuestTitle or "ANP Adventures"
-		objective = payload.CurrentObjectiveText or "No active quest"
-		progress = payload.ProgressText or "No active quest"
-		hint = payload.HintText or "Look for a green Quest Start marker."
+		objective = payload.CurrentObjectiveText or "ยังไม่มีภารกิจที่กำลังทำ"
+		progress = payload.ProgressText or "ยังไม่มีภารกิจที่กำลังทำ"
+		hint = payload.HintText or "มองหาสัญลักษณ์สีเขียวเพื่อเริ่มภารกิจ"
 		questAccent.BackgroundColor3 = Color3.fromRGB(99, 218, 132)
 	elseif state == "QuestCompleted" then
-		objective = payload.CurrentObjectiveText or "Quest complete. Find the next green marker."
-		progress = payload.ProgressText or "Quest complete"
-		hint = payload.HintText or "Start the next quest at the green marker."
+		objective = payload.CurrentObjectiveText or "ส่งภารกิจแล้ว มองหาสัญลักษณ์สีเขียวถัดไป"
+		progress = payload.ProgressText or "ส่งภารกิจแล้ว"
+		hint = payload.HintText or "เริ่มภารกิจถัดไปที่สัญลักษณ์สีเขียว"
 		questAccent.BackgroundColor3 = Color3.fromRGB(77, 225, 218)
 	elseif state == "EpisodeCompleted" then
-		title = payload.QuestTitle or "Episode 1 Complete!"
-		objective = payload.CurrentObjectiveText or "Star Core Segment 01 restored."
-		progress = payload.ProgressText or "Episode 1 complete"
-		hint = payload.HintText or "Star Core Segment 01 restored."
+		title = payload.QuestTitle or "จบตอนที่ 1 แล้ว!"
+		objective = payload.CurrentObjectiveText or "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
+		progress = payload.ProgressText or "จบตอนที่ 1 แล้ว"
+		hint = payload.HintText or "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ"
 		questAccent.BackgroundColor3 = Color3.fromRGB(255, 232, 130)
 	else
 		questAccent.BackgroundColor3 = Color3.fromRGB(92, 180, 255)
@@ -347,9 +347,9 @@ local function updateQuestPanel(payload)
 
 	questTitleLabel.Text = truncateText(title, 48)
 	objectiveLabel.Text = truncateText(objective, UIConfig.QuestTracker.MaxObjectiveTextLength)
-	progressLabel.Text = "Progress: " .. tostring(progress)
-	hintLabel.Text = "Hint: " .. truncateText(hint, UIConfig.QuestTracker.MaxHintTextLength)
-	zoneLabel.Text = zoneName and ("Zone: " .. tostring(zoneName)) or ""
+	progressLabel.Text = "ความคืบหน้า: " .. tostring(progress)
+	hintLabel.Text = "คำแนะนำ: " .. truncateText(hint, UIConfig.QuestTracker.MaxHintTextLength)
+	zoneLabel.Text = zoneName and ("พื้นที่: " .. tostring(zoneName)) or ""
 end
 
 local function updateLastHint(payload)
@@ -358,14 +358,14 @@ local function updateLastHint(payload)
 		return
 	end
 
-	hintLabel.Text = "Hint: " .. truncateText(message, UIConfig.QuestTracker.MaxHintTextLength)
+	hintLabel.Text = "คำแนะนำ: " .. truncateText(message, UIConfig.QuestTracker.MaxHintTextLength)
 end
 
 local function showEpisodeBanner(payload)
 	bannerToken += 1
 	local token = bannerToken
-	episodeTitle.Text = tostring(payload.Title or "Episode 1 Complete!")
-	episodeMessage.Text = tostring(payload.Message or "Star Core Segment 01 Restored")
+	episodeTitle.Text = tostring(payload.Title or "จบตอนที่ 1 แล้ว!")
+	episodeMessage.Text = tostring(payload.Message or "ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ")
 	episodeBanner.Visible = true
 	tweenTransparency(episodeBanner, 0.04, 0.2)
 

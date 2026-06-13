@@ -81,7 +81,7 @@ function Phase3FDSmokeTest.Run(services)
 	assertCondition(completePart.Data:GetAttribute("InteractionType") == "QuestComplete", "QuestComplete part should expose InteractionType.")
 
 	assertResultSuccess(PromptBindingService.BindAllPrompts(), "PromptBindingService should bind QuestComplete prompt.")
-	local completePrompt = assertPrompt(PromptBindingService, "interaction_complete_ep01_main_001", "Complete Quest", "Complete Quest 001")
+	local completePrompt = assertPrompt(PromptBindingService, "interaction_complete_ep01_main_001", "ส่งภารกิจ", "ส่งภารกิจที่ 1")
 
 	local player = makeFakePlayer(939001, "Phase3FDTurnIn")
 	assertResultSuccess(PlayerDataService.InitPlayer(player), "Phase 3F-D player data should initialize.")
@@ -124,7 +124,7 @@ function Phase3FDSmokeTest.Run(services)
 	assertCondition(completePrompt.Enabled == true, "QuestComplete prompt should enable after all objectives complete.")
 
 	local protonTurnInGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContains(protonTurnInGuidance, "Quest Complete marker", "Proton should guide to Quest Complete marker.")
+	assertGuidanceContains(protonTurnInGuidance, "สัญลักษณ์สีฟ้า", "Proton should guide to Quest Complete marker.")
 
 	local completeResult = PromptBindingService.SimulatePromptTrigger(player, "interaction_complete_ep01_main_001", {})
 	assertResultSuccess(completeResult, "QuestComplete interaction should complete Quest 001.")

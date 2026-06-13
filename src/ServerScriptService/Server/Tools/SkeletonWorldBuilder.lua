@@ -43,7 +43,7 @@ local PLACEHOLDER_COLORS = {
 
 local ZONE_PRESENTATION = {
 	zone_ep01_command_center = {
-		Name = "Command Center",
+		Name = "ศูนย์บัญชาการ",
 		BaseColor = Color3.fromRGB(210, 232, 255),
 		AccentColor = Color3.fromRGB(76, 151, 255),
 		Material = Enum.Material.SmoothPlastic,
@@ -51,7 +51,7 @@ local ZONE_PRESENTATION = {
 		Depth = 23,
 	},
 	zone_ep01_universe_explorer = {
-		Name = "Universe Explorer",
+		Name = "นักสำรวจจักรวาล",
 		BaseColor = Color3.fromRGB(38, 34, 72),
 		AccentColor = Color3.fromRGB(116, 89, 255),
 		Material = Enum.Material.Neon,
@@ -59,7 +59,7 @@ local ZONE_PRESENTATION = {
 		Depth = 54,
 	},
 	zone_ep01_terrain_sandbox = {
-		Name = "Terrain Sandbox",
+		Name = "พื้นที่จำลองพื้นดิน",
 		BaseColor = Color3.fromRGB(112, 158, 91),
 		AccentColor = Color3.fromRGB(205, 176, 105),
 		Material = Enum.Material.Grass,
@@ -67,7 +67,7 @@ local ZONE_PRESENTATION = {
 		Depth = 23,
 	},
 	zone_ep01_theos_satellite_center = {
-		Name = "THEOS Satellite Center",
+		Name = "ศูนย์ดาวเทียม THEOS",
 		BaseColor = Color3.fromRGB(214, 222, 226),
 		AccentColor = Color3.fromRGB(117, 188, 230),
 		Material = Enum.Material.Metal,
@@ -75,7 +75,7 @@ local ZONE_PRESENTATION = {
 		Depth = 23,
 	},
 	zone_ep01_rocket_mission = {
-		Name = "Rocket Mission",
+		Name = "ภารกิจจรวด",
 		BaseColor = Color3.fromRGB(92, 92, 96),
 		AccentColor = Color3.fromRGB(255, 128, 70),
 		Material = Enum.Material.Concrete,
@@ -83,7 +83,7 @@ local ZONE_PRESENTATION = {
 		Depth = 23,
 	},
 	zone_ep01_astronaut_training = {
-		Name = "Astronaut Training",
+		Name = "ฝึกนักบินอวกาศ",
 		BaseColor = Color3.fromRGB(216, 238, 250),
 		AccentColor = Color3.fromRGB(70, 170, 255),
 		Material = Enum.Material.SmoothPlastic,
@@ -91,7 +91,7 @@ local ZONE_PRESENTATION = {
 		Depth = 23,
 	},
 	zone_ep01_moon_walk = {
-		Name = "Moon Walk",
+		Name = "เดินบนดวงจันทร์",
 		BaseColor = Color3.fromRGB(176, 178, 184),
 		AccentColor = Color3.fromRGB(255, 232, 132),
 		Material = Enum.Material.Slate,
@@ -99,7 +99,6 @@ local ZONE_PRESENTATION = {
 		Depth = 25,
 	},
 }
-
 local CHARACTER_FRIENDLY_NAMES = {
 	[CharacterConfig.Ids.Atom] = "Atom",
 	[CharacterConfig.Ids.Neutron] = "Neutron",
@@ -107,14 +106,13 @@ local CHARACTER_FRIENDLY_NAMES = {
 }
 
 local DISCOVERY_FRIENDLY_NAMES = {
-	disc_ep01_command_expedition_terminal = "Expedition Terminal",
-	disc_ep01_command_star_core_display = "Star Core Display",
-	disc_ep01_universe_first_signal_marker = "First Signal Marker",
-	disc_ep01_universe_analysis_station = "Neutron Analysis Station",
-	disc_ep01_theos_satellite_history = "THEOS Satellite History",
-	disc_ep01_moon_star_core_segment_restoration_point = "Star Core Restoration Point",
+	disc_ep01_command_expedition_terminal = "เครื่องควบคุมการสำรวจ",
+	disc_ep01_command_star_core_display = "จอแสดงผลสตาร์คอร์",
+	disc_ep01_universe_first_signal_marker = "สัญลักษณ์สัญญาณจุดแรก",
+	disc_ep01_universe_analysis_station = "สถานีวิเคราะห์ของนิวตรอน",
+	disc_ep01_theos_satellite_history = "ประวัติดาวเทียม THEOS",
+	disc_ep01_moon_star_core_segment_restoration_point = "จุดฟื้นฟูสตาร์คอร์",
 }
-
 local EPISODE_ONE_ZONE_IDS = {
 	"zone_ep01_command_center",
 	"zone_ep01_universe_explorer",
@@ -805,44 +803,43 @@ end
 local function getObjectiveShortName(objectiveId)
 	local objectiveNumber = tonumber(string.match(objectiveId or "", "_(%d+)$"))
 	if objectiveNumber then
-		return "Obj" .. tostring(objectiveNumber)
+		return "เป้าหมาย " .. tostring(objectiveNumber)
 	end
 
-	return "Obj"
+	return "เป้าหมาย"
 end
 
 local function getZoneShortName(zoneId)
 	if zoneId == "zone_ep01_universe_explorer" then
-		return "Universe"
+		return "จักรวาล"
 	elseif zoneId == "zone_ep01_terrain_sandbox" then
-		return "Terrain"
+		return "พื้นดิน"
 	elseif zoneId == "zone_ep01_theos_satellite_center" then
 		return "THEOS"
 	elseif zoneId == "zone_ep01_rocket_mission" then
-		return "Rocket"
+		return "จรวด"
 	elseif zoneId == "zone_ep01_astronaut_training" then
-		return "Astronaut"
+		return "ฝึกอวกาศ"
 	elseif zoneId == "zone_ep01_moon_walk" then
-		return "Moon Walk"
+		return "ดวงจันทร์"
 	end
 
-	return "Command"
+	return "ศูนย์บัญชาการ"
 end
 
 local function getCompactInteractionLabel(interaction, friendlyName)
 	if interaction.Type == "QuestStart" then
-		return getQuestShortName(interaction.QuestId) .. " Start"
+		return getQuestShortName(interaction.QuestId) .. " เริ่ม"
 	elseif interaction.Type == "QuestComplete" then
-		return getQuestShortName(interaction.QuestId) .. " Complete"
+		return getQuestShortName(interaction.QuestId) .. " ส่ง"
 	elseif interaction.Type == "QuestObjective" then
 		return getQuestShortName(interaction.QuestId) .. " " .. getObjectiveShortName(interaction.ObjectiveId)
 	elseif interaction.Type == "ZoneTravel" then
-		return "Travel " .. getZoneShortName(interaction.ZoneId)
+		return "เดินทาง " .. getZoneShortName(interaction.ZoneId)
 	end
 
 	return friendlyName
 end
-
 local function setDeveloperLabel(object, category, friendlyName, internalId, compactText)
 	if not object:IsA("BasePart") then
 		return
@@ -1002,7 +999,7 @@ local function createQuestPathPresentation(presentationFolder)
 			0.08,
 			Enum.Material.SmoothPlastic
 		)
-		setDeveloperLabel(sign, "ROUTE", "Quest " .. questIndex, questId, if questIndex == 8 then "Q8 Finale" else "Q" .. questIndex)
+		setDeveloperLabel(sign, "ROUTE", "ภารกิจ " .. questIndex, questId, if questIndex == 8 then "ภารกิจ 8 ตอนจบ" else "ภารกิจ " .. questIndex)
 
 		for stepIndex = 0, completeStepIndex - 1 do
 			local arrowPosition = getTrackPosition(questId, stepIndex, 0.7, 0) + Vector3.new(TRACK_STEP_SPACING / 2, 0, -5.5)
@@ -1050,10 +1047,10 @@ end
 local function questFriendlyName(questId)
 	local questNumber = string.match(questId or "", "main_(%d+)")
 	if questNumber then
-		return "Quest " .. questNumber
+		return "ภารกิจ " .. questNumber
 	end
 
-	return questId or "Quest"
+	return questId or "ภารกิจ"
 end
 
 local function getInteractionFriendlyName(interaction)

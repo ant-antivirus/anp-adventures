@@ -309,7 +309,7 @@ function RewardService.GrantRewardBundle(player, rewardBundleId, sourceContext)
 	end
 
 	if playerFeedbackService then
-		playerFeedbackService.SendRewardReceived(player, rewardBundleId, "Reward received.")
+		playerFeedbackService.SendRewardReceived(player, rewardBundleId, "ได้รับรางวัลแล้ว")
 	end
 
 	return result(true, "RewardGranted", nil, summary)

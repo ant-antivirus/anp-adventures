@@ -31,17 +31,17 @@ local cooldownsByPlayerInteraction = {}
 local cooldownDurationSeconds = 1
 
 local FALLBACK_HINTS = {
-	QuestNotActive = "This clue is useful, but the expedition has not started yet.",
-	ObjectiveDependencyMissing = "You need to complete the previous step first.",
-	QuestPrerequisiteMissing = "This quest is not ready yet. Finish the previous expedition step first.",
-	QuestLocked = "This quest is not ready yet. Finish the previous expedition step first.",
-	RequiredObjectiveIncomplete = "This quest is not ready to complete yet. Finish the remaining objective first.",
-	DiscoveryAlreadyRecorded = "You already discovered this.",
-	ObjectiveAlreadyCompleted = "You already checked this.",
-	QuestAlreadyCompleted = "This quest is already complete.",
-	QuestAlreadyActive = "This quest is already active.",
-	ZoneLocked = "This area is not available yet.",
-	InteractionDisabled = "This interaction is not available right now.",
+	QuestNotActive = "เบาะแสนี้มีประโยชน์ แต่ยังไม่ได้เริ่มการสำรวจ",
+	ObjectiveDependencyMissing = "ทำขั้นตอนก่อนหน้าให้เสร็จก่อนนะ",
+	QuestPrerequisiteMissing = "ภารกิจนี้ยังไม่พร้อม ทำขั้นตอนก่อนหน้าให้เสร็จก่อนนะ",
+	QuestLocked = "ภารกิจนี้ยังไม่พร้อม ทำขั้นตอนก่อนหน้าให้เสร็จก่อนนะ",
+	RequiredObjectiveIncomplete = "ยังส่งภารกิจไม่ได้ ทำเป้าหมายที่เหลือให้เสร็จก่อนนะ",
+	DiscoveryAlreadyRecorded = "ค้นพบสิ่งนี้แล้ว",
+	ObjectiveAlreadyCompleted = "ตรวจสิ่งนี้แล้ว",
+	QuestAlreadyCompleted = "ภารกิจนี้เสร็จแล้ว",
+	QuestAlreadyActive = "กำลังทำภารกิจนี้อยู่",
+	ZoneLocked = "พื้นที่นี้ยังเข้าไม่ได้",
+	InteractionDisabled = "ตอนนี้ยังใช้งานสิ่งนี้ไม่ได้",
 }
 
 local FOCUSED_OBJECT_STATE_DEBUG_INTERACTIONS = {
@@ -125,7 +125,7 @@ local function getHintText(definition, code)
 		return definition.AlreadyDiscoveredHintText or definition.AlreadyCompletedHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
 	elseif code == "ObjectiveAlreadyCompleted" then
 		if definition.ObjectBehaviorType == "CollectibleItem" then
-			return definition.AlreadyCollectedHintText or definition.AlreadyUsedHintText or definition.UnavailableHintText or "You already collected this."
+			return definition.AlreadyCollectedHintText or definition.AlreadyUsedHintText or definition.UnavailableHintText or "เก็บสิ่งนี้แล้ว"
 		end
 		return definition.AlreadyUsedHintText or definition.AlreadyCompletedHintText or definition.UnavailableHintText or FALLBACK_HINTS[code]
 	elseif code == "QuestAlreadyCompleted" then

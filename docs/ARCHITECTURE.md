@@ -59,6 +59,12 @@ Phase 6D locks Episode 1 as the active MVP baseline. Runtime IDs for `ep01_lost_
 
 Future expansion must not rename, reuse, or delete locked EP1 IDs without migration/version planning. EP1 remains the only active episode; no active EP2 gameplay content is part of this baseline. Real DataStore remains disabled by default, server authority remains unchanged, and client UI stays display-only.
 
+## Phase 6E Thai Localization
+
+Phase 6E sets the Episode 1 MVP player-facing language to Thai. Quest titles, objective text, hints, onboarding, marker legend, UI labels, and visible world sign text may be Thai.
+
+Runtime IDs, enum/state strings, RemoteEvent payload field names, SaveSchema field names, service names, and file names remain stable English identifiers. Client code still only displays server payloads and does not calculate quest progress, rewards, or save/load state.
+
 ## Recommended Folder Structure
 
 ```text

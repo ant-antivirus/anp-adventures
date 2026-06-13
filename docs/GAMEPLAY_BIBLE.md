@@ -124,6 +124,8 @@ Phase 6C adds first-time onboarding guidance for fresh Episode 1 players. Onboar
 
 Phase 6D locks Episode 1 as the current active MVP content baseline. Quest 001 through Quest 008, required objective counts, Episode 1 final reward semantics, active zone IDs, and save/tracker contracts are documented in `EP1_CONTENT_LOCK_MANIFEST.md`. Future content must not alter locked EP1 IDs without migration planning.
 
+Phase 6E translates and polishes player-facing Episode 1 text into Thai. Runtime IDs and gameplay contracts remain unchanged; Thai text is presentation only.
+
 ---
 
 ## Badge System

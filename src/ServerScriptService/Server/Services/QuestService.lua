@@ -342,7 +342,7 @@ function QuestService.StartQuest(player, questId, sourceContext)
 		ZoneId = questDefinition.ZoneId,
 	})
 	if playerFeedbackService then
-		playerFeedbackService.SendQuestStarted(player, questId, "Quest started. Follow the next objective.")
+		playerFeedbackService.SendQuestStarted(player, questId, "เริ่มภารกิจแล้ว ตามเป้าหมายถัดไป")
 	end
 	refreshInteractionVisibility(player)
 	sendQuestTrackerUpdate(player)
@@ -516,7 +516,7 @@ function QuestService.ApplyObjectiveProgress(player, questId, objectiveId, amoun
 	end
 
 	if willCompleteObjective and playerFeedbackService then
-		playerFeedbackService.SendObjectiveUpdated(player, questId, objectiveId, "Objective complete. Check the next step.")
+		playerFeedbackService.SendObjectiveUpdated(player, questId, objectiveId, "ทำเป้าหมายสำเร็จ ดูขั้นตอนถัดไป")
 	end
 	if willCompleteObjective then
 		sendQuestTrackerUpdate(player)
@@ -704,7 +704,7 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 			return episodeCompletionResult
 		end
 		if playerFeedbackService then
-			playerFeedbackService.SendEpisodeCompleted(player, questDefinition.EpisodeId, "Episode 1 complete. Star Core Segment 01 has been restored.")
+			playerFeedbackService.SendEpisodeCompleted(player, questDefinition.EpisodeId, "จบตอนที่ 1 แล้ว ฟื้นฟูสตาร์คอร์ส่วนที่ 1 สำเร็จ")
 		end
 	end
 
@@ -716,7 +716,7 @@ function QuestService.CompleteQuest(player, questId, sourceContext)
 		RewardBundleIds = grantedRewardBundleIds,
 	})
 	if playerFeedbackService then
-		playerFeedbackService.SendQuestCompleted(player, questId, "Quest complete.")
+		playerFeedbackService.SendQuestCompleted(player, questId, "ส่งภารกิจสำเร็จ")
 	end
 	refreshInteractionVisibility(player)
 	sendQuestTrackerUpdate(player)

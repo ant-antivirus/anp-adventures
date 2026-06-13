@@ -1,6 +1,7 @@
 return {
 	zone_ep01_command_center = {
 		ZoneId = "zone_ep01_command_center",
+		DisplayName = "ศูนย์บัญชาการ",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Playable",
 		UnlockRules = {
@@ -19,6 +20,7 @@ return {
 	},
 	zone_ep01_universe_explorer = {
 		ZoneId = "zone_ep01_universe_explorer",
+		DisplayName = "นักสำรวจจักรวาล",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Playable",
 		UnlockRules = {
@@ -39,6 +41,7 @@ return {
 	},
 	zone_ep01_terrain_sandbox = {
 		ZoneId = "zone_ep01_terrain_sandbox",
+		DisplayName = "พื้นที่จำลองพื้นดิน",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Prototype",
 		UnlockRules = {
@@ -58,6 +61,7 @@ return {
 	},
 	zone_ep01_theos_satellite_center = {
 		ZoneId = "zone_ep01_theos_satellite_center",
+		DisplayName = "ศูนย์ดาวเทียม THEOS",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Prototype",
 		UnlockRules = {
@@ -85,6 +89,7 @@ return {
 	},
 	zone_ep01_rocket_mission = {
 		ZoneId = "zone_ep01_rocket_mission",
+		DisplayName = "ภารกิจจรวด",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Prototype",
 		UnlockRules = {
@@ -104,6 +109,7 @@ return {
 	},
 	zone_ep01_astronaut_training = {
 		ZoneId = "zone_ep01_astronaut_training",
+		DisplayName = "ฝึกนักบินอวกาศ",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Prototype",
 		UnlockRules = {
@@ -123,6 +129,7 @@ return {
 	},
 	zone_ep01_moon_walk = {
 		ZoneId = "zone_ep01_moon_walk",
+		DisplayName = "เดินบนดวงจันทร์",
 		EpisodeId = "ep01_lost_star_core",
 		ContentStatus = "Prototype",
 		UnlockRules = {

@@ -124,10 +124,10 @@ function Phase3G1SmokeTest.Run(services)
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_ep01_main_002_001", {}), "Quest 002 objective 001 should progress through interaction.")
 
 	local protonGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContains(protonGuidance, "Find the first signal marker", "Proton should guide to Quest 002 objective 002.")
+	assertGuidanceContains(protonGuidance, "หาสัญลักษณ์สัญญาณจุดแรก", "Proton should guide to Quest 002 objective 002.")
 
 	local neutronGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_neutron_guide", {})
-	assertGuidanceContains(neutronGuidance, "Locate the first signal marker", "Neutron should guide to Quest 002 objective 002.")
+	assertGuidanceContains(neutronGuidance, "หาสัญลักษณ์จุดแรก", "Neutron should guide to Quest 002 objective 002.")
 
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_ep01_main_002_002", {}), "Quest 002 objective 002 should progress through interaction.")
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_ep01_main_002_003", {}), "Quest 002 objective 003 should progress through interaction.")
@@ -190,7 +190,7 @@ function Phase3G1SmokeTest.Run(services)
 	local postQuest002Guidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
 	assertGuidanceContainsAll(
 		postQuest002Guidance,
-		{ "Quest 003", "available" },
+		{ "ภารกิจที่ 3", "พร้อม" },
 		"Guidance after Quest 002 should point to Quest 003."
 	)
 

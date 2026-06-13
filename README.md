@@ -26,6 +26,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 6B EP1 visual world presentation pass implemented
 - Phase 6C first-time onboarding flow implemented
 - Phase 6D EP1 content lock and final MVP hardening implemented
+- Phase 6E Thai player-facing localization implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 
@@ -55,6 +56,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase6COnboardingFlowSmokeTest] Phase 6C onboarding flow smoke test passed.
 [ANP Phase6DEP1ContentLockSmokeTest] Phase 6D EP1 content lock smoke test passed.
 [ANP Phase6DEP1FinalMvpRegressionSmokeTest] Phase 6D EP1 final MVP regression smoke test passed.
+[ANP Phase6EThaiLocalizationSmokeTest] Phase 6E Thai localization smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -68,6 +70,8 @@ The client does not calculate quest progress, grant rewards, or mutate player st
 Phase 6A polishes the display-only tracker, notification stack, and Episode Complete banner. UI still does not control gameplay, rewards, save/load, or inventory state.
 
 Phase 6C adds server-owned first-time onboarding payloads for welcome text, Episode 1 goal, marker legend, and first quest guidance. The client only displays these payloads.
+
+Phase 6E sets EP1 MVP player-facing text to Thai. Runtime IDs, enum/state values, RemoteEvent field names, and save schema fields remain English/stable.
 
 ## Skeleton Test Track
 
@@ -90,6 +94,8 @@ Use `docs/EP1_ONBOARDING_PLAYTEST_CHECKLIST.md` for the Phase 6C first-time onbo
 Use `docs/EP1_FINAL_MVP_CHECKLIST.md` for the Phase 6D final MVP hardening pass.
 
 See `docs/EP1_CONTENT_LOCK_MANIFEST.md` for locked Episode 1 runtime IDs and reward contracts. See `docs/EP1_MVP_RELEASE_NOTES_DRAFT.md` for the internal milestone summary.
+
+Use `docs/EP1_THAI_LOCALIZATION_CHECKLIST.md` for Thai text and UI fit verification.
 
 ## Save Readiness
 

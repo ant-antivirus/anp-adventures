@@ -83,9 +83,9 @@ function Phase3FCSmokeTest.Run(services)
 	assertCondition(protonMarker.Data:GetAttribute("InteractionId") == "interaction_npc_proton_guide", "Proton marker should expose NPCGuide InteractionId.")
 
 	assertResultSuccess(PromptBindingService.BindAllPrompts(), "PromptBindingService should bind NPC guide prompts.")
-	assertPrompt(PromptBindingService, "interaction_npc_atom_guide", "Ask", "Atom")
-	assertPrompt(PromptBindingService, "interaction_npc_neutron_guide", "Ask", "Neutron")
-	assertPrompt(PromptBindingService, "interaction_npc_proton_guide", "Ask", "Proton")
+	assertPrompt(PromptBindingService, "interaction_npc_atom_guide", "ถาม", "Atom")
+	assertPrompt(PromptBindingService, "interaction_npc_neutron_guide", "ถาม", "Neutron")
+	assertPrompt(PromptBindingService, "interaction_npc_proton_guide", "ถาม", "Proton")
 
 	local player = makeFakePlayer(938001, "Phase3FCGuidance")
 	assertResultSuccess(PlayerDataService.InitPlayer(player), "Phase 3F-C player data should initialize.")
@@ -97,10 +97,10 @@ function Phase3FCSmokeTest.Run(services)
 	assertResultSuccess(initialQuestState, "Initial Quest 001 state should read.")
 
 	local protonFreshGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContains(protonFreshGuidance, "green Quest Start marker", "Fresh player should get Proton Quest 001 start guidance.")
+	assertGuidanceContains(protonFreshGuidance, "สัญลักษณ์สีเขียว", "Fresh player should get Proton Quest 001 start guidance.")
 
 	local atomFreshGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_atom_guide", {})
-	assertGuidanceContains(atomFreshGuidance, "Start your first ANP expedition", "Fresh player should get Atom motivational Quest 001 start guidance.")
+	assertGuidanceContains(atomFreshGuidance, "เริ่มการสำรวจ ANP", "Fresh player should get Atom motivational Quest 001 start guidance.")
 
 	local afterGuidanceProgression = PlayerDataService.GetSnapshot(player, "Progression")
 	assertResultSuccess(afterGuidanceProgression, "Progression should read after NPC guidance.")
@@ -113,7 +113,7 @@ function Phase3FCSmokeTest.Run(services)
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_start_ep01_main_001", {}), "Quest 001 should start.")
 
 	local protonObjectiveGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContains(protonObjectiveGuidance, "Use the Expedition Terminal.", "Proton should guide to next incomplete objective.")
+	assertGuidanceContains(protonObjectiveGuidance, "ใช้งานเครื่องควบคุมการสำรวจ", "Proton should guide to next incomplete objective.")
 	assertCondition(
 		protonObjectiveGuidance.Data.Guidance.NextObjectiveId == "obj_ep01_main_001_001",
 		"Proton guidance should point at first incomplete Quest 001 objective."
@@ -122,7 +122,7 @@ function Phase3FCSmokeTest.Run(services)
 	assertResultSuccess(PromptBindingService.SimulatePromptTrigger(player, "interaction_ep01_main_001_001", {}), "Quest 001 first objective should progress.")
 
 	local protonUpdatedGuidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
-	assertGuidanceContains(protonUpdatedGuidance, "Review the mission briefing.", "Proton should update to next incomplete objective.")
+	assertGuidanceContains(protonUpdatedGuidance, "อ่านข้อมูลภารกิจ", "Proton should update to next incomplete objective.")
 	assertCondition(
 		protonUpdatedGuidance.Data.Guidance.NextObjectiveId == "obj_ep01_main_001_002",
 		"Proton guidance should advance after objective completion."
@@ -139,7 +139,7 @@ function Phase3FCSmokeTest.Run(services)
 	local protonQuest002Guidance = PromptBindingService.SimulatePromptTrigger(player, "interaction_npc_proton_guide", {})
 	assertGuidanceContainsAll(
 		protonQuest002Guidance,
-		{ "Quest 002", "available", "green Quest Start marker" },
+		{ "ภารกิจที่ 2", "พร้อม", "สัญลักษณ์สีเขียว" },
 		"Proton should guide to Quest 002 after Quest 001 completion."
 	)
 
