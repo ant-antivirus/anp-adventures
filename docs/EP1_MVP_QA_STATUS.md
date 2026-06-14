@@ -15,6 +15,7 @@ The following smoke tests are part of the expected Studio pass:
 - `Phase5BDataStoreAdapterSmokeTest`
 - `Phase5CControlledPersistencePilotSmokeTest`
 - `Phase5DStudioDataStorePilotSafetySmokeTest`
+- `Phase5EControlledDataStorePilotReadinessSmokeTest`
 - `Phase6APlayerFacingUISmokeTest`
 - `Phase6BVisualWorldPresentationSmokeTest`
 - `Phase6COnboardingFlowSmokeTest`
@@ -32,7 +33,7 @@ The following smoke tests are part of the expected Studio pass:
 | Manual QA | Passed | Latest gameplay manual playthrough completed Quest 001 through Quest 008 successfully. |
 | Thai localization | Passed | Thai player-facing copy is active; continue watching for UI fit issues during RC checks. |
 | Persistence default safety | Passed automated coverage | Real DataStore remains disabled by default. |
-| DataStore live pilot | Not started | Separate canary-run procedure only. |
+| DataStore live pilot | Not started | Phase 5E readiness exists; real manual pilot has not been executed. |
 | Release candidate | Pending | Waiting for Phase 6G Studio smoke confirmation. |
 
 ## Manual QA Result

@@ -37,7 +37,7 @@ EnableSaveOnPlayerRemoving = true
 EnableBindToCloseSave = true
 EnableAutosave = false
 RequirePilotCanaryUserId = true
-PilotCanaryUserIds = { 123456789 }
+PilotCanaryUserIds = { YOUR_ROBLOX_USER_ID }
 ```
 
 Replace `123456789` with your Roblox UserId.
@@ -45,6 +45,20 @@ Replace `123456789` with your Roblox UserId.
 Start with save-on-leave before enabling autosave.
 
 Never commit pilot-enabled config unless intentionally preparing a controlled test branch.
+
+Before committing any work after a pilot, revert these values:
+
+```lua
+PersistenceMode = "Mock"
+EnableRealDataStore = false
+EnableLoadOnPlayerAdded = false
+EnableSaveOnPlayerRemoving = false
+EnableBindToCloseSave = false
+EnableAutosave = false
+PilotCanaryUserIds = {}
+```
+
+Record manual pilot results in `docs/DATASTORE_PILOT_TEST_LOG.md`.
 
 ## Test Case A: Fresh Save
 

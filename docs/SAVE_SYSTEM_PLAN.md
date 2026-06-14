@@ -129,3 +129,23 @@ Added safety:
 - Reports include load/save result codes and blocked reasons, but never full save payloads.
 
 Normal Studio runs still use mock persistence and make no real cloud calls.
+
+## Phase 5E: Controlled Studio Pilot Readiness
+
+Phase 5E prepares the real Studio DataStore pilot execution path without enabling real persistence by default.
+
+Added readiness coverage:
+
+- `Phase5EControlledDataStorePilotReadinessSmokeTest` uses fake DataStore behavior and does not require cloud access.
+- Studio pilot config validates only with explicit `StudioDataStorePilot`, `EnableRealDataStore`, `AllowStudioRealDataStore`, and a canary UserId.
+- Non-canary players are skipped before touching DataStore.
+- `SaveNotFound` load state can safely allow a later save for an eligible canary.
+- Load failure still blocks later save by default.
+- Full Episode 1 save payload remains valid and preserves `item_star_core_segment_01`.
+
+Manual pilot tracking:
+
+- Use `docs/DATASTORE_PILOT_RUNBOOK.md` for setup.
+- Use `docs/DATASTORE_PILOT_TEST_LOG.md` to record results.
+- Do not commit pilot-enabled config or personal canary UserIds.
+- Production DataStore remains blocked until a separate production rollout phase.

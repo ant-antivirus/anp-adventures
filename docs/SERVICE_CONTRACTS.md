@@ -110,6 +110,20 @@ Validation rules:
 - Thai remains the default player-facing locale for EP1.
 - RC smoke checks must not add gameplay features or new active episode content.
 
+## Controlled DataStore Pilot Contract
+
+Phase 5E verifies pilot readiness without requiring real Roblox DataStore access during automated smoke tests.
+
+Validation rules:
+
+- Default config must remain mock-only.
+- Studio pilot config is temporary and local-only.
+- Pilot canary allowlist is required before real Studio DataStore load/save.
+- Non-canary users must not touch real DataStore.
+- Load failure blocks later save by default.
+- Pilot session reports must not include full save payloads.
+- Production DataStore mode remains blocked by default.
+
 ### PlayerRef
 
 Used by all player-facing methods.

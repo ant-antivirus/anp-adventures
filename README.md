@@ -22,6 +22,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 5B safe DataStore adapter implemented
 - Phase 5C controlled live persistence pilot implemented
 - Phase 5D Studio DataStore pilot safety polish implemented
+- Phase 5E controlled Studio DataStore pilot readiness implemented
 - Phase 6A player-facing UI polish implemented
 - Phase 6B EP1 visual world presentation pass implemented
 - Phase 6C first-time onboarding flow implemented
@@ -61,6 +62,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase6EThaiLocalizationSmokeTest] Phase 6E Thai localization smoke test passed.
 [ANP Phase6FEP1FinalQASmokeTest] Phase 6F EP1 final QA smoke test passed.
 [ANP Phase6GEP1ReleaseCandidateSmokeTest] Phase 6G EP1 release candidate smoke test passed.
+[ANP Phase5EControlledDataStorePilotReadinessSmokeTest] Phase 5E controlled DataStore pilot readiness smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -109,9 +111,9 @@ Use `docs/EP1_RELEASE_CANDIDATE_CHECKLIST.md` for the internal RC decision pass.
 
 Phase 5A adds save schema, serialization, validation, and mock in-memory persistence for tests. It does not use real Roblox persistence and does not autosave live players yet.
 
-Phase 5B adds a server-side DataStore adapter behind config. Phase 5C adds persistence mode validation, pilot DataStore naming, session diagnostics, and a runbook for controlled Studio API testing. Phase 5D adds canary UserId gating and pilot status/session reports. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
+Phase 5B adds a server-side DataStore adapter behind config. Phase 5C adds persistence mode validation, pilot DataStore naming, session diagnostics, and a runbook for controlled Studio API testing. Phase 5D adds canary UserId gating and pilot status/session reports. Phase 5E adds a pilot readiness smoke test and manual pilot test log template. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
 
-See `docs/SAVE_SYSTEM_PLAN.md` and `docs/DATASTORE_PILOT_RUNBOOK.md`.
+See `docs/SAVE_SYSTEM_PLAN.md`, `docs/DATASTORE_PILOT_RUNBOOK.md`, and `docs/DATASTORE_PILOT_TEST_LOG.md`.
 
 ## Logging
 
