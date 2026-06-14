@@ -16,6 +16,9 @@ Use this template when running a controlled Studio DataStore pilot. Do not commi
 
 - Join with no existing pilot save.
 - Confirm StartupHealth and persistence logs show Studio pilot mode.
+- Confirm smoke tests skipped with `SmokeTestGate: RealDataStoreEnabled`.
+- Confirm `Workspace.ANP_World` exists or skeleton world bootstrap log appeared.
+- Confirm quest prompts appear before starting the playtest.
 - Complete Quest 001.
 - Leave game.
 - Expected: Save success.
@@ -50,6 +53,8 @@ Use this template when running a controlled Studio DataStore pilot. Do not commi
 - Load failure blocks save.
 - Production DataStore is not used.
 - Config reverted before commit.
+- Smoke tests were skipped only because real DataStore was enabled.
+- Skeleton world bootstrap did not overwrite an existing manual world.
 
 ## 6. Final Decision
 

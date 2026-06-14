@@ -40,11 +40,28 @@ RequirePilotCanaryUserId = true
 PilotCanaryUserIds = { YOUR_ROBLOX_USER_ID }
 ```
 
-Replace `123456789` with your Roblox UserId.
+Replace `YOUR_ROBLOX_USER_ID` with your Roblox UserId in your local test copy only.
 
 Start with save-on-leave before enabling autosave.
 
 Never commit pilot-enabled config unless intentionally preparing a controlled test branch.
+
+Keep `SmokeTestConfig.lua` at its default values. When `EnableRealDataStore = true`,
+Studio smoke tests skip automatically because several normal smoke tests assert safe mock defaults.
+`WorldBootstrapConfig.lua` stays at its default values too. If `Workspace.ANP_World` is missing in Studio,
+Bootstrap builds the skeleton EP1 world before prompt binding so manual quest gameplay can run without smoke tests.
+
+The expected pilot log is:
+
+```text
+[ANP StartupHealth] SmokeTests: false
+[ANP StartupHealth] SmokeTestGate: RealDataStoreEnabled
+[ANP WorldBootstrap] Built skeleton world for Studio pilot/dev playtest.
+[ANP SmokeTests] Skipped reason=RealDataStoreEnabled
+```
+
+Do not permanently set `RunStudioSmokeTests = false`, and do not set
+`AllowSmokeTestsDuringRealDataStorePilot = true` unless debugging a specific smoke test issue.
 
 Before committing any work after a pilot, revert these values:
 
@@ -60,14 +77,26 @@ PilotCanaryUserIds = {}
 
 Record manual pilot results in `docs/DATASTORE_PILOT_TEST_LOG.md`.
 
+After reverting to Mock mode, normal Studio smoke tests should run again and report:
+
+```text
+[ANP StartupHealth] SmokeTests: true
+[ANP StartupHealth] SmokeTestGate: Enabled
+[ANP SmokeTestSummary]
+All Studio smoke tests passed.
+```
+
 ## Test Case A: Fresh Save
 
 1. Start fresh in Studio with API services enabled.
 2. Confirm the log says `mode=StudioDataStorePilot`.
-3. Confirm your player is canary eligible.
-4. Complete Quest 001 or several objectives.
-5. Leave the game to trigger save-on-leave.
-6. Confirm a save success log.
+3. Confirm `SmokeTestGate: RealDataStoreEnabled` and smoke tests are skipped.
+4. Confirm `Workspace.ANP_World` exists or the log says the skeleton world was built.
+5. Confirm prompts appear on the compact EP1 route.
+6. Confirm your player is canary eligible.
+7. Complete Quest 001 or several objectives.
+8. Leave the game to trigger save-on-leave.
+9. Confirm a save success log.
 
 ## Test Case B: Load Save
 

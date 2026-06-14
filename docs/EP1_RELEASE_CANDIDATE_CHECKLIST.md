@@ -27,6 +27,8 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Onboarding is readable.
 - Episode complete banner is readable.
 - No obvious Thai text overflow.
+- Long Thai text is wrapped or truncated with UTF-8 safe helpers.
+- No U+FFFD replacement characters appear in tracker, notifications, onboarding, or banners.
 
 ## 4. World
 

@@ -7,6 +7,8 @@ local Definitions = Shared:WaitForChild("Definitions")
 local Config = Shared:WaitForChild("Config")
 
 local Logger = require(script.Parent.Utils.Logger)
+local SmokeTestConfig = require(script.Parent.Config.SmokeTestConfig)
+local WorldBootstrapConfig = require(script.Parent.Config.WorldBootstrapConfig)
 local DefinitionValidator = require(script.Parent.Validators.DefinitionValidator)
 local PlayerDataService = require(script.Parent.Services.PlayerDataService)
 local ProgressionService = require(script.Parent.Services.ProgressionService)
@@ -69,6 +71,8 @@ local Phase6EThaiLocalizationSmokeTest = require(script.Parent.Tests.Phase6EThai
 local Phase6FEP1FinalQASmokeTest = require(script.Parent.Tests.Phase6FEP1FinalQASmokeTest)
 local Phase6GEP1ReleaseCandidateSmokeTest = require(script.Parent.Tests.Phase6GEP1ReleaseCandidateSmokeTest)
 local Phase5EControlledDataStorePilotReadinessSmokeTest = require(script.Parent.Tests.Phase5EControlledDataStorePilotReadinessSmokeTest)
+local SmokeTestConfigSmokeTest = require(script.Parent.Tests.SmokeTestConfigSmokeTest)
+local ThaiUtf8TextSafetySmokeTest = require(script.Parent.Tests.ThaiUtf8TextSafetySmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -84,6 +88,8 @@ local BadgeConfig = require(Config.BadgeConfig)
 local CompanionConfig = require(Config.CompanionConfig)
 local PersistenceConfig = require(Config.PersistenceConfig)
 local LocalizationConfig = require(Config.LocalizationConfig)
+
+local shouldRunSmokeTests, smokeTestGateReason = SmokeTestConfig.ShouldRunStudioSmokeTests(RunService, PersistenceConfig)
 
 local catalog = {
 	Episodes = EpisodeDefinitions,
@@ -134,7 +140,9 @@ print("[ANP StartupHealth] PersistenceMode: " .. tostring(PersistenceConfig.Pers
 print("[ANP StartupHealth] RealDataStore: " .. tostring(PersistenceConfig.EnableRealDataStore == true))
 print("[ANP StartupHealth] ClientAuthority: display-only")
 print("[ANP StartupHealth] EP1ContentLock: enabled")
-print("[ANP StartupHealth] SmokeTests: " .. tostring(RunService:IsStudio()))
+print("[ANP StartupHealth] SmokeTests: " .. tostring(shouldRunSmokeTests))
+print("[ANP StartupHealth] SmokeTestGate: " .. tostring(smokeTestGateReason))
+print("[ANP StartupHealth] WorldBootstrap: StudioSkeletonIfMissing")
 
 if RunService:IsStudio() then
 	PlayerDataService.ResetForTests()
@@ -241,10 +249,57 @@ GuidanceService.Init({
 	AnalyticsService = AnalyticsService,
 })
 
-local worldRegistryResult = WorldRegistryService.Init()
+local function initWorldRegistryWithStudioBootstrap()
+	local initResult = WorldRegistryService.Init()
+
+	if initResult.Success then
+		if WorldBootstrapConfig.LogWorldBootstrap == true and RunService:IsStudio() then
+			print("[ANP WorldBootstrap] Existing ANP_World found; skeleton build skipped.")
+		end
+		print("[ANP StartupHealth] WorldRoot: existing")
+		return initResult
+	end
+
+	local shouldBuildWorld, buildGateReason = WorldBootstrapConfig.ShouldBuildSkeletonWorld(
+		RunService,
+		PersistenceConfig,
+		initResult
+	)
+
+	if shouldBuildWorld then
+		local buildResult = SkeletonWorldBuilder.BuildIfMissing()
+		if buildResult.Success then
+			if WorldBootstrapConfig.LogWorldBootstrap == true then
+				print("[ANP WorldBootstrap] Built skeleton world for Studio pilot/dev playtest.")
+			end
+
+			local retryResult = WorldRegistryService.Init()
+			if retryResult.Success then
+				print("[ANP StartupHealth] WorldRoot: built")
+				return retryResult
+			end
+
+			warn("[ANP WorldBootstrap] Registry init failed after skeleton build: " .. tostring(retryResult.Code))
+			print("[ANP StartupHealth] WorldRoot: missing")
+			return retryResult
+		end
+
+		warn("[ANP WorldBootstrap] Skeleton world build failed: " .. tostring(buildResult.Code))
+		print("[ANP StartupHealth] WorldRoot: missing")
+		return initResult
+	end
+
+	if WorldBootstrapConfig.LogWorldBootstrap == true then
+		warn("[ANP WorldBootstrap] Skeleton world build skipped reason=" .. tostring(buildGateReason))
+	end
+	print("[ANP StartupHealth] WorldRoot: missing")
+	return initResult
+end
+
+local worldRegistryResult = initWorldRegistryWithStudioBootstrap()
 if not worldRegistryResult.Success then
 	if RunService:IsStudio() then
-		warn("[ANP] World registry init warning: " .. worldRegistryResult.Code .. ". Studio smoke test may build the skeleton world.")
+		warn("[ANP] World registry init warning: " .. worldRegistryResult.Code .. ". Studio world bootstrap or smoke test may build the skeleton world.")
 	else
 		error("[ANP] World registry initialization failed: " .. worldRegistryResult.Code)
 	end
@@ -298,8 +353,21 @@ end
 
 print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, and Phase 6G services initialized.")
 
-if RunService:IsStudio() then
+if shouldRunSmokeTests then
 	local passedSmokeTests = {}
+
+	SmokeTestConfigSmokeTest.Run({
+		SmokeTestConfig = SmokeTestConfig,
+	})
+	table.insert(passedSmokeTests, "SmokeTestConfigSmokeTest")
+
+	ThaiUtf8TextSafetySmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		QuestService = QuestService,
+		QuestTrackerService = QuestTrackerService,
+		OnboardingService = OnboardingService,
+	})
+	table.insert(passedSmokeTests, "ThaiUtf8TextSafetySmokeTest")
 
 	Phase2SmokeTest.Run({
 		PlayerDataService = PlayerDataService,
@@ -728,6 +796,8 @@ if RunService:IsStudio() then
 		SaveSerializationService = SaveSerializationService,
 		DataStorePersistenceService = DataStorePersistenceService,
 		PersistencePilotService = PersistencePilotService,
+		SmokeTestConfig = SmokeTestConfig,
+		WorldBootstrapConfig = WorldBootstrapConfig,
 		PromptBindingService = PromptBindingService,
 		SkeletonWorldBuilder = SkeletonWorldBuilder,
 		WorldRegistryService = WorldRegistryService,
@@ -740,6 +810,10 @@ if RunService:IsStudio() then
 		Logger.Smoke("* " .. smokeTestName)
 	end
 	Logger.Smoke("All Studio smoke tests passed.")
+else
+	if SmokeTestConfig.LogSkippedSmokeTests == true then
+		warn("[ANP SmokeTests] Skipped reason=" .. tostring(smokeTestGateReason))
+	end
 end
 
 local function onPlayerAdded(player)

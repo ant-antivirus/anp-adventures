@@ -165,6 +165,61 @@ local function assertPilotConfigValidation(canaryUserId)
 	return studioPilotConfig
 end
 
+local function assertPilotWorldBootstrapConfig(services, studioPilotConfig)
+	local SmokeTestConfig = services.SmokeTestConfig
+	local WorldBootstrapConfig = services.WorldBootstrapConfig
+
+	local StudioRunService = {}
+	function StudioRunService:IsStudio()
+		return true
+	end
+
+	local LiveRunService = {}
+	function LiveRunService:IsStudio()
+		return false
+	end
+
+	local missingWorldResult = {
+		Success = false,
+		Code = "WorldRootMissing",
+	}
+	local existingWorldResult = {
+		Success = true,
+		Code = "WorldRegistered",
+	}
+
+	local shouldRunSmokeTests, smokeGateReason = SmokeTestConfig.ShouldRunStudioSmokeTests(StudioRunService, studioPilotConfig)
+	assertCondition(shouldRunSmokeTests == false, "Studio pilot with real DataStore should skip normal smoke tests.")
+	assertCondition(smokeGateReason == "RealDataStoreEnabled", "Studio pilot smoke gate should explain real DataStore skip.")
+
+	local shouldBuildWorld, worldGateReason = WorldBootstrapConfig.ShouldBuildSkeletonWorld(
+		StudioRunService,
+		studioPilotConfig,
+		missingWorldResult
+	)
+	assertCondition(shouldBuildWorld == true, "Studio pilot should allow skeleton bootstrap when the world root is missing.")
+	assertCondition(worldGateReason == "BuildAllowed", "Missing Studio pilot world should return BuildAllowed.")
+
+	shouldBuildWorld, worldGateReason = WorldBootstrapConfig.ShouldBuildSkeletonWorld(
+		StudioRunService,
+		studioPilotConfig,
+		existingWorldResult
+	)
+	assertCondition(shouldBuildWorld == false, "Existing world root should not be rebuilt.")
+	assertCondition(worldGateReason == "WorldRootExists", "Existing world root should return WorldRootExists.")
+
+	shouldBuildWorld, worldGateReason = WorldBootstrapConfig.ShouldBuildSkeletonWorld(
+		LiveRunService,
+		studioPilotConfig,
+		missingWorldResult
+	)
+	assertCondition(shouldBuildWorld == false, "Non-Studio should not auto-build the skeleton world.")
+	assertCondition(worldGateReason == "NotStudio", "Non-Studio world bootstrap should return NotStudio.")
+
+	local shouldRunDefaultSmokeTests = SmokeTestConfig.ShouldRunStudioSmokeTests(StudioRunService, PersistenceConfig)
+	assertCondition(shouldRunDefaultSmokeTests == true, "Default Mock config should still run smoke tests.")
+end
+
 local function assertPilotEligibilityAndSaveFlow(services, studioPilotConfig)
 	local PlayerDataService = services.PlayerDataService
 	local SaveService = services.SaveService
@@ -271,6 +326,7 @@ function Phase5EControlledDataStorePilotReadinessSmokeTest.Run(services)
 	assertResultSuccess(PromptBindingService.BindAllPrompts(), "Prompts should bind for Phase 5E smoke test.")
 
 	local studioPilotConfig = assertPilotConfigValidation(965002)
+	assertPilotWorldBootstrapConfig(services, studioPilotConfig)
 	assertPilotEligibilityAndSaveFlow(services, studioPilotConfig)
 	assertLoadFailureProtection(services, studioPilotConfig)
 	assertEP1SaveReadiness(services)

@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UIConfig = require(Shared.Config.UIConfig)
+local TextUtils = require(Shared.Util.TextUtils)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -201,11 +202,7 @@ end
 
 local function truncateText(value, maxLength)
 	local text = tostring(value or "")
-	if #text <= maxLength then
-		return text
-	end
-
-	return string.sub(text, 1, math.max(0, maxLength - 3)) .. "..."
+	return TextUtils.TruncateUtf8(text, maxLength, "...")
 end
 
 local function tweenTransparency(root, targetTransparency, duration)

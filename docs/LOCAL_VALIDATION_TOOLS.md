@@ -9,6 +9,24 @@ Current required validation for the EP1 internal RC is:
 - Forbidden-system scan.
 - `git diff --check`.
 
+Normal Mock-mode Studio runs should show:
+
+```text
+[ANP StartupHealth] SmokeTests: true
+[ANP StartupHealth] SmokeTestGate: Enabled
+```
+
+During a temporary Studio DataStore pilot, `SmokeTestConfig` skips normal smoke tests
+when real DataStore is enabled:
+
+```text
+[ANP StartupHealth] SmokeTests: false
+[ANP StartupHealth] SmokeTestGate: RealDataStoreEnabled
+[ANP SmokeTests] Skipped reason=RealDataStoreEnabled
+```
+
+Revert `PersistenceConfig` to Mock mode before committing so smoke tests run again.
+
 This workspace has Luau tools at:
 
 ```text

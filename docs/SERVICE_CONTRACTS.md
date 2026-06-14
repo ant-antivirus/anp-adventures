@@ -85,6 +85,9 @@ Validation rules:
 - SaveSchema field names must not be translated.
 - Client UI may render Thai text but must remain display-only.
 - Server services still own tracker, onboarding, hint, quest, reward, and episode payload values.
+- Player-facing Thai text must not be truncated with byte-based `string.sub` or byte length checks.
+- Manual truncation must use `TextUtils.TruncateUtf8` so multi-byte Thai characters are never cut mid-character.
+- UI and payload checks should reject the U+FFFD replacement character.
 
 ## Final QA Contract
 
@@ -123,6 +126,32 @@ Validation rules:
 - Load failure blocks later save by default.
 - Pilot session reports must not include full save payloads.
 - Production DataStore mode remains blocked by default.
+
+## Studio Smoke Test Gate Contract
+
+`SmokeTestConfig` controls whether Bootstrap runs Studio smoke tests.
+
+Validation rules:
+
+- Smoke tests run by default in Mock persistence mode.
+- Smoke tests skip automatically when real DataStore is enabled for a controlled Studio pilot.
+- Skipped smoke tests must log a clear gate reason.
+- `RunStudioSmokeTests` must not be disabled permanently.
+- `AllowSmokeTestsDuringRealDataStorePilot` is for narrow debugging only and remains false by default.
+- The smoke test gate must not change gameplay, persistence safety, or client authority.
+
+## Studio World Bootstrap Contract
+
+`WorldBootstrapConfig` controls Studio-only skeleton world creation when `Workspace.ANP_World` is missing.
+
+Validation rules:
+
+- Skeleton world bootstrap is allowed in Studio only by default.
+- Bootstrap may build the skeleton world during a controlled Studio DataStore pilot even when smoke tests are skipped.
+- Existing `Workspace.ANP_World` must not be rebuilt or overwritten.
+- Production servers must not auto-generate the skeleton world by default.
+- World bootstrap must run before prompt binding so manual pilot gameplay can use prompts.
+- World bootstrap must not change quest IDs, objective IDs, interaction IDs, reward IDs, save behavior, or client authority.
 
 ### PlayerRef
 

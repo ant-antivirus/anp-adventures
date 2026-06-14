@@ -33,9 +33,10 @@
 | Area | Pass? | Notes |
 | --- | --- | --- |
 | No Thai text overflow in tracker |  |  |
+| Long Thai tracker text truncates safely with no replacement character |  |  |
 | Notifications fit readable Thai text |  |  |
 | Onboarding lines fit |  |  |
-| No mojibake or garbled text |  |  |
+| No mojibake, garbled text, or U+FFFD replacement character |  |  |
 | Text is readable on desktop and smaller windows |  |  |
 
 ## Internal Safety
