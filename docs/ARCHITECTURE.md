@@ -65,6 +65,18 @@ Phase 6E sets the Episode 1 MVP player-facing language to Thai. Quest titles, ob
 
 Runtime IDs, enum/state strings, RemoteEvent payload field names, SaveSchema field names, service names, and file names remain stable English identifiers. Client code still only displays server payloads and does not calculate quest progress, rewards, or save/load state.
 
+## Phase 6F Final QA Gate
+
+Phase 6F adds the final manual QA runbook, QA status document, and a cross-system final QA smoke test. It verifies EP1 remains the only active episode, Thai player-facing payloads are ready, Quest 008 still has five required objectives, reward and persistence defaults are safe, and world prompt binding remains intact.
+
+This phase does not add gameplay systems, EP2 content, production DataStore enablement, or client authority.
+
+## Phase 6G Release Candidate Defaults
+
+Phase 6G prepares EP1 as an internal release candidate baseline. Startup now prints a concise health summary showing active episode, quest count, locale, persistence mode, DataStore state, client authority model, content lock status, and Studio smoke-test status.
+
+The release candidate gate keeps `PersistenceMode = "Mock"`, real DataStore disabled, production DataStore blocked, Thai as the player-facing locale, EP1 as the only active episode, and client UI display-only.
+
 ## Recommended Folder Structure
 
 ```text

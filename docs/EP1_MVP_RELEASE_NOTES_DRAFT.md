@@ -18,6 +18,7 @@
 - MVP visual world presentation.
 - Save readiness with SaveSchema v1.
 - Controlled, canary-gated Studio DataStore pilot support.
+- Internal release candidate checklist and startup safety diagnostics.
 
 ## Intentionally Not Included
 
@@ -32,7 +33,7 @@
 ## Testing Status
 
 - Studio smoke coverage includes EP1 progression, object state, quest tracker, onboarding, visual world presentation, save readiness, and persistence pilot safety.
-- Manual checklists cover EP1 MVP playthrough, UI, onboarding, and world presentation.
+- Manual checklists cover EP1 MVP playthrough, UI, onboarding, world presentation, final QA, and RC decision criteria.
 
 ## Recommended Next Work
 

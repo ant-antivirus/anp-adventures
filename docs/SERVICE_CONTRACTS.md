@@ -86,6 +86,30 @@ Validation rules:
 - Client UI may render Thai text but must remain display-only.
 - Server services still own tracker, onboarding, hint, quest, reward, and episode payload values.
 
+## Final QA Contract
+
+Phase 6F is a verification layer only. It may add smoke tests and QA documentation, but it must not change locked EP1 IDs, reward semantics, save/load defaults, client authority, or active episode content.
+
+Validation rules:
+
+- EP1 remains the only active episode.
+- Quest 008 remains five required objectives.
+- Thai player-facing payloads keep stable English field names.
+- Real DataStore remains disabled by default.
+- Client UI remains display-only.
+
+## Release Candidate Runtime Defaults Contract
+
+Phase 6G audits release candidate defaults and startup diagnostics.
+
+Validation rules:
+
+- Startup health logs must be concise and must not include save payloads.
+- `PersistenceMode` remains `Mock` by default.
+- Real and production DataStore paths remain disabled unless explicitly configured for a separate pilot.
+- Thai remains the default player-facing locale for EP1.
+- RC smoke checks must not add gameplay features or new active episode content.
+
 ### PlayerRef
 
 Used by all player-facing methods.

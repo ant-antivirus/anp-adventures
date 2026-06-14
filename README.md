@@ -27,6 +27,8 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 6C first-time onboarding flow implemented
 - Phase 6D EP1 content lock and final MVP hardening implemented
 - Phase 6E Thai player-facing localization implemented
+- Phase 6F final manual QA pass implemented
+- Phase 6G release candidate cleanup and runtime defaults audit implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 
@@ -57,6 +59,8 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase6DEP1ContentLockSmokeTest] Phase 6D EP1 content lock smoke test passed.
 [ANP Phase6DEP1FinalMvpRegressionSmokeTest] Phase 6D EP1 final MVP regression smoke test passed.
 [ANP Phase6EThaiLocalizationSmokeTest] Phase 6E Thai localization smoke test passed.
+[ANP Phase6FEP1FinalQASmokeTest] Phase 6F EP1 final QA smoke test passed.
+[ANP Phase6GEP1ReleaseCandidateSmokeTest] Phase 6G EP1 release candidate smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -96,6 +100,10 @@ Use `docs/EP1_FINAL_MVP_CHECKLIST.md` for the Phase 6D final MVP hardening pass.
 See `docs/EP1_CONTENT_LOCK_MANIFEST.md` for locked Episode 1 runtime IDs and reward contracts. See `docs/EP1_MVP_RELEASE_NOTES_DRAFT.md` for the internal milestone summary.
 
 Use `docs/EP1_THAI_LOCALIZATION_CHECKLIST.md` for Thai text and UI fit verification.
+
+Use `docs/EP1_FINAL_MANUAL_QA_RUNBOOK.md` for the final Episode 1 manual QA pass. See `docs/EP1_MVP_QA_STATUS.md` for current QA readiness status.
+
+Use `docs/EP1_RELEASE_CANDIDATE_CHECKLIST.md` for the internal RC decision pass. See `docs/LOCAL_VALIDATION_TOOLS.md` for local validation commands and optional tooling notes.
 
 ## Save Readiness
 

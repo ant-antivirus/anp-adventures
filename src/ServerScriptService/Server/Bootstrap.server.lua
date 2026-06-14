@@ -66,6 +66,8 @@ local Phase6COnboardingFlowSmokeTest = require(script.Parent.Tests.Phase6COnboar
 local Phase6DEP1ContentLockSmokeTest = require(script.Parent.Tests.Phase6DEP1ContentLockSmokeTest)
 local Phase6DEP1FinalMvpRegressionSmokeTest = require(script.Parent.Tests.Phase6DEP1FinalMvpRegressionSmokeTest)
 local Phase6EThaiLocalizationSmokeTest = require(script.Parent.Tests.Phase6EThaiLocalizationSmokeTest)
+local Phase6FEP1FinalQASmokeTest = require(script.Parent.Tests.Phase6FEP1FinalQASmokeTest)
+local Phase6GEP1ReleaseCandidateSmokeTest = require(script.Parent.Tests.Phase6GEP1ReleaseCandidateSmokeTest)
 
 local EpisodeDefinitions = require(Definitions.EpisodeDefinitions)
 local ZoneDefinitions = require(Definitions.ZoneDefinitions)
@@ -80,6 +82,7 @@ local InteractionDefinitions = require(Definitions.InteractionDefinitions)
 local BadgeConfig = require(Config.BadgeConfig)
 local CompanionConfig = require(Config.CompanionConfig)
 local PersistenceConfig = require(Config.PersistenceConfig)
+local LocalizationConfig = require(Config.LocalizationConfig)
 
 local catalog = {
 	Episodes = EpisodeDefinitions,
@@ -122,6 +125,15 @@ if not validationResult.Success then
 end
 
 print("[ANP] Definition validation passed.")
+print("[ANP StartupHealth]")
+print("[ANP StartupHealth] Episode: ep01_lost_star_core")
+print("[ANP StartupHealth] ActiveQuests: " .. tostring(#EpisodeDefinitions.ep01_lost_star_core.QuestIds))
+print("[ANP StartupHealth] Locale: " .. tostring(LocalizationConfig.DefaultLocale))
+print("[ANP StartupHealth] PersistenceMode: " .. tostring(PersistenceConfig.PersistenceMode))
+print("[ANP StartupHealth] RealDataStore: " .. tostring(PersistenceConfig.EnableRealDataStore == true))
+print("[ANP StartupHealth] ClientAuthority: display-only")
+print("[ANP StartupHealth] EP1ContentLock: enabled")
+print("[ANP StartupHealth] SmokeTests: " .. tostring(RunService:IsStudio()))
 
 if RunService:IsStudio() then
 	PlayerDataService.ResetForTests()
@@ -283,7 +295,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, Phase 6B, Phase 6C, Phase 6D, and Phase 6E services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, and Phase 6G services initialized.")
 
 if RunService:IsStudio() then
 	local passedSmokeTests = {}
@@ -684,6 +696,29 @@ if RunService:IsStudio() then
 		WorldRegistryService = WorldRegistryService,
 	})
 	table.insert(passedSmokeTests, "Phase6EThaiLocalizationSmokeTest")
+
+	Phase6FEP1FinalQASmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		OnboardingService = OnboardingService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase6FEP1FinalQASmokeTest")
+
+	Phase6GEP1ReleaseCandidateSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PlayerFeedbackService = PlayerFeedbackService,
+		QuestTrackerService = QuestTrackerService,
+		OnboardingService = OnboardingService,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+		SaveService = SaveService,
+	})
+	table.insert(passedSmokeTests, "Phase6GEP1ReleaseCandidateSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

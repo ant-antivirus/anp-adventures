@@ -126,6 +126,10 @@ Phase 6D locks Episode 1 as the current active MVP content baseline. Quest 001 t
 
 Phase 6E translates and polishes player-facing Episode 1 text into Thai. Runtime IDs and gameplay contracts remain unchanged; Thai text is presentation only.
 
+Phase 6F prepares Episode 1 for final internal manual QA. It adds a step-by-step manual QA runbook, QA status summary, and final cross-system smoke gate while keeping EP1 as the only active episode and preserving locked IDs.
+
+Phase 6G prepares Episode 1 as an internal release candidate baseline. It audits runtime defaults, documents the RC checklist, adds startup health diagnostics, and verifies that EP1 remains the only active episode with Thai player-facing text and safe persistence defaults.
+
 ---
 
 ## Badge System
