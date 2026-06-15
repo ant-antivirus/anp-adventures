@@ -1,4 +1,7 @@
 local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local ZoneDefinitions = require(ReplicatedStorage.Shared.Definitions.ZoneDefinitions)
 
 local WorldRegistryService = {}
 
@@ -52,18 +55,57 @@ local function recordDuplicate(idType, id, object)
 	})
 end
 
+local function registerObjectByAttribute(object, attributeName, idType, target)
+	if object:IsA("ProximityPrompt") then
+		return
+	end
+
+	local id = object:GetAttribute(attributeName)
+	if type(id) == "string" and id ~= "" then
+		if target[id] == nil then
+			target[id] = object
+		else
+			recordDuplicate(idType, id, object)
+		end
+	end
+end
+
 local function registerChildrenByAttribute(folder, attributeName, idType, target)
 	if not folder then
 		return
 	end
 
 	for _, object in ipairs(folder:GetChildren()) do
-		local id = object:GetAttribute(attributeName)
-		if type(id) == "string" and id ~= "" then
-			if target[id] == nil then
-				target[id] = object
+		registerObjectByAttribute(object, attributeName, idType, target)
+	end
+end
+
+local function registerDescendantsByAttribute(folder, attributeName, idType, target)
+	if not folder then
+		return
+	end
+
+	for _, object in ipairs(folder:GetDescendants()) do
+		registerObjectByAttribute(object, attributeName, idType, target)
+	end
+end
+
+local function registerZoneObjects(folder)
+	if not folder then
+		return
+	end
+
+	for _, object in ipairs(folder:GetChildren()) do
+		local zoneId = object:GetAttribute("ZoneId")
+		if type(zoneId) ~= "string" or zoneId == "" then
+			zoneId = ZoneDefinitions[object.Name] and object.Name or nil
+		end
+
+		if zoneId then
+			if registry.Zones[zoneId] == nil then
+				registry.Zones[zoneId] = object
 			else
-				recordDuplicate(idType, id, object)
+				recordDuplicate("ZoneId", zoneId, object)
 			end
 		end
 	end
@@ -77,7 +119,9 @@ local function registerNPCMarkerInteractionHosts(folder)
 	for _, object in ipairs(folder:GetChildren()) do
 		local interactionId = object:GetAttribute("InteractionId")
 		if type(interactionId) == "string" and interactionId ~= "" then
-			if registry.NPCMarkersByInteractionId[interactionId] == nil then
+			if registry.InteractionPoints[interactionId] ~= nil then
+				registry.NPCMarkersByInteractionId[interactionId] = object
+			elseif registry.NPCMarkersByInteractionId[interactionId] == nil then
 				registry.NPCMarkersByInteractionId[interactionId] = object
 			else
 				recordDuplicate("NPCMarkerInteractionId", interactionId, object)
@@ -100,11 +144,14 @@ function WorldRegistryService.Init()
 		registry.Folders[folderName] = worldRoot:FindFirstChild(folderName)
 	end
 
-	registerChildrenByAttribute(registry.Folders.Zones, "ZoneId", "ZoneId", registry.Zones)
+	registerZoneObjects(registry.Folders.Zones)
 	registerChildrenByAttribute(registry.Folders.SpawnPoints, "SpawnPointId", "SpawnPointId", registry.SpawnPoints)
-	registerChildrenByAttribute(registry.Folders.InteractionPoints, "InteractionId", "InteractionId", registry.InteractionPoints)
-	registerChildrenByAttribute(registry.Folders.DiscoveryPoints, "DiscoveryId", "DiscoveryId", registry.DiscoveryPoints)
-	registerChildrenByAttribute(registry.Folders.NPCMarkers, "CharacterId", "CharacterId", registry.NPCMarkers)
+	registerDescendantsByAttribute(registry.Folders.InteractionPoints, "InteractionId", "InteractionId", registry.InteractionPoints)
+	registerDescendantsByAttribute(registry.Folders.DiscoveryPoints, "DiscoveryId", "DiscoveryId", registry.DiscoveryPoints)
+	registerDescendantsByAttribute(registry.Folders.NPCMarkers, "CharacterId", "CharacterId", registry.NPCMarkers)
+	registerDescendantsByAttribute(registry.Folders.Zones, "InteractionId", "InteractionId", registry.InteractionPoints)
+	registerDescendantsByAttribute(registry.Folders.Zones, "DiscoveryId", "DiscoveryId", registry.DiscoveryPoints)
+	registerDescendantsByAttribute(registry.Folders.Zones, "CharacterId", "CharacterId", registry.NPCMarkers)
 	registerNPCMarkerInteractionHosts(registry.Folders.NPCMarkers)
 
 	return result(true, "WorldRegistered", nil, {

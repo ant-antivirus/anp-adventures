@@ -161,6 +161,33 @@ local function getExistingPrompt(object, interactionId)
 	return nil
 end
 
+local function resolvePromptParent(object)
+	if object:IsA("BasePart") or object:IsA("Attachment") then
+		return hostResult(true, "PromptParentResolved", nil, object)
+	end
+
+	local promptPartName = object:GetAttribute("PromptPartName")
+	if type(promptPartName) == "string" and promptPartName ~= "" then
+		local namedPromptPart = object:FindFirstChild(promptPartName, true)
+		if namedPromptPart and (namedPromptPart:IsA("BasePart") or namedPromptPart:IsA("Attachment")) then
+			return hostResult(true, "PromptParentResolved", nil, namedPromptPart)
+		end
+	end
+
+	local defaultPromptPart = object:FindFirstChild("PromptPart", true)
+	if defaultPromptPart and (defaultPromptPart:IsA("BasePart") or defaultPromptPart:IsA("Attachment")) then
+		return hostResult(true, "PromptParentResolved", nil, defaultPromptPart)
+	end
+
+	for _, descendant in ipairs(object:GetDescendants()) do
+		if descendant:IsA("BasePart") or descendant:IsA("Attachment") then
+			return hostResult(true, "PromptParentResolved", nil, descendant)
+		end
+	end
+
+	return hostResult(false, "PromptParentMissing", "Interaction object has no prompt-compatible BasePart or Attachment.")
+end
+
 local function configurePrompt(prompt, definition)
 	prompt.Name = PROMPT_NAME
 	prompt.ActionText = definition.PromptActionText or getDefaultActionText(definition.Type)
@@ -262,7 +289,16 @@ function PromptBindingService.BindAllPrompts()
 			continue
 		end
 
-		local prompt = getOrCreatePrompt(objectResult.Data, definition)
+		local promptParentResult = resolvePromptParent(objectResult.Data)
+		if not promptParentResult.Success then
+			table.insert(errors, {
+				InteractionId = interactionId,
+				Code = promptParentResult.Code,
+			})
+			continue
+		end
+
+		local prompt = getOrCreatePrompt(promptParentResult.Data, definition)
 		bindPrompt(interactionId, prompt)
 		boundCount += 1
 	end

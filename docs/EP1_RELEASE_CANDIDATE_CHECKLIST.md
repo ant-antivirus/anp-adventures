@@ -36,6 +36,9 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Zones are visually distinct.
 - Prompts are not blocked.
 - Decorations do not break interaction.
+- World build mode is intentionally set.
+- Skeleton mode remains available for fast dev testing.
+- Manual mode validates Studio-authored objects and does not overwrite `Workspace.ANP_World`.
 
 ## 5. Persistence Defaults
 
@@ -63,6 +66,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 | Manual playthrough |  |  |  |
 | Thai UI fit |  |  |  |
 | World route |  |  |  |
+| Manual map authoring readiness |  |  |  |
 | Reward safety |  |  |  |
 | Persistence defaults |  |  |  |
 | Final RC decision |  |  |  |

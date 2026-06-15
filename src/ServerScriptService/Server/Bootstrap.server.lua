@@ -9,6 +9,7 @@ local Config = Shared:WaitForChild("Config")
 local Logger = require(script.Parent.Utils.Logger)
 local SmokeTestConfig = require(script.Parent.Config.SmokeTestConfig)
 local WorldBootstrapConfig = require(script.Parent.Config.WorldBootstrapConfig)
+local WorldBuildConfig = require(Config.WorldBuildConfig)
 local DefinitionValidator = require(script.Parent.Validators.DefinitionValidator)
 local PlayerDataService = require(script.Parent.Services.PlayerDataService)
 local ProgressionService = require(script.Parent.Services.ProgressionService)
@@ -34,6 +35,7 @@ local SaveService = require(script.Parent.Services.SaveService)
 local PersistencePilotService = require(script.Parent.Services.PersistencePilotService)
 local WorldObjectValidator = require(script.Parent.Validators.WorldObjectValidator)
 local InteractionValidator = require(script.Parent.Validators.InteractionValidator)
+local MapAuthoringValidator = require(script.Parent.Validators.MapAuthoringValidator)
 local SkeletonWorldBuilder = require(script.Parent.Tools.SkeletonWorldBuilder)
 local Phase2SmokeTest = require(script.Parent.Tests.Phase2SmokeTest)
 local Phase3ASmokeTest = require(script.Parent.Tests.Phase3ASmokeTest)
@@ -71,6 +73,7 @@ local Phase6EThaiLocalizationSmokeTest = require(script.Parent.Tests.Phase6EThai
 local Phase6FEP1FinalQASmokeTest = require(script.Parent.Tests.Phase6FEP1FinalQASmokeTest)
 local Phase6GEP1ReleaseCandidateSmokeTest = require(script.Parent.Tests.Phase6GEP1ReleaseCandidateSmokeTest)
 local Phase5EControlledDataStorePilotReadinessSmokeTest = require(script.Parent.Tests.Phase5EControlledDataStorePilotReadinessSmokeTest)
+local Phase7AManualMapAuthoringSmokeTest = require(script.Parent.Tests.Phase7AManualMapAuthoringSmokeTest)
 local SmokeTestConfigSmokeTest = require(script.Parent.Tests.SmokeTestConfigSmokeTest)
 local ThaiUtf8TextSafetySmokeTest = require(script.Parent.Tests.ThaiUtf8TextSafetySmokeTest)
 
@@ -142,7 +145,8 @@ print("[ANP StartupHealth] ClientAuthority: display-only")
 print("[ANP StartupHealth] EP1ContentLock: enabled")
 print("[ANP StartupHealth] SmokeTests: " .. tostring(shouldRunSmokeTests))
 print("[ANP StartupHealth] SmokeTestGate: " .. tostring(smokeTestGateReason))
-print("[ANP StartupHealth] WorldBootstrap: StudioSkeletonIfMissing")
+print("[ANP StartupHealth] WorldBuildMode: " .. tostring(WorldBuildConfig.BuildMode))
+print("[ANP StartupHealth] WorldBootstrap: " .. (WorldBuildConfig.BuildMode == "Skeleton" and "StudioSkeletonIfMissing" or "ManualMapRequired"))
 
 if RunService:IsStudio() then
 	PlayerDataService.ResetForTests()
@@ -260,6 +264,28 @@ local function initWorldRegistryWithStudioBootstrap()
 		return initResult
 	end
 
+	if WorldBuildConfig.BuildMode == "Manual" then
+		if WorldBuildConfig.LogWorldBuildMode == true then
+			warn("[ANP WorldBootstrap] Manual world mode requires Workspace.ANP_World; skeleton build skipped.")
+		end
+		print("[ANP StartupHealth] WorldRoot: missing")
+		return initResult
+	end
+
+	if WorldBuildConfig.BuildMode ~= "Skeleton" then
+		warn("[ANP WorldBootstrap] Unknown WorldBuildMode `" .. tostring(WorldBuildConfig.BuildMode) .. "`; skeleton build skipped.")
+		print("[ANP StartupHealth] WorldRoot: missing")
+		return initResult
+	end
+
+	if WorldBuildConfig.BuildSkeletonWhenMissingInStudio ~= true then
+		if WorldBuildConfig.LogWorldBuildMode == true then
+			warn("[ANP WorldBootstrap] Skeleton world build skipped reason=WorldBuildConfigDisabled")
+		end
+		print("[ANP StartupHealth] WorldRoot: missing")
+		return initResult
+	end
+
 	local shouldBuildWorld, buildGateReason = WorldBootstrapConfig.ShouldBuildSkeletonWorld(
 		RunService,
 		PersistenceConfig,
@@ -299,9 +325,31 @@ end
 local worldRegistryResult = initWorldRegistryWithStudioBootstrap()
 if not worldRegistryResult.Success then
 	if RunService:IsStudio() then
-		warn("[ANP] World registry init warning: " .. worldRegistryResult.Code .. ". Studio world bootstrap or smoke test may build the skeleton world.")
+		warn("[ANP] World registry init warning: " .. worldRegistryResult.Code .. ". Check WorldBuildMode and Workspace.ANP_World.")
 	else
 		error("[ANP] World registry initialization failed: " .. worldRegistryResult.Code)
+	end
+end
+
+if
+	worldRegistryResult.Success
+	and RunService:IsStudio()
+	and WorldBuildConfig.BuildMode == "Manual"
+	and WorldBuildConfig.ValidateManualMapInStudio == true
+then
+	local mapValidationResult = MapAuthoringValidator.Validate()
+	if not mapValidationResult.Success then
+		warn("[ANP MapAuthoringValidator] Manual map validation failed.")
+		for _, validationError in ipairs(mapValidationResult.Errors or {}) do
+			warn("[ANP MapAuthoringValidator] " .. validationError)
+		end
+	elseif WorldBuildConfig.LogWorldBuildMode == true then
+		print(
+			"[ANP MapAuthoringValidator] Manual map valid. zones="
+				.. tostring(mapValidationResult.Summary.ZonesChecked)
+				.. " interactions="
+				.. tostring(mapValidationResult.Summary.InteractionsMapped)
+		)
 	end
 end
 
@@ -351,7 +399,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, and Phase 6G services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, Phase 6G, and Phase 7A services initialized.")
 
 if shouldRunSmokeTests then
 	local passedSmokeTests = {}
@@ -803,6 +851,12 @@ if shouldRunSmokeTests then
 		WorldRegistryService = WorldRegistryService,
 	})
 	table.insert(passedSmokeTests, "Phase5EControlledDataStorePilotReadinessSmokeTest")
+
+	Phase7AManualMapAuthoringSmokeTest.Run({
+		MapAuthoringValidator = MapAuthoringValidator,
+		WorldBootstrapConfig = WorldBootstrapConfig,
+	})
+	table.insert(passedSmokeTests, "Phase7AManualMapAuthoringSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

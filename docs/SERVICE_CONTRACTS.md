@@ -153,6 +153,22 @@ Validation rules:
 - World bootstrap must run before prompt binding so manual pilot gameplay can use prompts.
 - World bootstrap must not change quest IDs, objective IDs, interaction IDs, reward IDs, save behavior, or client authority.
 
+## Manual Map Authoring Contract
+
+Phase 7A introduces `WorldBuildConfig`.
+
+Validation rules:
+
+- `BuildMode = "Skeleton"` preserves current dev/test skeleton behavior.
+- `BuildMode = "Manual"` must not call `SkeletonWorldBuilder` automatically.
+- Manual mode requires `Workspace.ANP_World` to exist.
+- Studio manual maps should pass `MapAuthoringValidator` before serious decoration begins.
+- Gameplay objects bind by attributes, not by client scripts.
+- Required gameplay attributes include `InteractionId`, `ZoneId`, and `ObjectType`.
+- Decor folders must not contain `InteractionId`, `QuestId`, `ObjectiveId`, or `RewardId`.
+- Manual map validation is read-only and must not mutate Studio-authored objects.
+- Prompt binding may attach to a gameplay object itself or to a child `PromptPart`.
+
 ### PlayerRef
 
 Used by all player-facing methods.

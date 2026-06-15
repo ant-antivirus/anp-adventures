@@ -2,6 +2,7 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PersistenceConfig = require(ReplicatedStorage.Shared.Config.PersistenceConfig)
+local WorldBuildConfig = require(ReplicatedStorage.Shared.Config.WorldBuildConfig)
 
 local Phase5EControlledDataStorePilotReadinessSmokeTest = {}
 
@@ -168,6 +169,10 @@ end
 local function assertPilotWorldBootstrapConfig(services, studioPilotConfig)
 	local SmokeTestConfig = services.SmokeTestConfig
 	local WorldBootstrapConfig = services.WorldBootstrapConfig
+
+	assertCondition(WorldBuildConfig.BuildMode == "Skeleton", "WorldBuildConfig should default to Skeleton for current dev flow.")
+	assertCondition(WorldBuildConfig.AllowSkeletonBuildInManualMode == false, "Manual mode should not allow skeleton overwrite by default.")
+	assertCondition(WorldBuildConfig.BuildSkeletonWhenMissingInStudio == true, "Skeleton mode should allow Studio world bootstrap when missing.")
 
 	local StudioRunService = {}
 	function StudioRunService:IsStudio()
