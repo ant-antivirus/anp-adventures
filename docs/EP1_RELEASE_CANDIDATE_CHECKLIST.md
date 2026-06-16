@@ -11,6 +11,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Final QA smoke test passes.
 - Release candidate smoke test passes.
 - Phase 6H RC sign-off smoke test passes.
+- Phase 7C decoration handoff smoke test passes.
 
 ## 2. Manual Playthrough
 
@@ -42,6 +43,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Manual mode validates Studio-authored objects and does not overwrite `Workspace.ANP_World`.
 - Manual map prompt binding succeeds for Attribute-authored objects.
 - Prompt binding is idempotent and does not create duplicate prompts.
+- Builder handoff docs are reviewed before handcrafted map work begins.
 
 ## 5. Persistence Defaults
 
@@ -71,6 +73,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 | Thai UI fit |  |  |  |
 | World route |  |  |  |
 | Manual map authoring readiness |  |  |  |
+| Decoration handoff package | Passed | Builder guide, decoration checklist, naming guide, backup guide, and Codex handoff status exist. | No |
 | Controlled Studio DataStore pilot | Passed | Sanitized result recorded; production DataStore remains off. | No |
 | Final handcrafted map | Not started | Tooling is ready; decoration is postponed. | No |
 | Reward safety |  |  |  |

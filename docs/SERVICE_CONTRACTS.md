@@ -181,6 +181,18 @@ Validation rules:
 - Required gameplay attributes include `InteractionId`, `ZoneId`, and `ObjectType`.
 - Decor folders must not contain `InteractionId`, `QuestId`, `ObjectiveId`, or `RewardId`.
 - Manual map validation is read-only and must not mutate Studio-authored objects.
+
+## Decoration Handoff Contract
+
+Phase 7C is a handoff/documentation phase.
+
+Validation rules:
+
+- Builder-facing documentation may describe future map work, but code must not create or decorate the final handcrafted map.
+- Manual map tooling remains server-authoritative and Attribute-based.
+- Final map decoration must not change locked EP1 runtime IDs.
+- Default persistence remains mock-only, with real DataStore disabled.
+- EP2 remains not started.
 - Prompt binding may attach to a gameplay object itself or to a child `PromptPart`.
 - For model-based gameplay objects, prompt binding may attach to `PrimaryPart` when no `PromptPart` exists.
 - Prompt binding must be idempotent and must not create duplicate prompts on repeated bind runs.

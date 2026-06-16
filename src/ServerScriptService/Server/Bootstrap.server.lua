@@ -76,6 +76,7 @@ local Phase5EControlledDataStorePilotReadinessSmokeTest = require(script.Parent.
 local Phase7AManualMapAuthoringSmokeTest = require(script.Parent.Tests.Phase7AManualMapAuthoringSmokeTest)
 local Phase7BManualMapBindingSmokeTest = require(script.Parent.Tests.Phase7BManualMapBindingSmokeTest)
 local Phase6HEP1RCSignOffSmokeTest = require(script.Parent.Tests.Phase6HEP1RCSignOffSmokeTest)
+local Phase7CDecorationHandoffSmokeTest = require(script.Parent.Tests.Phase7CDecorationHandoffSmokeTest)
 local SmokeTestConfigSmokeTest = require(script.Parent.Tests.SmokeTestConfigSmokeTest)
 local ThaiUtf8TextSafetySmokeTest = require(script.Parent.Tests.ThaiUtf8TextSafetySmokeTest)
 
@@ -398,7 +399,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, Phase 6G, Phase 6H, Phase 7A, and Phase 7B services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, Phase 6G, Phase 6H, Phase 7A, Phase 7B, and Phase 7C services initialized.")
 
 if shouldRunSmokeTests then
 	local passedSmokeTests = {}
@@ -877,6 +878,16 @@ if shouldRunSmokeTests then
 		WorldRegistryService = WorldRegistryService,
 	})
 	table.insert(passedSmokeTests, "Phase6HEP1RCSignOffSmokeTest")
+
+	Phase7CDecorationHandoffSmokeTest.Run({
+		PlayerDataService = PlayerDataService,
+		PromptBindingService = PromptBindingService,
+		SaveService = SaveService,
+		MapAuthoringValidator = MapAuthoringValidator,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase7CDecorationHandoffSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

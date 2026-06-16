@@ -40,6 +40,7 @@ The following smoke tests are part of the expected Studio pass:
 | Controlled Studio DataStore pilot | Passed | Load/save pilot was verified with sanitized result recorded separately. |
 | Manual Map Authoring Contract | Passed | Phase 7A contract, folder structure, attributes, and validation are documented. |
 | Manual Map Binding sample test | Passed | Phase 7B sample objects validate and bind through server prompt binding. |
+| Decoration handoff package | Passed | Phase 7C adds builder guides, decoration checklist, naming conventions, backup guidance, and handoff status. |
 | Final handcrafted map | Not started / postponed | Manual tooling is ready, but final world building and decoration are intentionally postponed. |
 | Production DataStore enablement | Not started | Production persistence remains blocked and requires a separate explicit phase. |
 | EP2 | Not started | No active EP2 gameplay content exists. |
@@ -52,6 +53,7 @@ The following smoke tests are part of the expected Studio pass:
 - Controlled Studio DataStore pilot passed with masked UserId record.
 - Production DataStore remains disabled.
 - Final handcrafted manual map is not done.
+- Phase 7C handoff docs are ready for a future builder.
 
 ## Known Intentionally Missing
 

@@ -58,8 +58,8 @@ Use this checklist before decorating or playtesting a Studio-authored EP1 map.
 - Confirm Episode 1 completes.
 - Confirm real DataStore remains disabled unless doing a separate controlled pilot.
 
-## Phase 6H Status
+## Phase 7C Handoff Status
 
 - Manual map authoring and binding tooling is ready for builder handoff.
 - Final handcrafted EP1 map creation and decoration have not started.
-- Next recommended step is Phase 7C Decoration Handoff / Builder Checklist, or manual handcrafted map planning.
+- Read `DECORATION_HANDOFF_GUIDE.md`, `EP1_DECORATION_CHECKLIST.md`, `MAP_NAMING_CONVENTIONS.md`, and `STUDIO_MAP_BACKUP_GUIDE.md` before manual handcrafted map planning.

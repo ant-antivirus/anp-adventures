@@ -4,6 +4,8 @@ Phase 7A prepares ANP Adventures for Studio-authored EP1 maps without replacing 
 
 The handcrafted map is not implemented in this phase. This guide defines the contract future map work must follow.
 
+Phase 7C adds the builder handoff package. Read `DECORATION_HANDOFF_GUIDE.md`, `EP1_DECORATION_CHECKLIST.md`, `MAP_NAMING_CONVENTIONS.md`, and `STUDIO_MAP_BACKUP_GUIDE.md` before editing the real map.
+
 ## World Build Modes
 
 `WorldBuildConfig.BuildMode` controls startup behavior:

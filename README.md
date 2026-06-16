@@ -33,6 +33,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 6H EP1 RC sign-off and default config cleanup implemented
 - Phase 7A manual map authoring contract and safe world build mode implemented
 - Phase 7B manual map binding and validation hardening implemented
+- Phase 7C decoration handoff and builder checklist implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 - Controlled Studio DataStore pilot load/save passed with sanitized result recorded
@@ -70,6 +71,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase7AManualMapAuthoringSmokeTest] Phase 7A manual map authoring smoke test passed.
 [ANP Phase7BManualMapBindingSmokeTest] Phase 7B manual map binding smoke test passed.
 [ANP Phase6HEP1RCSignOffSmokeTest] Phase 6H EP1 RC sign-off smoke test passed.
+[ANP Phase7CDecorationHandoffSmokeTest] Phase 7C decoration handoff smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -118,9 +120,11 @@ Use `docs/EP1_FINAL_MANUAL_QA_RUNBOOK.md` for the final Episode 1 manual QA pass
 
 Use `docs/EP1_RELEASE_CANDIDATE_CHECKLIST.md` for the internal RC decision pass. See `docs/LOCAL_VALIDATION_TOOLS.md` for local validation commands and optional tooling notes.
 
-Use `docs/MANUAL_MAP_AUTHORING_GUIDE.md`, `docs/MAP_OBJECT_ATTRIBUTE_CONTRACT.md`, and `docs/MANUAL_MAP_BINDING_CHECKLIST.md` before beginning handcrafted EP1 map work.
+Use `docs/DECORATION_HANDOFF_GUIDE.md`, `docs/EP1_DECORATION_CHECKLIST.md`, `docs/MAP_NAMING_CONVENTIONS.md`, `docs/STUDIO_MAP_BACKUP_GUIDE.md`, and `docs/CODEX_HANDOFF_STATUS.md` before beginning handcrafted EP1 map work.
 
-Phase 6H records EP1 RC sign-off status, the sanitized controlled Studio DataStore pilot result, and the default config cleanup check. Final handcrafted map work is still postponed.
+Use `docs/MANUAL_MAP_AUTHORING_GUIDE.md`, `docs/MAP_OBJECT_ATTRIBUTE_CONTRACT.md`, and `docs/MANUAL_MAP_BINDING_CHECKLIST.md` for the gameplay-object binding contract.
+
+Phase 7C adds the decoration handoff package. Codex core system work can pause after this point; final handcrafted map work is still postponed.
 
 ## Save Readiness
 

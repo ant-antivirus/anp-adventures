@@ -136,6 +136,8 @@ Phase 7A prepares for future manual map authoring. Skeleton mode remains the com
 
 Phase 7B hardens Attribute-based prompt binding for future manual maps. Gameplay objects can be human-readable Studio objects, but server binding depends on stable attributes and a valid prompt host, not object names.
 
+Phase 7C adds the decoration handoff package for the future builder. It documents map naming, backup, decoration safety, and the recommended Q1-first manual build path. It does not create final map art, add EP2, or change locked EP1 IDs.
+
 ---
 
 ## Badge System
