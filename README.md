@@ -30,10 +30,12 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 6E Thai player-facing localization implemented
 - Phase 6F final manual QA pass implemented
 - Phase 6G release candidate cleanup and runtime defaults audit implemented
+- Phase 6H EP1 RC sign-off and default config cleanup implemented
 - Phase 7A manual map authoring contract and safe world build mode implemented
 - Phase 7B manual map binding and validation hardening implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
+- Controlled Studio DataStore pilot load/save passed with sanitized result recorded
 
 ## How To Run
 
@@ -67,6 +69,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase5EControlledDataStorePilotReadinessSmokeTest] Phase 5E controlled DataStore pilot readiness smoke test passed.
 [ANP Phase7AManualMapAuthoringSmokeTest] Phase 7A manual map authoring smoke test passed.
 [ANP Phase7BManualMapBindingSmokeTest] Phase 7B manual map binding smoke test passed.
+[ANP Phase6HEP1RCSignOffSmokeTest] Phase 6H EP1 RC sign-off smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -117,11 +120,13 @@ Use `docs/EP1_RELEASE_CANDIDATE_CHECKLIST.md` for the internal RC decision pass.
 
 Use `docs/MANUAL_MAP_AUTHORING_GUIDE.md`, `docs/MAP_OBJECT_ATTRIBUTE_CONTRACT.md`, and `docs/MANUAL_MAP_BINDING_CHECKLIST.md` before beginning handcrafted EP1 map work.
 
+Phase 6H records EP1 RC sign-off status, the sanitized controlled Studio DataStore pilot result, and the default config cleanup check. Final handcrafted map work is still postponed.
+
 ## Save Readiness
 
 Phase 5A adds save schema, serialization, validation, and mock in-memory persistence for tests. It does not use real Roblox persistence and does not autosave live players yet.
 
-Phase 5B adds a server-side DataStore adapter behind config. Phase 5C adds persistence mode validation, pilot DataStore naming, session diagnostics, and a runbook for controlled Studio API testing. Phase 5D adds canary UserId gating and pilot status/session reports. Phase 5E adds a pilot readiness smoke test, manual pilot test log template, smoke-test gate, and Studio-only skeleton world bootstrap for real DataStore pilot playtests. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
+Phase 5B adds a server-side DataStore adapter behind config. Phase 5C adds persistence mode validation, pilot DataStore naming, session diagnostics, and a runbook for controlled Studio API testing. Phase 5D adds canary UserId gating and pilot status/session reports. Phase 5E adds a pilot readiness smoke test, manual pilot test log template, smoke-test gate, and Studio-only skeleton world bootstrap for real DataStore pilot playtests. Phase 6H records that the controlled Studio DataStore pilot passed. Real DataStore load/save, autosave, and shutdown flush remain disabled by default; Studio uses mock persistence unless explicitly configured otherwise.
 
 See `docs/SAVE_SYSTEM_PLAN.md`, `docs/DATASTORE_PILOT_RUNBOOK.md`, and `docs/DATASTORE_PILOT_TEST_LOG.md`.
 

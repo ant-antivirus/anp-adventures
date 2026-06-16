@@ -113,6 +113,18 @@ Validation rules:
 - Thai remains the default player-facing locale for EP1.
 - RC smoke checks must not add gameplay features or new active episode content.
 
+## EP1 RC Sign-off Contract
+
+Phase 6H records non-map EP1 RC sign-off status.
+
+Validation rules:
+
+- Controlled Studio DataStore pilot results may be documented only with masked UserIds.
+- Committed persistence defaults must remain `Mock` with real DataStore disabled.
+- Production DataStore mode remains blocked.
+- Manual map authoring and binding systems may be marked ready, but final handcrafted map objects are not created by this phase.
+- Server authority and display-only client UI remain unchanged.
+
 ## Controlled DataStore Pilot Contract
 
 Phase 5E verifies pilot readiness without requiring real Roblox DataStore access during automated smoke tests.

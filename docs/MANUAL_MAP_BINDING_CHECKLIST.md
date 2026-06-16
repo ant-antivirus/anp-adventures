@@ -57,3 +57,9 @@ Use this checklist before decorating or playtesting a Studio-authored EP1 map.
 - Confirm Quest 008 still shows five objectives.
 - Confirm Episode 1 completes.
 - Confirm real DataStore remains disabled unless doing a separate controlled pilot.
+
+## Phase 6H Status
+
+- Manual map authoring and binding tooling is ready for builder handoff.
+- Final handcrafted EP1 map creation and decoration have not started.
+- Next recommended step is Phase 7C Decoration Handoff / Builder Checklist, or manual handcrafted map planning.

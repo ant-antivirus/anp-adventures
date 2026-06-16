@@ -77,6 +77,10 @@ Phase 6G prepares EP1 as an internal release candidate baseline. Startup now pri
 
 The release candidate gate keeps `PersistenceMode = "Mock"`, real DataStore disabled, production DataStore blocked, Thai as the player-facing locale, EP1 as the only active episode, and client UI display-only.
 
+## Phase 6H RC Sign-off
+
+Phase 6H closes non-map EP1 RC system work. It records the sanitized controlled Studio DataStore pilot result, confirms committed defaults remain safe, and marks manual map authoring/binding tools ready while final handcrafted map creation stays postponed.
+
 ## Phase 7A Manual Map Authoring
 
 Phase 7A adds an explicit world build mode contract. `WorldBuildConfig.BuildMode = "Skeleton"` preserves the compact dev/test route, while `BuildMode = "Manual"` requires an existing Studio-authored `Workspace.ANP_World` and must not auto-build or overwrite it.

@@ -77,6 +77,17 @@ PilotCanaryUserIds = {}
 
 Record manual pilot results in `docs/DATASTORE_PILOT_TEST_LOG.md`.
 
+## Phase 6H Result
+
+The controlled Studio DataStore pilot passed with the sanitized result recorded in `docs/DATASTORE_PILOT_TEST_LOG.md`.
+
+Committed defaults remain safe:
+
+- `PersistenceMode = "Mock"`
+- `EnableRealDataStore = false`
+- `PilotCanaryUserIds = {}`
+- Production DataStore remains blocked.
+
 After reverting to Mock mode, normal Studio smoke tests should run again and report:
 
 ```text

@@ -2,6 +2,28 @@
 
 Use this template when running a controlled Studio DataStore pilot. Do not commit pilot-enabled config or personal canary UserIds.
 
+## Sanitized Phase 6H Pilot Result
+
+- Roblox account: Atom_Neutron
+- UserId: [masked]
+- PersistenceMode tested locally: `StudioDataStorePilot`
+- DataStoreName: `ANPAdventures_PlayerData_StudioPilot_v1`
+- Load result: Passed
+- Save result: Passed
+- Evidence codes observed:
+  - `DataStoreSaveLoaded`
+  - `PlayerLoaded`
+  - `DataStoreSaveStored`
+  - `PlayerSaved`
+- Controlled Studio DataStore Pilot: Passed
+
+Notes:
+
+- Pilot-enabled config was local-only.
+- Committed config must remain `PersistenceMode = "Mock"`.
+- Committed canary UserId list must remain empty.
+- Production DataStore was not enabled.
+
 ## 1. Test Environment
 
 - Date:
@@ -58,6 +80,6 @@ Use this template when running a controlled Studio DataStore pilot. Do not commi
 
 ## 6. Final Decision
 
-- Pilot passed?
-- Blockers?
-- Follow-up issues?
+- Pilot passed? Yes, controlled Studio pilot passed with sanitized result above.
+- Blockers? None for EP1 RC pause.
+- Follow-up issues? Production DataStore enablement remains future work and must require a separate explicit phase.

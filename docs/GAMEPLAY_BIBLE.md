@@ -130,6 +130,8 @@ Phase 6F prepares Episode 1 for final internal manual QA. It adds a step-by-step
 
 Phase 6G prepares Episode 1 as an internal release candidate baseline. It audits runtime defaults, documents the RC checklist, adds startup health diagnostics, and verifies that EP1 remains the only active episode with Thai player-facing text and safe persistence defaults.
 
+Phase 6H records the EP1 RC sign-off state. The controlled Studio DataStore pilot passed, committed persistence defaults remain mock-only, manual map tooling is ready, and final handcrafted map work is intentionally postponed.
+
 Phase 7A prepares for future manual map authoring. Skeleton mode remains the compact dev/test route, while Manual mode requires a Studio-authored `Workspace.ANP_World` and validates gameplay objects by attributes. This phase does not create final map art, add EP2, or change locked EP1 IDs.
 
 Phase 7B hardens Attribute-based prompt binding for future manual maps. Gameplay objects can be human-readable Studio objects, but server binding depends on stable attributes and a valid prompt host, not object names.

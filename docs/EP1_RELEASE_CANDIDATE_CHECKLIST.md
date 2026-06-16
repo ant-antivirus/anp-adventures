@@ -10,6 +10,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Thai localization test passes.
 - Final QA smoke test passes.
 - Release candidate smoke test passes.
+- Phase 6H RC sign-off smoke test passes.
 
 ## 2. Manual Playthrough
 
@@ -48,6 +49,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Mock mode is default.
 - Production mode is blocked.
 - Studio DataStore pilot requires explicit canary configuration.
+- Controlled Studio DataStore pilot result is recorded with masked UserId.
 
 ## 6. Known Not Included
 
@@ -58,7 +60,7 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - Cosmetics.
 - Party, trading, or pet systems.
 - Production DataStore enablement.
-- Final handcrafted map art.
+- Final handcrafted map art and decoration.
 
 ## 7. RC Decision
 
@@ -69,6 +71,8 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 | Thai UI fit |  |  |  |
 | World route |  |  |  |
 | Manual map authoring readiness |  |  |  |
+| Controlled Studio DataStore pilot | Passed | Sanitized result recorded; production DataStore remains off. | No |
+| Final handcrafted map | Not started | Tooling is ready; decoration is postponed. | No |
 | Reward safety |  |  |  |
 | Persistence defaults |  |  |  |
 | Final RC decision |  |  |  |
