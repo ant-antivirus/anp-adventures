@@ -25,6 +25,7 @@ The following smoke tests are part of the expected Studio pass:
 - `Phase6FEP1FinalQASmokeTest`
 - `Phase6GEP1ReleaseCandidateSmokeTest`
 - `Phase7AManualMapAuthoringSmokeTest`
+- `Phase7BManualMapBindingSmokeTest`
 
 ## QA Status Labels
 
@@ -35,7 +36,7 @@ The following smoke tests are part of the expected Studio pass:
 | Thai localization | Passed | Thai player-facing copy is active; continue watching for UI fit issues during RC checks. |
 | Persistence default safety | Passed automated coverage | Real DataStore remains disabled by default. |
 | DataStore live pilot | Not started | Phase 5E readiness exists; real manual pilot has not been executed. |
-| Manual map authoring readiness | In progress | Phase 7A adds contracts and validator before final handcrafted map work. |
+| Manual map authoring readiness | In progress | Phase 7A adds contracts and validator; Phase 7B hardens Attribute-based prompt binding before final handcrafted map work. |
 | Release candidate | Pending | Waiting for Phase 6G Studio smoke confirmation. |
 
 ## Manual QA Result

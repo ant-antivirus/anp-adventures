@@ -83,6 +83,8 @@ Phase 7A adds an explicit world build mode contract. `WorldBuildConfig.BuildMode
 
 Manual gameplay objects bind by attributes such as `InteractionId`, `ZoneId`, and `ObjectType`. `MapAuthoringValidator` provides read-only Studio validation for active EP1 zones, required interaction routes, duplicate IDs, prompt attachment hosts, and decor folders that accidentally contain gameplay IDs. Gameplay authority remains server-side through existing services.
 
+Phase 7B hardens the manual binding path. `WorldRegistryService` discovers nested Attribute-based gameplay objects under manual zone folders, while `PromptBindingService` attaches prompts to `PromptPart`, model `PrimaryPart`, or direct `BasePart` hosts. Prompt activation still routes through `InteractionService`; manual map objects must not contain scripts that complete quests, grant rewards, or save data.
+
 ## Recommended Folder Structure
 
 ```text

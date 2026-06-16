@@ -179,6 +179,10 @@ local function resolvePromptParent(object)
 		return hostResult(true, "PromptParentResolved", nil, defaultPromptPart)
 	end
 
+	if object:IsA("Model") and object.PrimaryPart then
+		return hostResult(true, "PromptParentResolved", nil, object.PrimaryPart)
+	end
+
 	for _, descendant in ipairs(object:GetDescendants()) do
 		if descendant:IsA("BasePart") or descendant:IsA("Attachment") then
 			return hostResult(true, "PromptParentResolved", nil, descendant)

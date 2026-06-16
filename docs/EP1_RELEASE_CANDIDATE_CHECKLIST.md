@@ -39,6 +39,8 @@ Use this checklist before marking Episode 1 as an internal release candidate.
 - World build mode is intentionally set.
 - Skeleton mode remains available for fast dev testing.
 - Manual mode validates Studio-authored objects and does not overwrite `Workspace.ANP_World`.
+- Manual map prompt binding succeeds for Attribute-authored objects.
+- Prompt binding is idempotent and does not create duplicate prompts.
 
 ## 5. Persistence Defaults
 

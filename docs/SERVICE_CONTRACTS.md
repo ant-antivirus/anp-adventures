@@ -135,6 +135,7 @@ Validation rules:
 
 - Smoke tests run by default in Mock persistence mode.
 - Smoke tests skip automatically when real DataStore is enabled for a controlled Studio pilot.
+- Smoke tests skip automatically when `WorldBuildConfig.BuildMode = "Manual"` because the full suite assumes the Skeleton/default dev world.
 - Skipped smoke tests must log a clear gate reason.
 - `RunStudioSmokeTests` must not be disabled permanently.
 - `AllowSmokeTestsDuringRealDataStorePilot` is for narrow debugging only and remains false by default.
@@ -163,11 +164,15 @@ Validation rules:
 - `BuildMode = "Manual"` must not call `SkeletonWorldBuilder` automatically.
 - Manual mode requires `Workspace.ANP_World` to exist.
 - Studio manual maps should pass `MapAuthoringValidator` before serious decoration begins.
+- Manual mode is report-only; missing gameplay objects must be listed, not auto-created.
 - Gameplay objects bind by attributes, not by client scripts.
 - Required gameplay attributes include `InteractionId`, `ZoneId`, and `ObjectType`.
 - Decor folders must not contain `InteractionId`, `QuestId`, `ObjectiveId`, or `RewardId`.
 - Manual map validation is read-only and must not mutate Studio-authored objects.
 - Prompt binding may attach to a gameplay object itself or to a child `PromptPart`.
+- For model-based gameplay objects, prompt binding may attach to `PrimaryPart` when no `PromptPart` exists.
+- Prompt binding must be idempotent and must not create duplicate prompts on repeated bind runs.
+- Prompt activation must continue to route to `InteractionService`.
 
 ### PlayerRef
 

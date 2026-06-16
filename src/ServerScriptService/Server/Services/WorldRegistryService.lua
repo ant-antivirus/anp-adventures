@@ -55,6 +55,35 @@ local function recordDuplicate(idType, id, object)
 	})
 end
 
+local function isDescendantOfFolder(object, folder)
+	return folder ~= nil and object ~= nil and object:IsDescendantOf(folder)
+end
+
+local function shouldAllowSkeletonManualInteractionDuplicate(existingObject, object)
+	local interactionPointsFolder = registry.Folders.InteractionPoints
+	local zonesFolder = registry.Folders.Zones
+	if not interactionPointsFolder or not zonesFolder then
+		return false
+	end
+
+	return (
+		isDescendantOfFolder(existingObject, interactionPointsFolder)
+		and isDescendantOfFolder(object, zonesFolder)
+	)
+		or (
+			isDescendantOfFolder(existingObject, zonesFolder)
+			and isDescendantOfFolder(object, interactionPointsFolder)
+		)
+end
+
+local function chooseInteractionRegistryObject(existingObject, object)
+	if isDescendantOfFolder(object, registry.Folders.InteractionPoints) then
+		return object
+	end
+
+	return existingObject
+end
+
 local function registerObjectByAttribute(object, attributeName, idType, target)
 	if object:IsA("ProximityPrompt") then
 		return
@@ -64,6 +93,8 @@ local function registerObjectByAttribute(object, attributeName, idType, target)
 	if type(id) == "string" and id ~= "" then
 		if target[id] == nil then
 			target[id] = object
+		elseif attributeName == "InteractionId" and shouldAllowSkeletonManualInteractionDuplicate(target[id], object) then
+			target[id] = chooseInteractionRegistryObject(target[id], object)
 		else
 			recordDuplicate(idType, id, object)
 		end
@@ -90,6 +121,31 @@ local function registerDescendantsByAttribute(folder, attributeName, idType, tar
 	end
 end
 
+local function isManualZoneContainer(object, zoneId)
+	return object:IsA("Folder") and object.Name == zoneId
+end
+
+local function isSkeletonZoneMarker(object, zoneId)
+	return object:IsA("BasePart") and object.Name == "Zone_" .. zoneId
+end
+
+local function shouldAllowZoneCompatibilityDuplicate(existingObject, object, zoneId)
+	if not existingObject or not object then
+		return false
+	end
+
+	return (isManualZoneContainer(existingObject, zoneId) and isSkeletonZoneMarker(object, zoneId))
+		or (isSkeletonZoneMarker(existingObject, zoneId) and isManualZoneContainer(object, zoneId))
+end
+
+local function chooseZoneRegistryObject(existingObject, object, zoneId)
+	if isSkeletonZoneMarker(object, zoneId) then
+		return object
+	end
+
+	return existingObject
+end
+
 local function registerZoneObjects(folder)
 	if not folder then
 		return
@@ -104,6 +160,8 @@ local function registerZoneObjects(folder)
 		if zoneId then
 			if registry.Zones[zoneId] == nil then
 				registry.Zones[zoneId] = object
+			elseif shouldAllowZoneCompatibilityDuplicate(registry.Zones[zoneId], object, zoneId) then
+				registry.Zones[zoneId] = chooseZoneRegistryObject(registry.Zones[zoneId], object, zoneId)
 			else
 				recordDuplicate("ZoneId", zoneId, object)
 			end

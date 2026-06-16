@@ -29,6 +29,18 @@ function SmokeTestConfigSmokeTest.Run(dependencies)
 	assertCondition(shouldRun == true, "Studio mock config should run smoke tests.")
 	assertCondition(reason == "Enabled", "Studio mock config should return Enabled.")
 
+	shouldRun, reason = SmokeTestConfig.ShouldRunStudioSmokeTests(
+		StudioRunService,
+		{
+			EnableRealDataStore = false,
+		},
+		{
+			BuildMode = "Manual",
+		}
+	)
+	assertCondition(shouldRun == false, "Studio manual world build mode should skip the full smoke suite.")
+	assertCondition(reason == "WorldBuildModeManual", "Manual world build mode should return WorldBuildModeManual.")
+
 	shouldRun, reason = SmokeTestConfig.ShouldRunStudioSmokeTests(StudioRunService, {
 		EnableRealDataStore = true,
 	})
@@ -58,6 +70,7 @@ function SmokeTestConfigSmokeTest.Run(dependencies)
 		SmokeTestConfig.AllowSmokeTestsDuringRealDataStorePilot == false,
 		"Default AllowSmokeTestsDuringRealDataStorePilot should be false."
 	)
+	assertCondition(SmokeTestConfig.SkipWhenWorldBuildModeManual == true, "Default SkipWhenWorldBuildModeManual should be true.")
 
 	print("[ANP SmokeTestConfigSmokeTest] Smoke test config smoke test passed.")
 end

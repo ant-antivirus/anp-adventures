@@ -10,7 +10,12 @@ Every gameplay object with an interaction must define:
 - `ZoneId`: string
 - `ObjectType`: string
 
-The object itself, or a child named `PromptPart`, must include a `BasePart` or `Attachment` for prompt attachment.
+Prompt attachment rules:
+
+- Prefer a child named `PromptPart`.
+- If the object is a `Model`, set `PrimaryPart` when no `PromptPart` exists.
+- If the object is a `BasePart`, the prompt can attach directly to it.
+- If none of these exist, validation and binding should fail clearly.
 
 ## QuestStart
 

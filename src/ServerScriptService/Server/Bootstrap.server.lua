@@ -74,6 +74,7 @@ local Phase6FEP1FinalQASmokeTest = require(script.Parent.Tests.Phase6FEP1FinalQA
 local Phase6GEP1ReleaseCandidateSmokeTest = require(script.Parent.Tests.Phase6GEP1ReleaseCandidateSmokeTest)
 local Phase5EControlledDataStorePilotReadinessSmokeTest = require(script.Parent.Tests.Phase5EControlledDataStorePilotReadinessSmokeTest)
 local Phase7AManualMapAuthoringSmokeTest = require(script.Parent.Tests.Phase7AManualMapAuthoringSmokeTest)
+local Phase7BManualMapBindingSmokeTest = require(script.Parent.Tests.Phase7BManualMapBindingSmokeTest)
 local SmokeTestConfigSmokeTest = require(script.Parent.Tests.SmokeTestConfigSmokeTest)
 local ThaiUtf8TextSafetySmokeTest = require(script.Parent.Tests.ThaiUtf8TextSafetySmokeTest)
 
@@ -92,7 +93,7 @@ local CompanionConfig = require(Config.CompanionConfig)
 local PersistenceConfig = require(Config.PersistenceConfig)
 local LocalizationConfig = require(Config.LocalizationConfig)
 
-local shouldRunSmokeTests, smokeTestGateReason = SmokeTestConfig.ShouldRunStudioSmokeTests(RunService, PersistenceConfig)
+local shouldRunSmokeTests, smokeTestGateReason = SmokeTestConfig.ShouldRunStudioSmokeTests(RunService, PersistenceConfig, WorldBuildConfig)
 
 local catalog = {
 	Episodes = EpisodeDefinitions,
@@ -339,17 +340,14 @@ if
 then
 	local mapValidationResult = MapAuthoringValidator.Validate()
 	if not mapValidationResult.Success then
+		warn(MapAuthoringValidator.FormatSummary(mapValidationResult))
+		warn(MapAuthoringValidator.FormatIssueReport(mapValidationResult))
 		warn("[ANP MapAuthoringValidator] Manual map validation failed.")
 		for _, validationError in ipairs(mapValidationResult.Errors or {}) do
 			warn("[ANP MapAuthoringValidator] " .. validationError)
 		end
 	elseif WorldBuildConfig.LogWorldBuildMode == true then
-		print(
-			"[ANP MapAuthoringValidator] Manual map valid. zones="
-				.. tostring(mapValidationResult.Summary.ZonesChecked)
-				.. " interactions="
-				.. tostring(mapValidationResult.Summary.InteractionsMapped)
-		)
+		print(MapAuthoringValidator.FormatSummary(mapValidationResult))
 	end
 end
 
@@ -399,7 +397,7 @@ if worldRegistryResult.Success then
 	end
 end
 
-print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, Phase 6G, and Phase 7A services initialized.")
+print("[ANP] Phase 2, Phase 3A, Phase 3B, Phase 3C, Phase 3D, Phase 3E, Phase 3F-A, Phase 3F-B, Phase 3F-C, Phase 3F-D, Phase 3G-1, Phase 3G-2, Phase 3G-3, Phase 3G-4, Phase 3H, Phase 4A, Phase 4B, Phase 4C, Phase 4E, Phase 5A, Phase 5B, Phase 5C, Phase 5D, Phase 5E, Phase 6A, Phase 6B, Phase 6C, Phase 6D, Phase 6E, Phase 6F, Phase 6G, Phase 7A, and Phase 7B services initialized.")
 
 if shouldRunSmokeTests then
 	local passedSmokeTests = {}
@@ -857,6 +855,14 @@ if shouldRunSmokeTests then
 		WorldBootstrapConfig = WorldBootstrapConfig,
 	})
 	table.insert(passedSmokeTests, "Phase7AManualMapAuthoringSmokeTest")
+
+	Phase7BManualMapBindingSmokeTest.Run({
+		MapAuthoringValidator = MapAuthoringValidator,
+		PromptBindingService = PromptBindingService,
+		SkeletonWorldBuilder = SkeletonWorldBuilder,
+		WorldRegistryService = WorldRegistryService,
+	})
+	table.insert(passedSmokeTests, "Phase7BManualMapBindingSmokeTest")
 
 	Logger.Smoke("[ANP SmokeTestSummary]")
 	Logger.Smoke("Passed:")

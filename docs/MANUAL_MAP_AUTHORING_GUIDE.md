@@ -13,6 +13,10 @@ The handcrafted map is not implemented in this phase. This guide defines the con
 
 Default remains `Skeleton` so existing smoke tests and fast playtesting continue to work.
 
+When `BuildMode = "Manual"`, the full Studio smoke suite is skipped with `SmokeTestGate: WorldBuildModeManual` because many smoke tests intentionally assert the committed Skeleton/default workflow. Manual map validation and prompt binding still run during startup so the Studio-authored map can be checked and playtested.
+
+Manual mode is report-only. If required gameplay objects are missing, startup logs list the missing or invalid requirements with codes, IDs, expected values, and object paths where available. Manual mode must not auto-create skeleton gameplay objects or overwrite `Workspace.ANP_World`.
+
 ## Recommended Studio Structure
 
 ```text
@@ -51,6 +55,8 @@ Workspace
 
 Each zone folder may be named by its `ZoneId` or may carry a `ZoneId` attribute. The validator expects active EP1 zone folders and a `Gameplay` folder under each one.
 
+Skeleton/dev validators also accept zone folders named by `ZoneId`, so switching between Manual and Skeleton mode does not fail only because a zone folder lacks a duplicate `ZoneId` attribute.
+
 ## Gameplay Objects
 
 Gameplay objects must use attributes. Runtime IDs stay English and stable.
@@ -59,7 +65,10 @@ Gameplay objects must use attributes. Runtime IDs stay English and stable.
 - Use `ZoneId` to identify the owning zone.
 - Use `ObjectType` to identify the object role, such as `QuestStart`, `QuestObjective`, or `QuestComplete`.
 - Use `DisplayName` for human-readable Thai display copy when useful.
-- Keep a reachable `BasePart` or child `PromptPart` for prompt attachment.
+- Keep a reachable prompt host:
+  - preferred: child `PromptPart`
+  - model fallback: `PrimaryPart`
+  - direct fallback: gameplay object is a `BasePart`
 
 Manual map objects should not contain scripts that complete quests, grant rewards, or save data. The server services remain authoritative.
 
@@ -98,5 +107,6 @@ Run the Studio smoke tests after map edits. `MapAuthoringValidator` checks:
 - No duplicate `InteractionId`.
 - Required start, objective, and complete interactions are mapped.
 - Decor folders do not contain gameplay IDs.
+- Prompt hosts exist and can receive server-owned `ProximityPrompt` instances.
 
 Manual mode validation is read-only and does not mutate the map.

@@ -8,6 +8,10 @@ local SmokeTestConfig = {
 	-- Used only for explicit debugging. Keep false by default.
 	AllowSmokeTestsDuringRealDataStorePilot = false,
 
+	-- Manual map authoring mode is for Studio map validation/playtesting, not the full
+	-- skeleton/default smoke suite. Keep smoke tests enabled in committed Skeleton mode.
+	SkipWhenWorldBuildModeManual = true,
+
 	LogSkippedSmokeTests = true,
 }
 
@@ -19,7 +23,12 @@ local function getSetting(settingName, overrideConfig)
 	return SmokeTestConfig[settingName]
 end
 
-function SmokeTestConfig.ShouldRunStudioSmokeTests(runService, persistenceConfig, overrideConfig)
+function SmokeTestConfig.ShouldRunStudioSmokeTests(runService, persistenceConfig, worldBuildConfig, overrideConfig)
+	if worldBuildConfig and worldBuildConfig.BuildMode == nil and overrideConfig == nil then
+		overrideConfig = worldBuildConfig
+		worldBuildConfig = nil
+	end
+
 	if not runService:IsStudio() then
 		return false, "NotStudio"
 	end
@@ -33,6 +42,14 @@ function SmokeTestConfig.ShouldRunStudioSmokeTests(runService, persistenceConfig
 		if getSetting("AllowSmokeTestsDuringRealDataStorePilot", overrideConfig) ~= true then
 			return false, "RealDataStoreEnabled"
 		end
+	end
+
+	if
+		worldBuildConfig
+		and worldBuildConfig.BuildMode == "Manual"
+		and getSetting("SkipWhenWorldBuildModeManual", overrideConfig) == true
+	then
+		return false, "WorldBuildModeManual"
 	end
 
 	return true, "Enabled"

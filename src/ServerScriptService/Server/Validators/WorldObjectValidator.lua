@@ -64,6 +64,42 @@ local function validateDuplicate(idMap, id, idType, object, validationResult)
 	idMap[id] = object
 end
 
+local function isManualZoneContainer(object, zoneId)
+	return object:IsA("Folder") and object.Name == zoneId
+end
+
+local function isSkeletonZoneMarker(object, zoneId)
+	return object:IsA("BasePart") and object.Name == "Zone_" .. zoneId
+end
+
+local function shouldAllowZoneCompatibilityDuplicate(existingObject, object, zoneId)
+	if not existingObject or not object then
+		return false
+	end
+
+	return (isManualZoneContainer(existingObject, zoneId) and isSkeletonZoneMarker(object, zoneId))
+		or (isSkeletonZoneMarker(existingObject, zoneId) and isManualZoneContainer(object, zoneId))
+end
+
+local function validateZoneDuplicate(zoneIds, zoneId, object, validationResult)
+	if type(zoneId) ~= "string" or zoneId == "" then
+		return
+	end
+
+	local existingObject = zoneIds[zoneId]
+	if existingObject then
+		if shouldAllowZoneCompatibilityDuplicate(existingObject, object, zoneId) then
+			return
+		end
+
+		validationResult.Summary.DuplicateIds += 1
+		addError(validationResult, "Duplicate ZoneId `" .. zoneId .. "` on `" .. object:GetFullName() .. "`.")
+		return
+	end
+
+	zoneIds[zoneId] = object
+end
+
 local function characterIdExists(characterId)
 	for _, configuredCharacterId in pairs(CharacterConfig.Ids) do
 		if configuredCharacterId == characterId then
@@ -82,6 +118,19 @@ local function questContainsObjective(questDefinition, objectiveId)
 	end
 
 	return false
+end
+
+local function resolveZoneId(object)
+	local zoneId = object:GetAttribute("ZoneId")
+	if type(zoneId) == "string" and zoneId ~= "" then
+		return zoneId
+	end
+
+	if ZoneDefinitions[object.Name] then
+		return object.Name
+	end
+
+	return nil
 end
 
 function WorldObjectValidator.Validate()
@@ -106,11 +155,11 @@ function WorldObjectValidator.Validate()
 	if folders.Zones then
 		for _, object in ipairs(folders.Zones:GetChildren()) do
 			validationResult.Summary.Zones += 1
-			local zoneId = object:GetAttribute("ZoneId")
+			local zoneId = resolveZoneId(object)
 			if type(zoneId) ~= "string" or zoneId == "" then
-				addError(validationResult, "Zone object `" .. object:GetFullName() .. "` is missing ZoneId.")
+				addError(validationResult, "Zone object `" .. object:GetFullName() .. "` is missing ZoneId and does not use a ZoneDefinitions id as its name.")
 			else
-				validateDuplicate(zoneIds, zoneId, "ZoneId", object, validationResult)
+				validateZoneDuplicate(zoneIds, zoneId, object, validationResult)
 				if not ZoneDefinitions[zoneId] then
 					addError(validationResult, "ZoneId `" .. zoneId .. "` does not exist in ZoneDefinitions.")
 				end

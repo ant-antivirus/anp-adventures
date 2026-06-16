@@ -31,6 +31,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 - Phase 6F final manual QA pass implemented
 - Phase 6G release candidate cleanup and runtime defaults audit implemented
 - Phase 7A manual map authoring contract and safe world build mode implemented
+- Phase 7B manual map binding and validation hardening implemented
 - Real DataStore persistence disabled by default
 - Mock persistence remains the default Studio mode
 
@@ -65,6 +66,7 @@ Current focus: Episode 1 playable prototype with player feedback, quest tracker 
 [ANP Phase6GEP1ReleaseCandidateSmokeTest] Phase 6G EP1 release candidate smoke test passed.
 [ANP Phase5EControlledDataStorePilotReadinessSmokeTest] Phase 5E controlled DataStore pilot readiness smoke test passed.
 [ANP Phase7AManualMapAuthoringSmokeTest] Phase 7A manual map authoring smoke test passed.
+[ANP Phase7BManualMapBindingSmokeTest] Phase 7B manual map binding smoke test passed.
 [ANP SmokeTestSummary]
 All Studio smoke tests passed.
 ```
@@ -91,6 +93,8 @@ Dev labels are compact and configurable so the test track remains readable witho
 
 Phase 7A adds explicit `Skeleton` and `Manual` world build modes. Manual mode is for future Studio-authored maps and must not auto-build or overwrite `Workspace.ANP_World`. Gameplay map objects bind by attributes and can be validated with `MapAuthoringValidator`.
 
+Phase 7B hardens manual map binding so Attribute-authored gameplay objects can register with `WorldRegistryService` and bind server-owned `ProximityPrompt` instances. Manual objects should provide a child `PromptPart`, a model `PrimaryPart`, or be a `BasePart`.
+
 ## MVP Playtest Checklist
 
 Use `docs/EP1_MVP_PLAYTEST_CHECKLIST.md` for the current internal Episode 1 playtest pass.
@@ -111,7 +115,7 @@ Use `docs/EP1_FINAL_MANUAL_QA_RUNBOOK.md` for the final Episode 1 manual QA pass
 
 Use `docs/EP1_RELEASE_CANDIDATE_CHECKLIST.md` for the internal RC decision pass. See `docs/LOCAL_VALIDATION_TOOLS.md` for local validation commands and optional tooling notes.
 
-Use `docs/MANUAL_MAP_AUTHORING_GUIDE.md` and `docs/MAP_OBJECT_ATTRIBUTE_CONTRACT.md` before beginning handcrafted EP1 map work.
+Use `docs/MANUAL_MAP_AUTHORING_GUIDE.md`, `docs/MAP_OBJECT_ATTRIBUTE_CONTRACT.md`, and `docs/MANUAL_MAP_BINDING_CHECKLIST.md` before beginning handcrafted EP1 map work.
 
 ## Save Readiness
 

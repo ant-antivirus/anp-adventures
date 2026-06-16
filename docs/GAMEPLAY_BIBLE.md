@@ -132,6 +132,8 @@ Phase 6G prepares Episode 1 as an internal release candidate baseline. It audits
 
 Phase 7A prepares for future manual map authoring. Skeleton mode remains the compact dev/test route, while Manual mode requires a Studio-authored `Workspace.ANP_World` and validates gameplay objects by attributes. This phase does not create final map art, add EP2, or change locked EP1 IDs.
 
+Phase 7B hardens Attribute-based prompt binding for future manual maps. Gameplay objects can be human-readable Studio objects, but server binding depends on stable attributes and a valid prompt host, not object names.
+
 ---
 
 ## Badge System
